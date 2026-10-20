@@ -7,7 +7,7 @@ on:
       - tools/update_stock_data.py
       - .github/workflows/update_stocks.yml
   schedule:
-    # 北京时间周一至周五 15:01（UTC 11:00），遇假日将保留最近交易日行情
+    # 每天北京时间 15:01（UTC 07:01）；交易所或数据接口可能延迟更新
     - cron: '1 7 * * *'
 permissions:
   contents: write
@@ -41,3 +41,4 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "Update verified daily stock data"
             git push origin HEAD:main
+          fi
