@@ -1,0 +1,21 @@
+{
+  "updated_utc": "2026-10-20T19:15:46+00:00",
+  "indices": [
+    {
+      "code": "sh000001",
+      "name": "上证指数",
+      "latest_trading_day": "2026-10-20",
+      "rows": 800,
+      "source": "AKShare / 新浪指数",
+      "status": "ok"
+    },
+    {
+      "code": "sz399001",
+      "name": "深证成指",
+      "latest_trading_day": "2026-10-20",
+      "rows": 800,
+      "source": "AKShare / 新浪指数",
+      "status": "ok"
+    }
+  ]
+}

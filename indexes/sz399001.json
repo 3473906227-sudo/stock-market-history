@@ -1,0 +1,8 @@
+{
+  "code": "sz399001",
+  "name": "深证成指",
+  "latest_trading_day": "2026-10-20",
+  "rows": 800,
+  "source": "AKShare / 新浪指数",
+  "status": "ok"
+}
