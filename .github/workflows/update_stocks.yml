@@ -2,8 +2,8 @@ name: Daily A-share market indices sync
 on:
   workflow_dispatch:
   schedule:
-    # 北京时间周一至周五 19:25（UTC 11:25）；非实时，遇节假日保留已有数据
-    - cron: '25 11 * * 1-5'
+    # 北京时间周一至周五 15:01（UTC 11:25）；非实时，遇节假日保留已有数据
+    - cron: '1 7 * * *'
   push:
     paths:
       - tools/update_market_indices.py
