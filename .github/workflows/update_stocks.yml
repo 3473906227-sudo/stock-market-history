@@ -32,8 +32,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          staging="$(mktemp -d)"
+          cp -a data/. "$staging/"
+
+          git fetch origin main
+          git reset --hard origin/main
+
+          mkdir -p data
+          cp -a "$staging/." data/
           git add data/
+
           if ! git diff --cached --quiet; then
             git commit -m "Update verified daily stock data"
-            git push
+            git push origin HEAD:main
           fi
