@@ -94,7 +94,8 @@ def fetch_one(info: tuple[str, str, str, str]) -> tuple[pd.DataFrame, str, list[
     name, east_code, sina_code, yahoo_code = info
     candidates = []
     errors = []
-    # 同一最新日期时，优先级：东方财富 > 新浪 > Yahoo Finance。
+    # 历史序列优先级：东方财富 > 新浪 > Yahoo Finance。
+    # 较低优先级的数据源只补充主数据源尚未覆盖的更新日期，避免整段历史成交量口径突变。
     priorities = {
         "AKShare / 东方财富指数": 3,
         "AKShare / 新浪指数": 2,
@@ -151,18 +152,41 @@ def fetch_one(info: tuple[str, str, str, str]) -> tuple[pd.DataFrame, str, list[
     if not candidates:
         raise ValueError("所有数据源均失败：" + " | ".join(errors))
 
-    # 先按最新交易日选择；最新日期相同时再按数据源优先级选择。
-    candidates.sort(
-        key=lambda item: (
-            str(item[0].iloc[-1]["date"]),
-            priorities.get(item[1], 0),
-        ),
-        reverse=True,
-    )
-    selected_frame, selected_source = candidates[0]
+    # 先用最高优先级的成功来源作为历史主序列。
+    candidates.sort(key=lambda item: priorities.get(item[1], 0), reverse=True)
+    selected_frame, primary_source = candidates[0]
+    selected_frame = selected_frame.copy()
+    used_sources = [primary_source]
+    current_latest = str(selected_frame.iloc[-1]["date"])
+
+    # 其他来源仅补入主序列之后的新日期，不用备用源重写已有历史行。
+    for candidate_frame, candidate_source in sorted(
+        candidates, key=lambda item: str(item[0].iloc[-1]["date"])
+    ):
+        candidate_latest = str(candidate_frame.iloc[-1]["date"])
+        if candidate_latest <= current_latest:
+            continue
+        extra = candidate_frame[
+            pd.to_datetime(candidate_frame["date"]) > pd.to_datetime(current_latest)
+        ].copy()
+        if extra.empty:
+            continue
+        selected_frame = pd.concat([selected_frame, extra], ignore_index=True)
+        selected_frame = (
+            selected_frame.drop_duplicates(subset=["date"], keep="last")
+            .sort_values("date")
+            .reset_index(drop=True)
+        )
+        current_latest = str(selected_frame.iloc[-1]["date"])
+        if candidate_source not in used_sources:
+            used_sources.append(candidate_source)
+
+    selected_frame = selected_frame.tail(MAX_ROWS).reset_index(drop=True)
+    selected_source = " + ".join(used_sources)
     print(
         f"{name} 数据源核验：" + "；".join(diagnostics)
-        + f"；采用 {selected_source}，最新={selected_frame.iloc[-1]['date']}",
+        + f"；历史主源={primary_source}；补充来源={used_sources[1:] or '无'}"
+        + f"；最终最新={selected_frame.iloc[-1]['date']}",
         flush=True,
     )
     if errors:
