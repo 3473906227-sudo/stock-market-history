@@ -2,9 +2,9 @@ name: Daily A-share market indices sync
 on:
   workflow_dispatch:
   schedule:
-    # 北京时间每天 15:01（UTC 07:01）主更新；15:17（UTC 07:17）补跑。GitHub 定时任务可能延迟。
-    - cron: '1 7 * * *'
-    - cron: '17 7 * * *'
+    # 北京时间每天 15:35（UTC 07:35）主更新；15:50（UTC 07:50）补跑，避开个股更新并给指数数据源留出刷新时间。GitHub 定时任务可能延迟。
+    - cron: '35 7 * * *'
+    - cron: '50 7 * * *'
   push:
     paths:
       - tools/update_market_indices.py
