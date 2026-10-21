@@ -13,7 +13,7 @@ permissions:
   contents: write
 # 与已有股票日线同步器串行，避免两项任务同时推送 main 产生冲突
 concurrency:
-  group: stock-data-sync
+  group: market-index-sync
   cancel-in-progress: false
 jobs:
   index-sync:
