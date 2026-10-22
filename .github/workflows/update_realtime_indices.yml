@@ -1,0 +1,66 @@
+name: Intraday A-share index quote relay
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub cron uses UTC. 09:00-11:55 and 13:00-15:55 China time, weekdays.
+    # Target every 5 minutes; scheduled runs can be delayed by GitHub.
+    - cron: '*/5 1-3,5-7 * * 1-5'
+  push:
+    paths:
+      - tools/update_realtime_indices.py
+      - .github/workflows/update_realtime_indices.yml
+
+permissions:
+  contents: write
+
+# Independent from daily historical sync. Push conflicts are handled with fetch/retry below.
+concurrency:
+  group: intraday-index-quote-relay
+  cancel-in-progress: false
+
+jobs:
+  realtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch and validate current index quotes
+        run: python tools/update_realtime_indices.py
+      - name: Commit only the validated quote snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          staging="$(mktemp -d)"
+          cp indexes/realtime.json "$staging/realtime.json"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p indexes
+            cp "$staging/realtime.json" indexes/realtime.json
+            git add indexes/realtime.json
+
+            if git diff --cached --quiet; then
+              echo "Quote snapshot is unchanged; no commit required."
+              exit 0
+            fi
+
+            git commit -m "Update intraday A-share index quote snapshot"
+            if git push origin HEAD:main; then
+              echo "Validated intraday quote snapshot published."
+              exit 0
+            fi
+
+            echo "Push raced with another data workflow; retrying ($attempt/3)."
+            sleep "$((attempt * 2))"
+          done
+
+          echo "Could not publish quote snapshot after three attempts."
+          exit 1
