@@ -14,7 +14,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: stock-data-sync
+  group: stock-market-data-sync
   cancel-in-progress: false
 jobs:
   sync:
