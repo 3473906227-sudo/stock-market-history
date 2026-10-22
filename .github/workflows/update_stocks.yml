@@ -7,9 +7,10 @@ on:
       - tools/update_stock_data.py
       - .github/workflows/update_stocks.yml
   schedule:
-    # 北京时间每天 15:01（UTC 07:01）主更新；15:17（UTC 07:17）补跑。交易所或接口可能延迟。
+    # 北京时间 15:01 主更新、15:17 补跑、16:10 最终补跑（UTC 07:01/07:17/08:10）；GitHub 定时任务可能延迟或漏触发。
     - cron: '1 7 * * *'
     - cron: '17 7 * * *'
+    - cron: '10 8 * * *'
 permissions:
   contents: write
 concurrency:
