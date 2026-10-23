@@ -2,19 +2,21 @@ name: Daily A-share market indices sync
 on:
   workflow_dispatch:
   schedule:
-    # 北京时间 15:35 主更新、15:50 补跑、16:35 最终补跑（UTC 07:35/07:50/08:35）；给个股更新及指数数据源留出刷新时间。GitHub 定时任务可能延迟或漏触发。
-    - cron: '35 7 * * *'
-    - cron: '50 7 * * *'
-    - cron: '35 8 * * *'
+    # UTC 时区；北京时间 15:38/16:03/16:43/17:27（工作日），错开个股任务。
+    # 遇 GitHub 调度长延迟，需通过独立 PythonAnywhere 调度补充触发。
+    - cron: '38 7 * * 1-5'
+    - cron: '3 8 * * 1-5'
+    - cron: '43 8 * * 1-5'
+    - cron: '27 9 * * 1-5'
   push:
     paths:
       - tools/update_market_indices.py
       - .github/workflows/update_market_indices.yml
 permissions:
   contents: write
-# 与已有股票日线同步器串行，避免两项任务同时推送 main 产生冲突
+# 指数与个股任务分别排队，不让跨工作流任务挤掉 pending run；Git push 在步骤内解决并发。
 concurrency:
-  group: stock-market-data-sync
+  group: index-history-daily-sync
   cancel-in-progress: false
 jobs:
   index-sync:
@@ -34,13 +36,30 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           staging="$(mktemp -d)"
-          cp -a indexes/. "$staging/"
-          git fetch origin main
-          git reset --hard origin/main
-          mkdir -p indexes
-          cp -a "$staging/." indexes/
-          git add indexes/
-          if ! git diff --cached --quiet; then
-            git commit -m "Update validated A-share index data"
-            git push origin HEAD:main
-          fi
+          # 严禁将旧 checkout 的 realtime.json 一起发布，从而回滚实时快照。
+          for name in sh000001.csv sz399001.csv sh000001.json sz399001.json index.json; do
+            test -f "indexes/$name" || { echo "::error::缺少 indexes/$name"; exit 1; }
+            cp "indexes/$name" "$staging/$name"
+          done
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p indexes
+            for name in sh000001.csv sz399001.csv sh000001.json sz399001.json index.json; do
+              cp "$staging/$name" "indexes/$name"
+            done
+            git add indexes/sh000001.csv indexes/sz399001.csv indexes/sh000001.json indexes/sz399001.json indexes/index.json
+            if git diff --cached --quiet; then
+              echo "指数日线没有有效变更，不需要提交。"
+              exit 0
+            fi
+            git commit -m "Update validated A-share index history"
+            if git push origin HEAD:main; then
+              echo "指数日线发布成功（未碰实时快照）"
+              exit 0
+            fi
+            echo "其他任务并行推送，指数日线重试 $attempt/4"
+            sleep "$((attempt * 3))"
+          done
+          echo "::error::指数日线提交重试失败"
+          exit 1

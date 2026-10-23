@@ -7,14 +7,17 @@ on:
       - tools/update_stock_data.py
       - .github/workflows/update_stocks.yml
   schedule:
-    # 北京时间 15:01 主更新、15:17 补跑、16:10 最终补跑（UTC 07:01/07:17/08:10）；GitHub 定时任务可能延迟或漏触发。
-    - cron: '1 7 * * *'
-    - cron: '17 7 * * *'
-    - cron: '10 8 * * *'
+    # UTC 时区；北京时间 15:13/15:29/16:08/16:41/17:23 多次补跑（工作日）。
+    # GitHub schedule 可能大幅延迟；关键时点用外部调度脚本补充触发。
+    - cron: '13 7 * * 1-5'
+    - cron: '29 7 * * 1-5'
+    - cron: '8 8 * * 1-5'
+    - cron: '41 8 * * 1-5'
+    - cron: '23 9 * * 1-5'
 permissions:
   contents: write
 concurrency:
-  group: stock-market-data-sync
+  group: stock-history-daily-sync
   cancel-in-progress: false
 jobs:
   sync:
@@ -35,12 +38,24 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           staging="$(mktemp -d)"
           cp -a data/. "$staging/"
-          git fetch origin main
-          git reset --hard origin/main
-          mkdir -p data
-          cp -a "$staging/." data/
-          git add data/
-          if ! git diff --cached --quiet; then
+          # 仅发布 data/，且对其它并行数据流的推送冲突自动重试。
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p data
+            cp -a "$staging/." data/
+            git add data/
+            if git diff --cached --quiet; then
+              echo "个股日线没有有效变更，不需要提交。"
+              exit 0
+            fi
             git commit -m "Update verified daily stock data"
-            git push origin HEAD:main
-          fi
+            if git push origin HEAD:main; then
+              echo "个股日线发布成功"
+              exit 0
+            fi
+            echo "其他任务并行推送，个股日线重试 $attempt/4"
+            sleep "$((attempt * 3))"
+          done
+          echo "::error::个股行情提交重试失败"
+          exit 1

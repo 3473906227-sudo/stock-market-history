@@ -3,11 +3,9 @@ name: Intraday A-share index quote relay
 on:
   workflow_dispatch:
   schedule:
-    # GitHub cron uses UTC. Every 5 minutes during the trading day window, weekdays.
-    # Final post-close snapshot at 15:10 China time, after the 15:01 stock sync starts.
-    # Scheduled runs can be delayed by GitHub.
-    - cron: '*/5 1-3,5-6 * * 1-5'
-    - cron: '10 7 * * 1-5'
+    # GitHub cron 为 UTC，约北京时间09:02-11:57、13:02-15:57每5分钟目标采集。
+    # 避开整5分拥堵；GitHub调度可能延误，需外部触发器保证更强时效。
+    - cron: '2-57/5 1-3,5-7 * * 1-5'
   push:
     paths:
       - tools/update_realtime_indices.py
@@ -46,6 +44,11 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             mkdir -p indexes
+            # 延迟执行的旧任务不能覆盖更晚的实时采集结果。
+            if [ -f indexes/realtime.json ] && python -c 'import json,sys; from datetime import datetime; p=lambda path:datetime.fromisoformat(json.load(open(path,encoding="utf-8"))["generated_at"].replace("Z","+00:00"));sys.exit(0 if p(sys.argv[2])>=p(sys.argv[1]) else 1)' "$staging/realtime.json" indexes/realtime.json; then
+              echo "远端快照采集时间更新，跳过本次较旧的快照。"
+              exit 0
+            fi
             cp "$staging/realtime.json" indexes/realtime.json
             git add indexes/realtime.json
 
