@@ -1,41 +1,41 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-22T12:41:45+00:00",
+  "generated_at": "2026-10-23T05:29:55+00:00",
   "source": "GitHub Actions intraday index quote relay",
   "refresh_target_seconds": 300,
-  "market_time": "2026-10-22 20:41:45",
+  "market_time": "2026-10-23 13:29:55",
   "quotes": {
     "sh000001": {
-      "price": 3658.03,
-      "prev_close": 3713.03,
-      "change": -55.0,
-      "change_pct": -1.48,
+      "price": 3647.2,
+      "prev_close": 3658.03,
+      "change": -10.83,
+      "change_pct": -0.3,
       "provider_time": null,
       "time_verified": false,
       "date": "",
       "source": "东方财富实时行情",
       "has_ohlc": true,
-      "open": 3714.48,
-      "high": 3714.48,
-      "low": 3649.86,
-      "volume": 437691963.0,
-      "amount": 706095648847.8
+      "open": 3623.57,
+      "high": 3658.18,
+      "low": 3574.27,
+      "volume": 386327444.0,
+      "amount": 605772419720.7
     },
     "sz399001": {
-      "price": 11357.32,
-      "prev_close": 11704.35,
-      "change": -347.03,
-      "change_pct": -2.96,
+      "price": 11472.88,
+      "prev_close": 11357.32,
+      "change": 115.56,
+      "change_pct": 1.02,
       "provider_time": null,
       "time_verified": false,
       "date": "",
       "source": "东方财富实时行情",
       "has_ohlc": true,
-      "open": 11690.34,
-      "high": 11690.92,
-      "low": 11350.96,
-      "volume": 525836834.0,
-      "amount": 822618050432.5358
+      "open": 11187.55,
+      "high": 11520.3,
+      "low": 11043.31,
+      "volume": 486528887.0,
+      "amount": 727197163572.9688
     }
   }
 }
