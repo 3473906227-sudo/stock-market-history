@@ -24,3 +24,16 @@
 - 个股与指数提交具有远端竞争后自动重试功能。
 - GitHub 定时器触发时间不可作为**实际行情时间**；网页应展示服务端读取时间与快照采集时间，盘中超过10分钟未更新显示预警。
 - 非A股交易时间，市场价格不变化为正常；供应商没有可核验时间戳时，采集时间不等于成交时间。
+
+## 仅交易日运行（2026年交易所正式日历）
+
+- 上交所2026年休市安排：https://www.sse.com.cn/disclosure/dealinstruc/closed/c/c_20251222_10802510.shtml
+- 三个GitHub Actions工作流的 `schedule` 使用工作日，但会在运行开始先通过 `--check-trading-day` 检查**交易所节假日与周末**，休市日跳过安装依赖、行情请求和Git提交。
+- 注意GitHub cron无法根据动态休市日历完全阻止创建workflow run：法定节假日仍会产生一次轻量预检，显示为成功但数据采集步骤已跳过。
+- 独立PythonAnywhere定时触发器会**先判断交易日**，休市日直接退出，不调用GitHub API和不需要Token。
+- **未来年度未核实：保守停止。** 当前录入2026年官方日历；2027年及以后的休市日历正式公布后，请维护 `tools/github_schedule_trigger.py` 中 `A_SHARE_CLOSED_RANGES` 以及网页 `_A_SHARE_CLOSED_RANGES`，否则不会自动采集，避免误把假日当交易日。
+- 日历自检（不要求令牌）：
+  `python3 tools/github_schedule_trigger.py --check-trading-day --date 2026-10-01`（休市）
+  `python3 tools/github_schedule_trigger.py --check-trading-day --date 2026-10-08`（交易）
+  `python3 tools/github_schedule_trigger.py --check-trading-day --date 2027-01-04`（未知，非零退出）
+- 使用旧版外部触发器的服务器请下载更新的同名脚本替换，原 `--mode stocks/indices/rescue` 语法不变。

@@ -9,6 +9,7 @@ on:
   push:
     paths:
       - tools/update_realtime_indices.py
+      - tools/github_schedule_trigger.py
       - .github/workflows/update_realtime_indices.yml
 
 permissions:
@@ -25,13 +26,19 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Check A-share official trading days
+        id: calendar
+        run: python tools/github_schedule_trigger.py --check-trading-day
       - name: Set up Python
+        if: steps.calendar.outputs.trading_day == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Fetch and validate current index quotes
+        if: steps.calendar.outputs.trading_day == 'true'
         run: python tools/update_realtime_indices.py
       - name: Commit only the validated quote snapshot
+        if: steps.calendar.outputs.trading_day == 'true'
         shell: bash
         run: |
           set -euo pipefail

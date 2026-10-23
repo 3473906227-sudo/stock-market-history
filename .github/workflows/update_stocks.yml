@@ -5,6 +5,7 @@ on:
     paths:
       - stock_symbols.txt
       - tools/update_stock_data.py
+      - tools/github_schedule_trigger.py
       - .github/workflows/update_stocks.yml
   schedule:
     # UTC 时区；北京时间 15:13/15:29/16:08/16:41/17:23 多次补跑（工作日）。
@@ -25,14 +26,21 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Check A-share official trading days
+        id: calendar
+        run: python tools/github_schedule_trigger.py --check-trading-day
       - uses: actions/setup-python@v5
+        if: steps.calendar.outputs.trading_day == 'true'
         with:
           python-version: '3.11'
       - name: Install data-only dependencies
+        if: steps.calendar.outputs.trading_day == 'true'
         run: python -m pip install --upgrade pip && python -m pip install pandas numpy akshare yfinance
       - name: Download historical daily candles
+        if: steps.calendar.outputs.trading_day == 'true'
         run: python tools/update_stock_data.py
       - name: Commit only validated market-data files
+        if: steps.calendar.outputs.trading_day == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
