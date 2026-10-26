@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-26T15:27:47+00:00",
+  "updated_utc": "2026-10-26T16:13:49+00:00",
   "success_count": 2,
   "failed_codes": [],
   "indices": [
@@ -11,9 +11,9 @@
       "source": "AKShare / 新浪指数",
       "source_dates": [
         "AKShare / 新浪指数=2026-10-26",
-        "Yahoo Finance=2026-10-26"
+        "Yahoo Finance=2026-10-23"
       ],
-      "updated_utc": "2026-10-26T15:27:37+00:00",
+      "updated_utc": "2026-10-26T16:13:39+00:00",
       "status": "ok"
     },
     {
@@ -24,9 +24,9 @@
       "source": "AKShare / 新浪指数",
       "source_dates": [
         "AKShare / 新浪指数=2026-10-26",
-        "Yahoo Finance=2026-10-26"
+        "Yahoo Finance=2026-10-23"
       ],
-      "updated_utc": "2026-10-26T15:27:46+00:00",
+      "updated_utc": "2026-10-26T16:13:49+00:00",
       "status": "ok"
     }
   ]
