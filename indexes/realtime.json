@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-26T05:50:57+00:00",
+  "generated_at": "2026-10-26T11:35:13+00:00",
   "source": "GitHub Actions intraday index quote relay",
   "refresh_target_seconds": 300,
-  "market_time": "2026-10-26 13:50:57",
+  "market_time": "2026-10-26 19:35:13",
   "quotes": {
     "sh000001": {
-      "price": 3686.46,
+      "price": 3697.52,
       "prev_close": 3690.48,
-      "change": -4.02,
-      "change_pct": -0.11,
+      "change": 7.04,
+      "change_pct": 0.19,
       "provider_time": null,
       "time_verified": false,
       "date": "",
@@ -18,14 +18,14 @@
       "open": 3671.0,
       "high": 3699.01,
       "low": 3664.82,
-      "volume": 323845390.0,
-      "amount": 564128428661.2
+      "volume": 432794318.0,
+      "amount": 746528025716.4
     },
     "sz399001": {
-      "price": 11549.35,
+      "price": 11534.38,
       "prev_close": 11673.83,
-      "change": -124.48,
-      "change_pct": -1.07,
+      "change": -139.45,
+      "change_pct": -1.19,
       "provider_time": null,
       "time_verified": false,
       "date": "",
@@ -34,8 +34,8 @@
       "open": 11560.36,
       "high": 11638.79,
       "low": 11432.29,
-      "volume": 428203574.0,
-      "amount": 677375635882.7781
+      "volume": 542597712.0,
+      "amount": 862265345861.256
     }
   }
 }
