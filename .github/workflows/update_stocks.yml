@@ -8,8 +8,10 @@ on:
       - tools/github_schedule_trigger.py
       - .github/workflows/update_stocks.yml
   schedule:
-    # UTC 时区；北京时间 15:05/15:13/15:29/16:08/16:41/17:23 多次补跑（工作日）。
+    # UTC 时区；北京时间 11:30（午间历史补齐，不写入未收盘的当日K线）。
+    # 盘后北京时间15:05/15:13/15:29/16:08/16:41/17:23继续同步补跑（工作日）。
     # GitHub schedule 可能大幅延迟；关键时点用外部调度脚本补充触发。
+    - cron: '30 3 * * 1-5'
     - cron: '5 7 * * 1-5'
     - cron: '13 7 * * 1-5'
     - cron: '29 7 * * 1-5'
