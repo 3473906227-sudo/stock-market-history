@@ -1,13 +1,13 @@
 {
   "code": "sz399001",
   "name": "深证成指",
-  "latest_trading_day": "2026-10-23",
+  "latest_trading_day": "2026-10-26",
   "rows": 800,
   "source": "AKShare / 新浪指数",
   "source_dates": [
-    "AKShare / 新浪指数=2026-10-23",
-    "Yahoo Finance=2026-10-23"
+    "AKShare / 新浪指数=2026-10-26",
+    "Yahoo Finance=2026-10-26"
   ],
-  "updated_utc": "2026-10-23T15:47:20+00:00",
+  "updated_utc": "2026-10-26T14:33:37+00:00",
   "status": "ok"
 }
