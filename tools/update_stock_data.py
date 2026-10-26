@@ -196,6 +196,14 @@ def merge_with_existing(symbol: str, fresh: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     symbols = read_symbols()
+    # 以整次任务的开始时间判断是否为已收盘行情，避免午间任务运行过程中越过15点，
+    # 导致部分个股写入未收盘日线、部分个股写入已收盘日线。
+    run_started_cn = datetime.now(TZ_CN)
+    preclose = (run_started_cn.hour, run_started_cn.minute) < (15, 5)
+    today_cn = run_started_cn.date().isoformat()
+    if preclose:
+        print(f"北京时间 {run_started_cn:%Y-%m-%d %H:%M:%S}：午间/盘前同步只补历史日线；"
+              "不发布当日尚未完成的A股OHLCV，盘后任务再更新当日数据。", flush=True)
     succeeded = 0
     failed = []
 
@@ -204,6 +212,11 @@ def main() -> None:
         meta_path = OUT / f"{symbol}.json"
         try:
             fresh, source = fetch_one(symbol)
+            if preclose and is_cn_a_share(symbol):
+                # 数据供应商在11:30可能把“今日午盘”当作完整日K；严禁进入历史收盘CSV。
+                fresh = fresh.loc[fresh["date"] < today_cn].copy()
+                if len(fresh) < 20:
+                    raise ValueError("盘前/午间过滤当日未完结K线后，有效历史样本不足20条")
             combined = merge_with_existing(symbol, fresh)
             latest = str(combined.iloc[-1]["date"])
 
@@ -217,6 +230,7 @@ def main() -> None:
                 "rows": len(combined),
                 "latest_trading_day": latest,
                 "synced_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "sync_mode": "preclose_history_only" if preclose and is_cn_a_share(symbol) else "regular_daily",
             }
             meta_path.write_text(
                 json.dumps(metadata, ensure_ascii=False, indent=2),
