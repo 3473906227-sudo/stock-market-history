@@ -1,13 +1,13 @@
 {
   "code": "sh000001",
   "name": "上证指数",
-  "latest_trading_day": "2026-10-29",
+  "latest_trading_day": "2026-10-30",
   "rows": 800,
   "source": "AKShare / 新浪指数",
   "source_dates": [
-    "AKShare / 新浪指数=2026-10-29",
-    "Yahoo Finance=2026-10-28"
+    "AKShare / 新浪指数=2026-10-30",
+    "Yahoo Finance=2026-10-30"
   ],
-  "updated_utc": "2026-10-29T16:17:28+00:00",
+  "updated_utc": "2026-10-30T14:30:52+00:00",
   "status": "ok"
 }
