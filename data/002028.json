@@ -2,7 +2,7 @@
   "symbol": "002028",
   "source": "AKShare/Sina 前复权",
   "rows": 4000,
-  "latest_trading_day": "2026-10-29",
-  "synced_utc": "2026-10-29T16:14:34+00:00",
-  "sync_mode": "preclose_history_only"
+  "latest_trading_day": "2026-10-30",
+  "synced_utc": "2026-10-30T10:23:01+00:00",
+  "sync_mode": "regular_daily"
 }
