@@ -1,8 +1,8 @@
 {
   "symbol": "600926",
-  "source": "AKShare/Sina 前复权",
+  "source": "Yahoo Finance",
   "rows": 2431,
   "latest_trading_day": "2026-10-30",
-  "synced_utc": "2026-10-30T14:02:20+00:00",
+  "synced_utc": "2026-10-30T14:11:08+00:00",
   "sync_mode": "regular_daily"
 }
