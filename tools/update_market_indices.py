@@ -56,7 +56,8 @@ def normalize(frame: pd.DataFrame) -> pd.DataFrame:
     if missing:
         raise ValueError(f"源接口缺少字段 {missing}；实际字段={list(df.columns)[:20]}")
 
-    df = df[required].copy()
+    optional = [col for col in ("session", "collected_at_cn") if col in df.columns]
+    df = df[required + optional].copy()
     dates = pd.to_datetime(df["date"], errors="coerce")
     try:
         if dates.dt.tz is not None:
@@ -77,6 +78,17 @@ def normalize(frame: pd.DataFrame) -> pd.DataFrame:
     max_price = df[["open", "high", "low", "close"]].max(axis=1)
     min_price = df[["open", "high", "low", "close"]].min(axis=1)
     df = df[(df["high"] >= max_price) & (df["low"] <= min_price)]
+
+    # Preserve bar state metadata. Older CSV/source frames remain explicitly legacy.
+    if "session" not in df.columns:
+        df["session"] = "legacy"
+    else:
+        df["session"] = df["session"].fillna("legacy").astype(str).str.strip().str.lower()
+        df.loc[~df["session"].isin({"legacy", "intraday", "unknown", "final"}), "session"] = "legacy"
+    if "collected_at_cn" not in df.columns:
+        df["collected_at_cn"] = ""
+    else:
+        df["collected_at_cn"] = df["collected_at_cn"].fillna("").astype(str).str.slice(0, 32)
 
     today = datetime.now(TZ_CN).date()
     df = df[pd.to_datetime(df["date"]).dt.date <= today]
@@ -215,6 +227,11 @@ def merge_with_existing(code: str, fresh: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    # Use one timestamp for both indices so the two files receive a consistent session label.
+    run_started_cn = datetime.now(TZ_CN)
+    run_today = run_started_cn.date().isoformat()
+    run_stamp = run_started_cn.isoformat(timespec="seconds")
+    before_final_bar = (run_started_cn.hour, run_started_cn.minute) < (15, 20)
     stock_latest = latest_stock_trading_day()
     if stock_latest:
         print(f"个股数据最新交易日交叉核验基准：{stock_latest}", flush=True)
@@ -227,7 +244,15 @@ def main() -> None:
         name = info[0]
         try:
             frame, source, diagnostics = fetch_one(info)
+            frame = frame.copy()
+            frame["session"] = "final"
+            frame["collected_at_cn"] = ""
             latest = str(frame.iloc[-1]["date"])
+            # 11:20 任务若拿到当日K线，明确标为盘中；15:20及之后才标记完整收盘。
+            # 若盘中数据源尚未返回今日行，则保留最近一个完整收盘日，不伪造当日数据。
+            if latest == run_today and before_final_bar:
+                frame.loc[frame.index[-1], "session"] = "intraday"
+            frame.loc[frame.index[-1], "collected_at_cn"] = run_stamp
 
             # 若个股数据已出现更晚交易日，指数不得以陈旧行情冒充更新成功。
             if stock_latest and latest < stock_latest:
@@ -251,6 +276,8 @@ def main() -> None:
                 "source": source,
                 "source_dates": diagnostics,
                 "updated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "session": str(combined.iloc[-1].get("session", "legacy")),
+                "collected_at_cn": str(combined.iloc[-1].get("collected_at_cn", "")),
                 "status": "ok",
             }
             summary.append(item)
