@@ -1,32 +1,38 @@
 {
-  "updated_utc": "2026-10-30T15:18:58+00:00",
+  "updated_utc": "2026-11-02T12:39:06+00:00",
   "success_count": 2,
   "failed_codes": [],
   "indices": [
     {
       "code": "sh000001",
       "name": "上证指数",
-      "latest_trading_day": "2026-10-30",
+      "latest_trading_day": "2026-11-02",
       "rows": 800,
-      "source": "AKShare / 新浪指数",
+      "source": "AKShare / 东方财富指数",
       "source_dates": [
-        "AKShare / 新浪指数=2026-10-30",
-        "Yahoo Finance=2026-10-30"
+        "AKShare / 东方财富指数=2026-11-02",
+        "AKShare / 新浪指数=2026-11-02",
+        "Yahoo Finance=2026-11-02"
       ],
-      "updated_utc": "2026-10-30T15:18:54+00:00",
+      "updated_utc": "2026-11-02T12:39:02+00:00",
+      "session": "final",
+      "collected_at_cn": "2026-11-02T20:38:05+08:00",
       "status": "ok"
     },
     {
       "code": "sz399001",
       "name": "深证成指",
-      "latest_trading_day": "2026-10-30",
+      "latest_trading_day": "2026-11-02",
       "rows": 800,
-      "source": "AKShare / 新浪指数",
+      "source": "AKShare / 东方财富指数",
       "source_dates": [
-        "AKShare / 新浪指数=2026-10-30",
-        "Yahoo Finance=2026-10-30"
+        "AKShare / 东方财富指数=2026-11-02",
+        "AKShare / 新浪指数=2026-11-02",
+        "Yahoo Finance=2026-11-02"
       ],
-      "updated_utc": "2026-10-30T15:18:57+00:00",
+      "updated_utc": "2026-11-02T12:39:05+00:00",
+      "session": "final",
+      "collected_at_cn": "2026-11-02T20:38:05+08:00",
       "status": "ok"
     }
   ]
