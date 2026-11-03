@@ -3,6 +3,6 @@
   "source": "AKShare/Sina 前复权",
   "rows": 3577,
   "latest_trading_day": "2026-11-03",
-  "synced_utc": "2026-11-03T15:23:38+00:00",
-  "sync_mode": "regular_daily"
+  "synced_utc": "2026-11-03T16:09:05+00:00",
+  "sync_mode": "preclose_history_only"
 }
