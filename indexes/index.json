@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-04T15:24:11+00:00",
+  "updated_utc": "2026-11-04T15:34:47+00:00",
   "success_count": 2,
   "failed_codes": [],
   "indices": [
@@ -8,15 +8,14 @@
       "name": "上证指数",
       "latest_trading_day": "2026-11-04",
       "rows": 800,
-      "source": "AKShare / 东方财富指数",
+      "source": "AKShare / 新浪指数",
       "source_dates": [
-        "AKShare / 东方财富指数=2026-11-04",
         "AKShare / 新浪指数=2026-11-04",
         "Yahoo Finance=2026-11-04"
       ],
-      "updated_utc": "2026-11-04T15:24:07+00:00",
+      "updated_utc": "2026-11-04T15:34:45+00:00",
       "session": "final",
-      "collected_at_cn": "2026-11-04T23:22:45+08:00",
+      "collected_at_cn": "2026-11-04T23:34:38+08:00",
       "status": "ok"
     },
     {
@@ -24,15 +23,14 @@
       "name": "深证成指",
       "latest_trading_day": "2026-11-04",
       "rows": 800,
-      "source": "AKShare / 东方财富指数",
+      "source": "AKShare / 新浪指数",
       "source_dates": [
-        "AKShare / 东方财富指数=2026-11-04",
         "AKShare / 新浪指数=2026-11-04",
         "Yahoo Finance=2026-11-04"
       ],
-      "updated_utc": "2026-11-04T15:24:10+00:00",
+      "updated_utc": "2026-11-04T15:34:46+00:00",
       "session": "final",
-      "collected_at_cn": "2026-11-04T23:22:45+08:00",
+      "collected_at_cn": "2026-11-04T23:34:38+08:00",
       "status": "ok"
     }
   ]
