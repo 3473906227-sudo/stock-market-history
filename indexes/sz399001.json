@@ -3,14 +3,13 @@
   "name": "深证成指",
   "latest_trading_day": "2026-11-05",
   "rows": 800,
-  "source": "AKShare / 东方财富指数",
+  "source": "AKShare / 新浪指数",
   "source_dates": [
-    "AKShare / 东方财富指数=2026-11-05",
     "AKShare / 新浪指数=2026-11-05",
     "Yahoo Finance=2026-11-04"
   ],
-  "updated_utc": "2026-11-05T16:26:30+00:00",
+  "updated_utc": "2026-11-05T16:50:06+00:00",
   "session": "final",
-  "collected_at_cn": "2026-11-06T00:25:29+08:00",
+  "collected_at_cn": "2026-11-06T00:49:59+08:00",
   "status": "ok"
 }
