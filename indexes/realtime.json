@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T07:45:47+00:00",
+  "generated_at": "2026-11-06T15:24:40+00:00",
   "source": "GitHub Actions intraday index quote relay",
   "refresh_target_seconds": 300,
-  "market_time": "2026-11-06 15:45:47",
+  "market_time": "2026-11-06 23:24:40",
   "quotes": {
     "sh000001": {
       "price": 3649.18,
