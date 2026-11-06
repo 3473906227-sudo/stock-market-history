@@ -3,13 +3,14 @@
   "name": "上证指数",
   "latest_trading_day": "2026-11-06",
   "rows": 800,
-  "source": "AKShare / 新浪指数",
+  "source": "AKShare / 东方财富指数",
   "source_dates": [
+    "AKShare / 东方财富指数=2026-11-06",
     "AKShare / 新浪指数=2026-11-06",
     "Yahoo Finance=2026-11-06"
   ],
-  "updated_utc": "2026-11-06T14:59:28+00:00",
+  "updated_utc": "2026-11-06T15:13:58+00:00",
   "session": "final",
-  "collected_at_cn": "2026-11-06T22:58:17+08:00",
+  "collected_at_cn": "2026-11-06T23:12:46+08:00",
   "status": "ok"
 }
