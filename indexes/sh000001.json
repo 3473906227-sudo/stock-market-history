@@ -1,16 +1,16 @@
 {
   "code": "sh000001",
   "name": "上证指数",
-  "latest_trading_day": "2026-11-05",
+  "latest_trading_day": "2026-11-06",
   "rows": 800,
   "source": "AKShare / 东方财富指数",
   "source_dates": [
-    "AKShare / 东方财富指数=2026-11-05",
-    "AKShare / 新浪指数=2026-11-05",
-    "Yahoo Finance=2026-11-04"
+    "AKShare / 东方财富指数=2026-11-06",
+    "AKShare / 新浪指数=2026-11-06",
+    "Yahoo Finance=2026-11-06"
   ],
-  "updated_utc": "2026-11-05T17:28:17+00:00",
+  "updated_utc": "2026-11-06T10:58:48+00:00",
   "session": "final",
-  "collected_at_cn": "2026-11-06T01:27:29+08:00",
+  "collected_at_cn": "2026-11-06T18:57:19+08:00",
   "status": "ok"
 }
