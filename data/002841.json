@@ -1,8 +1,8 @@
 {
   "symbol": "002841",
   "source": "AKShare/Sina 前复权",
-  "rows": 2377,
-  "latest_trading_day": "2026-11-06",
-  "synced_utc": "2026-11-06T15:53:57+00:00",
+  "rows": 2378,
+  "latest_trading_day": "2026-11-09",
+  "synced_utc": "2026-11-09T11:59:58+00:00",
   "sync_mode": "regular_daily"
 }
