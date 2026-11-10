@@ -1,8 +1,8 @@
 {
   "symbol": "603019",
   "source": "AKShare/Sina 前复权",
-  "rows": 2891,
-  "latest_trading_day": "2026-11-09",
-  "synced_utc": "2026-11-09T19:57:53+00:00",
-  "sync_mode": "preclose_history_only"
+  "rows": 2892,
+  "latest_trading_day": "2026-11-10",
+  "synced_utc": "2026-11-10T11:38:20+00:00",
+  "sync_mode": "regular_daily"
 }
