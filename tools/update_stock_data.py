@@ -251,6 +251,39 @@ def main() -> None:
             )
         time.sleep(0.6)
 
+    # 生成轻量清单：只列出已有CSV和有效元数据的股票，避免Web端枚举数百个大文件。
+    catalog_rows = []
+    for symbol in symbols:
+        csv_path = OUT / f"{symbol}.csv"
+        meta_path = OUT / f"{symbol}.json"
+        if not csv_path.is_file() or not meta_path.is_file():
+            continue
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            latest_day = str(meta.get("latest_trading_day", ""))[:10]
+            if meta.get("symbol") != symbol or len(latest_day) != 10 or latest_day[4:5] != "-":
+                continue
+            catalog_rows.append({
+                "symbol": symbol,
+                "latest_trading_day": latest_day,
+                "rows": int(meta.get("rows", 0) or 0),
+                "source": str(meta.get("source", ""))[:90],
+                "synced_utc": str(meta.get("synced_utc", ""))[:32],
+            })
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            continue
+    catalog_rows.sort(key=lambda item: item["symbol"])
+    catalog_payload = {
+        "ok": True,
+        "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "count": len(catalog_rows),
+        "stocks": catalog_rows,
+    }
+    catalog_tmp = OUT / "catalog.json.tmp"
+    catalog_tmp.write_text(json.dumps(catalog_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    catalog_tmp.replace(OUT / "catalog.json")
+    print(f"轻量股票清单已生成：{len(catalog_rows)}只（data/catalog.json）", flush=True)
+
     print(
         f"个股行情同步结束：成功 {succeeded}/{len(symbols)}，失败 {len(failed)}；"
         f"失败代码={','.join(failed) if failed else '无'}",
