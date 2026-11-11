@@ -24,6 +24,7 @@ INDEXES = ROOT / "indexes"
 OUT = DATA / "scores.json"
 CN = timezone(timedelta(hours=8))
 SYMBOL_FILE = ROOT / "stock_symbols.txt"
+RISK_WATCH_CODES = {"002555": "风险观察：近年利润波动明显，不进入核心优选排序"}
 
 
 def stamp() -> str:
@@ -322,6 +323,11 @@ def main():
         total = round(sum(components), 2) if complete else None
 
         flags = []
+        risk_note = RISK_WATCH_CODES.get(code)
+        if risk_note:
+            complete = False
+            total = None
+            flags.append(risk_note)
         if pe is None or pe <= 0:
             flags.append("市盈率无效或亏损，估值评分不完整")
         if fin_values.get("净资产收益率") is not None and fin_values["净资产收益率"] < 0:
@@ -345,7 +351,7 @@ def main():
             "name": str(display_name)[:48],
             "industry": industry or "未匹配官方行业",
             "score": total,
-            "label": score_label(total),
+            "label": "风险观察（不进核心优选排名）" if risk_note else score_label(total),
             "complete": complete,
             "coverage": sum(x is not None for x in components),
             "components": {
