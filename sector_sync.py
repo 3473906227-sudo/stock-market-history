@@ -92,7 +92,7 @@ def live_quotes():
 def history(name):
     now = clock()
     df = ak.stock_board_industry_hist_em(
-        symbol=name, period='daily',
+        symbol=name, period='日k',
         start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
         end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
     if df is None or df.empty or '日期' not in df or '收盘' not in df:
