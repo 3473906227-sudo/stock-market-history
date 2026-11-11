@@ -238,7 +238,7 @@ def main():
         'failed_count': len(failed), 'failed': failed[:60],
         'quotes_updated': new_live})
     print(f'行业全量更新完成：历史 {succeeded_hist}/{len(names)}，成分 {succeeded_members}/{len(names)}', flush=True)
-    return 0 if (succeeded_hist or succeeded_members) else 2
+    return 0 if succeeded_hist > 0 else 2
 
 
 if __name__ == '__main__':
