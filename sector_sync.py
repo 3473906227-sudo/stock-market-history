@@ -89,10 +89,10 @@ def live_quotes():
     return rows
 
 
-def history(name):
+def history(name, board_code=None):
     now = clock()
     df = ak.stock_board_industry_hist_em(
-        symbol=name, period='日k',
+        symbol=(board_code if board_code and str(board_code).startswith('BK') else name), period='日k',
         start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
         end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
     if df is None or df.empty or '日期' not in df or '收盘' not in df:
@@ -120,8 +120,8 @@ def history(name):
     return len(frame)
 
 
-def members(name):
-    df = ak.stock_board_industry_cons_em(symbol=name)
+def members(name, board_code=None):
+    df = ak.stock_board_industry_cons_em(symbol=(board_code if board_code and str(board_code).startswith('BK') else name))
     if df is None or df.empty or '代码' not in df:
         raise ValueError('行业成分股列表为空')
     codes = set()
@@ -134,19 +134,19 @@ def members(name):
     return codes
 
 
-def fetch_both(name):
+def fetch_both(name, board_code=None):
     hist_ok = False
     codes = None
     errors = []
     try:
-        n = history(name)
+        n = history(name, board_code)
         hist_ok = True
         print(f'{name}: 历史日K {n} 条', flush=True)
     except Exception as exc:
         errors.append('history: ' + str(exc)[:160])
     time.sleep(.3)
     try:
-        codes = members(name)
+        codes = members(name, board_code)
     except Exception as exc:
         errors.append('members: ' + str(exc)[:160])
     return name, hist_ok, codes, errors
@@ -208,7 +208,8 @@ def main():
     succeeded_members = 0
     failed = []
     with ThreadPoolExecutor(max_workers=max(1, min(args.workers, 4))) as pool:
-        jobs = {pool.submit(fetch_both, name): name for name in names}
+        board_codes = {str(b.get('name')): str(b.get('code') or '') for b in boards if isinstance(b, dict)}
+        jobs = {pool.submit(fetch_both, name, board_codes.get(name)): name for name in names}
         for job in as_completed(jobs):
             name, ok_hist, codes, errors = job.result()
             if ok_hist:
