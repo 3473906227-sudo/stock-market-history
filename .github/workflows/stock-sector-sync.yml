@@ -1,0 +1,85 @@
+name: A-share industry boards sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      quotes_only:
+        description: 'Only update current board quotes (true/false)'
+        type: boolean
+        required: false
+        default: false
+  schedule:
+    # UTC -> 北京时间11:40（盘中行情），15:55、16:45（盘后历史/成分/补采）
+    - cron: '40 3 * * 1-5'
+    - cron: '55 7 * * 1-5'
+    - cron: '45 8 * * 1-5'
+  push:
+    paths:
+      - sector_sync.py
+      - .github/workflows/stock-sector-sync.yml
+
+permissions:
+  contents: write
+concurrency:
+  group: a-share-industry-boards
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exchange trading day
+        id: calendar
+        if: github.event_name == 'schedule'
+        run: python tools/github_schedule_trigger.py --check-trading-day
+      - uses: actions/setup-python@v5
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        with:
+          python-version: '3.11'
+      - name: Install market-data libraries
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        run: python -m pip install --upgrade 'akshare>=1.16' 'pandas>=2.0'
+      - name: Download verified industry quotes / history / constituents
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        env:
+          TRIGGER_CRON: ${{ github.event.schedule }}
+          MANUAL_QUOTES: ${{ inputs.quotes_only || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ "$MANUAL_QUOTES" = "true" ] || [ "$TRIGGER_CRON" = '40 3 * * 1-5' ]; then
+            python sector_sync.py --quotes-only
+          else
+            python sector_sync.py --workers 3
+          fi
+      - name: Publish only verified industry files (parallel-safe)
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          staging="$(mktemp -d)"
+          test -s data/sectors/quotes.json || { echo '::error::缺少已验证的行业快照'; exit 1; }
+          cp -a data/sectors/. "$staging/"
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p data/sectors
+            cp -a "$staging/." data/sectors/
+            git add data/sectors/
+            if git diff --cached --quiet; then
+              echo '行业数据无变化，不提交。'
+              exit 0
+            fi
+            git commit -m 'data: refresh verified A-share industry boards'
+            if git push origin HEAD:main; then
+              echo '行业行情已同步到 main/data/sectors/'
+              exit 0
+            fi
+            echo "同步时发生并行写入冲突，重试 $attempt/4"
+            sleep "$((attempt * 3))"
+          done
+          echo '::error::行业行情发布失败（已重试4次）'
+          exit 1
