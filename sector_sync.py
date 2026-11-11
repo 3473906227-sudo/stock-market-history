@@ -163,17 +163,38 @@ def fetch_both(name, board_code=None):
 
 
 def returns(boards):
+    """从已落盘的完整收盘日K计算收益、均线趋势和量能，不使用盘中未完成K线。"""
     for b in boards:
         file = HIST / (digest(b['name']) + '.csv')
         if not file.is_file():
             continue
         try:
-            frame = pd.read_csv(file, usecols=['date', 'close']).dropna().sort_values('date')
+            frame = pd.read_csv(file, usecols=['date', 'close', 'volume']).dropna().sort_values('date')
             v = pd.to_numeric(frame['close'], errors='coerce')
+            volume = pd.to_numeric(frame['volume'], errors='coerce')
             if len(v) >= 21 and v.iloc[-6] > 0 and v.iloc[-21] > 0:
                 b['ret5'] = round((v.iloc[-1] / v.iloc[-6] - 1) * 100, 3)
                 b['ret20'] = round((v.iloc[-1] / v.iloc[-21] - 1) * 100, 3)
                 b['history_asof'] = str(frame.iloc[-1]['date'])[:10]
+                b['history_close'] = round(float(v.iloc[-1]), 3)
+            if len(v) >= 60:
+                ma20 = float(v.iloc[-20:].mean())
+                ma60 = float(v.iloc[-60:].mean())
+                close = float(v.iloc[-1])
+                b['ma20'] = round(ma20, 3)
+                b['ma60'] = round(ma60, 3)
+                if close >= ma20 >= ma60:
+                    b['trend'] = 'bullish'
+                elif close <= ma20 <= ma60:
+                    b['trend'] = 'bearish'
+                elif close >= ma20:
+                    b['trend'] = 'above_ma20'
+                else:
+                    b['trend'] = 'below_ma20'
+            if len(volume) >= 6:
+                prior_avg = float(volume.iloc[-6:-1].mean())
+                if prior_avg > 0:
+                    b['volume_ratio'] = round(float(volume.iloc[-1]) / prior_avg, 3)
         except (OSError, ValueError, TypeError, KeyError, IndexError):
             continue
 
@@ -201,7 +222,7 @@ def main():
         older = {r['name']: r for r in prior.get('boards', []) if isinstance(r, dict) and r.get('name')}
         for b in boards:
             before = older.get(b['name'], {})
-            for key in ('ret5', 'ret20', 'history_asof'):
+            for key in ('ret5', 'ret20', 'history_asof', 'history_close', 'ma20', 'ma60', 'trend', 'volume_ratio'):
                 if key in before:
                     b[key] = before[key]
         save_json(OUT / 'quotes.json', {
