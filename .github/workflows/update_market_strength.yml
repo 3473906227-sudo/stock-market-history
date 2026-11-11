@@ -1,0 +1,72 @@
+name: A-share market index strength status
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC 12:25 = 北京时间20:25，作为盘后兜底。
+    - cron: '25 12 * * 1-5'
+  workflow_run:
+    workflows:
+      - Daily A-share market indices sync
+    types: [completed]
+    branches: [main]
+  push:
+    paths:
+      - tools/update_market_strength.py
+      - .github/workflows/update_market_strength.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: a-share-market-index-strength
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check official A-share trading day
+        id: calendar
+        if: github.event_name == 'schedule'
+        run: python tools/github_schedule_trigger.py --check-trading-day
+      - uses: actions/setup-python@v5
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        with:
+          python-version: '3.11'
+      - name: Calculate market strength from completed index candles only
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        run: python tools/update_market_strength.py
+      - name: Publish validated market strength snapshot
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s data/market_strength.json || { echo '::error::缺少大盘强弱快照'; exit 1; }
+          staging="$(mktemp -d)"
+          cp data/market_strength.json "$staging/market_strength.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p data
+            cp "$staging/market_strength.json" data/market_strength.json
+            git add data/market_strength.json
+            if git diff --cached --quiet; then
+              echo "大盘强弱状态无变化，无需提交。"
+              exit 0
+            fi
+            git commit -m "data: refresh actual A-share market strength states"
+            if git push origin HEAD:main; then
+              echo "已发布 data/market_strength.json"
+              exit 0
+            fi
+            echo "其他行情任务并行推送，重试 $attempt/4"
+            sleep "$((attempt * 3))"
+          done
+          echo "::error::大盘强弱快照发布失败（已重试4次）"
+          exit 1
