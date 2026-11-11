@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-11-11 18:07:38",
+  "generated_at": "2026-11-11 18:11:59",
   "quote_asof": "2026-11-11",
   "report_period": "20260930",
   "source": "AKShare / 东方财富全市场业绩报表与估值快照 + GitHub Actions真实日线与官方行业历史",
@@ -11,8 +11,8 @@
     "technical": 25
   },
   "count": 158,
-  "complete_count": 156,
-  "incomplete_count": 2,
+  "complete_count": 155,
+  "incomplete_count": 3,
   "market_ret20": -4.125,
   "stocks": [
     {
@@ -685,10 +685,10 @@
         "asof": "2026-11-11",
         "close": 54.3,
         "ma20": 53.8375,
-        "ma60": 51.141333333333336,
+        "ma60": 51.15149999999999,
         "ret20": 3.1339031339031376,
-        "ret60": 9.058043783892344,
-        "volume_ratio": 0.7558352404850066
+        "ret60": 9.036144578313255,
+        "volume_ratio": 0.7558358015815325
       },
       "flags": [],
       "asof": "2026-11-11"
@@ -2574,7 +2574,7 @@
         "ma60": 71.95066666666666,
         "ret20": 2.216887884778318,
         "ret60": -3.479999999999994,
-        "volume_ratio": 0.676524523720931
+        "volume_ratio": 0.6765246399871551
       },
       "flags": [],
       "asof": "2026-11-11"
@@ -3891,10 +3891,10 @@
         "asof": "2026-11-11",
         "close": 24.58,
         "ma20": 23.3215,
-        "ma60": 21.944166666666664,
+        "ma60": 21.951999999999998,
         "ret20": 15.5618241654913,
-        "ret60": 10.273665320771652,
-        "volume_ratio": 0.8498919611221994
+        "ret60": 10.174809502465255,
+        "volume_ratio": 0.8498919919463358
       },
       "flags": [
         "净利润同比大幅下滑",
@@ -5331,61 +5331,6 @@
       "asof": "2026-11-11"
     },
     {
-      "symbol": "002555",
-      "name": "三七互娱",
-      "industry": "游戏Ⅲ",
-      "score": 56.0,
-      "label": "谨慎观察",
-      "complete": true,
-      "coverage": 4,
-      "components": {
-        "fundamental": 17.0,
-        "valuation": 19,
-        "sector": 20,
-        "technical": 0
-      },
-      "fundamental": {
-        "roe": 10.68,
-        "revenue_growth": -8.7878,
-        "profit_growth": -37.29,
-        "operating_cashflow_per_share": 0.542,
-        "gross_margin": 78.5123,
-        "eps": 0.67,
-        "report_period": "20260930",
-        "coverage": "5/5"
-      },
-      "valuation": {
-        "pe_ttm": 18.25,
-        "pb": 2.68,
-        "industry_pe_median": 26.28,
-        "industry_pb_median": 3.05,
-        "pe_peer_ratio": 0.694,
-        "pb_peer_ratio": 0.879,
-        "peg": null,
-        "peer_basis": "东方财富全市场同业中位数"
-      },
-      "sector": {
-        "ret5": 6.08,
-        "ret20": 9.85,
-        "excess20": 13.98,
-        "asof": "2026-11-11"
-      },
-      "technical": {
-        "asof": "2026-11-11",
-        "close": 16.17,
-        "ma20": 16.218500000000002,
-        "ma60": 17.360666666666667,
-        "ret20": -5.824111822946998,
-        "ret60": -16.520392359318524,
-        "volume_ratio": 0.9558063176902244
-      },
-      "flags": [
-        "净利润同比大幅下滑",
-        "60日技术趋势偏弱"
-      ],
-      "asof": "2026-11-11"
-    },
-    {
       "symbol": "601117",
       "name": "中国化学",
       "industry": "建筑装饰",
@@ -5696,7 +5641,7 @@
         "ma60": 16.455666666666666,
         "ret20": -0.11422044545975618,
         "ret60": 14.914586070959256,
-        "volume_ratio": 1.0587582833361264
+        "volume_ratio": 1.0587586182227906
       },
       "flags": [],
       "asof": "2026-11-11"
@@ -6752,7 +6697,7 @@
         "ma60": 31.028166666666664,
         "ret20": 3.2863849765258246,
         "ret60": -16.349809885931556,
-        "volume_ratio": 0.92566883797574
+        "volume_ratio": 0.9256687639300021
       },
       "flags": [
         "60日技术趋势偏弱"
@@ -8247,6 +8192,62 @@
       "flags": [
         "净利润同比大幅下滑",
         "每股经营现金流为负"
+      ],
+      "asof": "2026-11-11"
+    },
+    {
+      "symbol": "002555",
+      "name": "三七互娱",
+      "industry": "游戏Ⅲ",
+      "score": null,
+      "label": "风险观察（不进核心优选排名）",
+      "complete": false,
+      "coverage": 4,
+      "components": {
+        "fundamental": 17.0,
+        "valuation": 19,
+        "sector": 20,
+        "technical": 0
+      },
+      "fundamental": {
+        "roe": 10.68,
+        "revenue_growth": -8.7878,
+        "profit_growth": -37.29,
+        "operating_cashflow_per_share": 0.542,
+        "gross_margin": 78.5123,
+        "eps": 0.67,
+        "report_period": "20260930",
+        "coverage": "5/5"
+      },
+      "valuation": {
+        "pe_ttm": 18.25,
+        "pb": 2.68,
+        "industry_pe_median": 26.28,
+        "industry_pb_median": 3.05,
+        "pe_peer_ratio": 0.694,
+        "pb_peer_ratio": 0.879,
+        "peg": null,
+        "peer_basis": "东方财富全市场同业中位数"
+      },
+      "sector": {
+        "ret5": 6.08,
+        "ret20": 9.85,
+        "excess20": 13.98,
+        "asof": "2026-11-11"
+      },
+      "technical": {
+        "asof": "2026-11-11",
+        "close": 16.17,
+        "ma20": 16.218500000000002,
+        "ma60": 17.360666666666667,
+        "ret20": -5.824111822946998,
+        "ret60": -16.520392359318524,
+        "volume_ratio": 0.9558063176902244
+      },
+      "flags": [
+        "风险观察：近年利润波动明显，不进入核心优选排序",
+        "净利润同比大幅下滑",
+        "60日技术趋势偏弱"
       ],
       "asof": "2026-11-11"
     },
