@@ -4,7 +4,7 @@
 数据输出（与 stock_ai_web.py v2.19 兼容）：
   data/sectors/quotes.json                  行业行情、近5/20日收益
   data/sectors/symbols.json                 A股代码 -> 东方财富真实行业名称
-  data/sectors/history/<name-sha20>.csv    行业收盘日K（date,close）
+  data/sectors/history/<name-sha20>.csv    行业OHLCV日K（date,open,high,low,close,volume）
 失败不覆写已有行情；盘中未完成的当日日K不进入历史序列。
 """
 from __future__ import annotations
@@ -95,12 +95,22 @@ def history(name, board_code=None):
         symbol=(board_code if board_code and str(board_code).startswith('BK') else name), period='日k',
         start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
         end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
-    if df is None or df.empty or '日期' not in df or '收盘' not in df:
-        raise ValueError('缺少行业历史日期或收盘价')
+    required = {'日期', '开盘', '最高', '最低', '收盘', '成交量'}
+    if df is None or df.empty or not required.issubset(set(df.columns)):
+        raise ValueError('缺少行业历史OHLCV字段（日期/开盘/最高/最低/收盘/成交量）')
     frame = pd.DataFrame({
         'date': pd.to_datetime(df['日期'], errors='coerce'),
-        'close': pd.to_numeric(df['收盘'], errors='coerce')})
-    frame = frame.dropna().loc[lambda f: f['close'] > 0]
+        'open': pd.to_numeric(df['开盘'], errors='coerce'),
+        'high': pd.to_numeric(df['最高'], errors='coerce'),
+        'low': pd.to_numeric(df['最低'], errors='coerce'),
+        'close': pd.to_numeric(df['收盘'], errors='coerce'),
+        'volume': pd.to_numeric(df['成交量'], errors='coerce')})
+    frame = frame.dropna()
+    frame = frame.loc[(frame['open'] > 0) & (frame['high'] > 0) &
+                      (frame['low'] > 0) & (frame['close'] > 0) &
+                      (frame['volume'] >= 0) &
+                      (frame['high'] >= frame[['open','close','low']].max(axis=1)) &
+                      (frame['low'] <= frame[['open','close','high']].min(axis=1))]
     frame = frame.drop_duplicates('date', keep='last').sort_values('date')
     frame = frame[frame['date'].dt.date <= now.date()]
     if (now.hour, now.minute) < (15, 20):
