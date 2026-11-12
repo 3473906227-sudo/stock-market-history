@@ -1,8 +1,8 @@
 {
   "symbol": "600373",
-  "source": "AKShare/东方财富前复权",
+  "source": "AKShare/Sina 前复权",
   "rows": 4000,
   "latest_trading_day": "2026-11-12",
-  "synced_utc": "2026-11-12T16:06:28+00:00",
+  "synced_utc": "2026-11-12T16:13:13+00:00",
   "sync_mode": "preclose_history_only"
 }
