@@ -2,7 +2,7 @@
   "symbol": "600886",
   "source": "AKShare/Sina 前复权",
   "rows": 4000,
-  "latest_trading_day": "2026-11-11",
-  "synced_utc": "2026-11-11T17:58:44+00:00",
-  "sync_mode": "preclose_history_only"
+  "latest_trading_day": "2026-11-12",
+  "synced_utc": "2026-11-12T11:46:44+00:00",
+  "sync_mode": "regular_daily"
 }
