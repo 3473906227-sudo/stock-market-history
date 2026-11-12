@@ -2,7 +2,7 @@
   "ok": true,
   "source": "GitHub Actions · validated completed index OHLCV",
   "method": "真实收盘日线 + 1/5/20/60日收益 + 同期另一指数相对强弱 + MA20/MA60 + 成交量确认；不使用AI预测或未来收益标签。",
-  "generated_at_cn": "2026-11-12T19:16:54+08:00",
+  "generated_at_cn": "2026-11-12T23:44:40+08:00",
   "asof": "2026-11-12",
   "count": 2,
   "overall": {
