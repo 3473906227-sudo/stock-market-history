@@ -2,7 +2,7 @@
   "symbol": "000895",
   "source": "AKShare/Sina 前复权",
   "rows": 4000,
-  "latest_trading_day": "2026-11-12",
-  "synced_utc": "2026-11-12T18:21:59+00:00",
-  "sync_mode": "preclose_history_only"
+  "latest_trading_day": "2026-11-13",
+  "synced_utc": "2026-11-13T11:25:55+00:00",
+  "sync_mode": "regular_daily"
 }
