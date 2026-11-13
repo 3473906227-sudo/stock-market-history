@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_utc": "2026-11-13T15:32:57+00:00",
+  "generated_utc": "2026-11-13T15:40:55+00:00",
   "count": 158,
   "stocks": [
     {
@@ -8,1106 +8,1106 @@
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:24:49+00:00"
+      "synced_utc": "2026-11-13T15:33:37+00:00"
     },
     {
       "symbol": "000157",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:24:52+00:00"
+      "synced_utc": "2026-11-13T15:33:39+00:00"
     },
     {
       "symbol": "000333",
       "latest_trading_day": "2026-11-13",
       "rows": 3133,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:24:55+00:00"
+      "synced_utc": "2026-11-13T15:33:42+00:00"
     },
     {
       "symbol": "000338",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:00+00:00"
+      "synced_utc": "2026-11-13T15:33:44+00:00"
     },
     {
       "symbol": "000400",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:04+00:00"
+      "synced_utc": "2026-11-13T15:33:47+00:00"
     },
     {
       "symbol": "000425",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:08+00:00"
+      "synced_utc": "2026-11-13T15:33:50+00:00"
     },
     {
       "symbol": "000538",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:11+00:00"
+      "synced_utc": "2026-11-13T15:33:51+00:00"
     },
     {
       "symbol": "000568",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:14+00:00"
+      "synced_utc": "2026-11-13T15:33:55+00:00"
     },
     {
       "symbol": "000596",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:18+00:00"
+      "synced_utc": "2026-11-13T15:33:58+00:00"
     },
     {
       "symbol": "000651",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:20+00:00"
+      "synced_utc": "2026-11-13T15:34:01+00:00"
     },
     {
       "symbol": "000719",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:24+00:00"
+      "synced_utc": "2026-11-13T15:34:03+00:00"
     },
     {
       "symbol": "000858",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:26+00:00"
+      "synced_utc": "2026-11-13T15:34:04+00:00"
     },
     {
       "symbol": "000895",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:29+00:00"
+      "synced_utc": "2026-11-13T15:34:06+00:00"
     },
     {
       "symbol": "000938",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:34+00:00"
+      "synced_utc": "2026-11-13T15:34:09+00:00"
     },
     {
       "symbol": "000963",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:36+00:00"
+      "synced_utc": "2026-11-13T15:34:11+00:00"
     },
     {
       "symbol": "000977",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:39+00:00"
+      "synced_utc": "2026-11-13T15:34:13+00:00"
     },
     {
       "symbol": "000999",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:41+00:00"
+      "synced_utc": "2026-11-13T15:34:16+00:00"
     },
     {
       "symbol": "002001",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:46+00:00"
+      "synced_utc": "2026-11-13T15:34:19+00:00"
     },
     {
       "symbol": "002027",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:51+00:00"
+      "synced_utc": "2026-11-13T15:34:21+00:00"
     },
     {
       "symbol": "002028",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:55+00:00"
+      "synced_utc": "2026-11-13T15:34:23+00:00"
     },
     {
       "symbol": "002050",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:25:57+00:00"
+      "synced_utc": "2026-11-13T15:34:25+00:00"
     },
     {
       "symbol": "002078",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:01+00:00"
+      "synced_utc": "2026-11-13T15:34:26+00:00"
     },
     {
       "symbol": "002138",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:04+00:00"
+      "synced_utc": "2026-11-13T15:34:31+00:00"
     },
     {
       "symbol": "002142",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:06+00:00"
+      "synced_utc": "2026-11-13T15:34:33+00:00"
     },
     {
       "symbol": "002179",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:09+00:00"
+      "synced_utc": "2026-11-13T15:34:35+00:00"
     },
     {
       "symbol": "002230",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:12+00:00"
+      "synced_utc": "2026-11-13T15:34:38+00:00"
     },
     {
       "symbol": "002236",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:15+00:00"
+      "synced_utc": "2026-11-13T15:34:42+00:00"
     },
     {
       "symbol": "002241",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:17+00:00"
+      "synced_utc": "2026-11-13T15:34:45+00:00"
     },
     {
       "symbol": "002311",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:20+00:00"
+      "synced_utc": "2026-11-13T15:34:47+00:00"
     },
     {
       "symbol": "002352",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:23+00:00"
+      "synced_utc": "2026-11-13T15:34:51+00:00"
     },
     {
       "symbol": "002371",
       "latest_trading_day": "2026-11-13",
       "rows": 3966,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:26+00:00"
+      "synced_utc": "2026-11-13T15:34:52+00:00"
     },
     {
       "symbol": "002415",
       "latest_trading_day": "2026-11-13",
       "rows": 3943,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:30+00:00"
+      "synced_utc": "2026-11-13T15:34:55+00:00"
     },
     {
       "symbol": "002422",
       "latest_trading_day": "2026-11-13",
       "rows": 3966,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:34+00:00"
+      "synced_utc": "2026-11-13T15:34:59+00:00"
     },
     {
       "symbol": "002463",
       "latest_trading_day": "2026-11-13",
       "rows": 3933,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:37+00:00"
+      "synced_utc": "2026-11-13T15:35:01+00:00"
     },
     {
       "symbol": "002475",
       "latest_trading_day": "2026-11-13",
       "rows": 3894,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:41+00:00"
+      "synced_utc": "2026-11-13T15:35:04+00:00"
     },
     {
       "symbol": "002517",
       "latest_trading_day": "2026-11-13",
       "rows": 3593,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:45+00:00"
+      "synced_utc": "2026-11-13T15:35:06+00:00"
     },
     {
       "symbol": "002555",
       "latest_trading_day": "2026-11-13",
       "rows": 3530,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:48+00:00"
+      "synced_utc": "2026-11-13T15:35:09+00:00"
     },
     {
       "symbol": "002558",
       "latest_trading_day": "2026-11-13",
       "rows": 3444,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:51+00:00"
+      "synced_utc": "2026-11-13T15:35:12+00:00"
     },
     {
       "symbol": "002594",
       "latest_trading_day": "2026-11-13",
       "rows": 3722,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:53+00:00"
+      "synced_utc": "2026-11-13T15:35:19+00:00"
     },
     {
       "symbol": "002602",
       "latest_trading_day": "2026-11-13",
       "rows": 3243,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:55+00:00"
+      "synced_utc": "2026-11-13T15:35:21+00:00"
     },
     {
       "symbol": "002648",
       "latest_trading_day": "2026-11-13",
       "rows": 3585,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:26:58+00:00"
+      "synced_utc": "2026-11-13T15:35:23+00:00"
     },
     {
       "symbol": "002714",
       "latest_trading_day": "2026-11-13",
       "rows": 3084,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:01+00:00"
+      "synced_utc": "2026-11-13T15:35:26+00:00"
     },
     {
       "symbol": "002841",
       "latest_trading_day": "2026-11-13",
       "rows": 2382,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:04+00:00"
+      "synced_utc": "2026-11-13T15:35:28+00:00"
     },
     {
       "symbol": "002850",
       "latest_trading_day": "2026-11-13",
       "rows": 2357,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:07+00:00"
+      "synced_utc": "2026-11-13T15:35:31+00:00"
     },
     {
       "symbol": "002916",
       "latest_trading_day": "2026-11-13",
       "rows": 2161,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:09+00:00"
+      "synced_utc": "2026-11-13T15:35:34+00:00"
     },
     {
       "symbol": "002920",
       "latest_trading_day": "2026-11-13",
       "rows": 2154,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:11+00:00"
+      "synced_utc": "2026-11-13T15:35:36+00:00"
     },
     {
       "symbol": "002938",
       "latest_trading_day": "2026-11-13",
       "rows": 1975,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:14+00:00"
+      "synced_utc": "2026-11-13T15:35:40+00:00"
     },
     {
       "symbol": "003816",
       "latest_trading_day": "2026-11-13",
       "rows": 1749,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:17+00:00"
+      "synced_utc": "2026-11-13T15:35:43+00:00"
     },
     {
       "symbol": "300015",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:19+00:00"
+      "synced_utc": "2026-11-13T15:35:45+00:00"
     },
     {
       "symbol": "300033",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:21+00:00"
+      "synced_utc": "2026-11-13T15:35:47+00:00"
     },
     {
       "symbol": "300058",
       "latest_trading_day": "2026-11-13",
       "rows": 3852,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:23+00:00"
+      "synced_utc": "2026-11-13T15:35:50+00:00"
     },
     {
       "symbol": "300124",
       "latest_trading_day": "2026-11-13",
       "rows": 3895,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:26+00:00"
+      "synced_utc": "2026-11-13T15:35:52+00:00"
     },
     {
       "symbol": "300274",
       "latest_trading_day": "2026-11-13",
       "rows": 3623,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:28+00:00"
+      "synced_utc": "2026-11-13T15:35:56+00:00"
     },
     {
       "symbol": "300308",
       "latest_trading_day": "2026-11-13",
       "rows": 3378,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:31+00:00"
+      "synced_utc": "2026-11-13T15:35:58+00:00"
     },
     {
       "symbol": "300394",
       "latest_trading_day": "2026-11-13",
       "rows": 2839,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:34+00:00"
+      "synced_utc": "2026-11-13T15:36:02+00:00"
     },
     {
       "symbol": "300413",
       "latest_trading_day": "2026-11-13",
       "rows": 2610,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:37+00:00"
+      "synced_utc": "2026-11-13T15:36:07+00:00"
     },
     {
       "symbol": "300502",
       "latest_trading_day": "2026-11-13",
       "rows": 2598,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:40+00:00"
+      "synced_utc": "2026-11-13T15:36:09+00:00"
     },
     {
       "symbol": "300750",
       "latest_trading_day": "2026-11-13",
       "rows": 2045,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:46+00:00"
+      "synced_utc": "2026-11-13T15:36:12+00:00"
     },
     {
       "symbol": "300760",
       "latest_trading_day": "2026-11-13",
       "rows": 1961,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:48+00:00"
+      "synced_utc": "2026-11-13T15:36:16+00:00"
     },
     {
       "symbol": "600018",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:51+00:00"
+      "synced_utc": "2026-11-13T15:36:19+00:00"
     },
     {
       "symbol": "600025",
       "latest_trading_day": "2026-11-13",
       "rows": 2161,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:54+00:00"
+      "synced_utc": "2026-11-13T15:36:22+00:00"
     },
     {
       "symbol": "600030",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:27:59+00:00"
+      "synced_utc": "2026-11-13T15:36:27+00:00"
     },
     {
       "symbol": "600031",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:02+00:00"
+      "synced_utc": "2026-11-13T15:36:30+00:00"
     },
     {
       "symbol": "600036",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:04+00:00"
+      "synced_utc": "2026-11-13T15:36:32+00:00"
     },
     {
       "symbol": "600050",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:07+00:00"
+      "synced_utc": "2026-11-13T15:36:34+00:00"
     },
     {
       "symbol": "600066",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:10+00:00"
+      "synced_utc": "2026-11-13T15:36:36+00:00"
     },
     {
       "symbol": "600085",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:13+00:00"
+      "synced_utc": "2026-11-13T15:36:39+00:00"
     },
     {
       "symbol": "600089",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:16+00:00"
+      "synced_utc": "2026-11-13T15:36:41+00:00"
     },
     {
       "symbol": "600111",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:19+00:00"
+      "synced_utc": "2026-11-13T15:36:45+00:00"
     },
     {
       "symbol": "600132",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:21+00:00"
+      "synced_utc": "2026-11-13T15:36:48+00:00"
     },
     {
       "symbol": "600150",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:24+00:00"
+      "synced_utc": "2026-11-13T15:36:51+00:00"
     },
     {
       "symbol": "600161",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:28+00:00"
+      "synced_utc": "2026-11-13T15:36:55+00:00"
     },
     {
       "symbol": "600183",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:32+00:00"
+      "synced_utc": "2026-11-13T15:37:00+00:00"
     },
     {
       "symbol": "600276",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:35+00:00"
+      "synced_utc": "2026-11-13T15:37:02+00:00"
     },
     {
       "symbol": "600298",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:39+00:00"
+      "synced_utc": "2026-11-13T15:37:05+00:00"
     },
     {
       "symbol": "600309",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:41+00:00"
+      "synced_utc": "2026-11-13T15:37:09+00:00"
     },
     {
       "symbol": "600332",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:45+00:00"
+      "synced_utc": "2026-11-13T15:37:11+00:00"
     },
     {
       "symbol": "600373",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:49+00:00"
+      "synced_utc": "2026-11-13T15:37:13+00:00"
     },
     {
       "symbol": "600406",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:52+00:00"
+      "synced_utc": "2026-11-13T15:37:15+00:00"
     },
     {
       "symbol": "600415",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:54+00:00"
+      "synced_utc": "2026-11-13T15:37:18+00:00"
     },
     {
       "symbol": "600426",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:28:56+00:00"
+      "synced_utc": "2026-11-13T15:37:21+00:00"
     },
     {
       "symbol": "600436",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:00+00:00"
+      "synced_utc": "2026-11-13T15:37:23+00:00"
     },
     {
       "symbol": "600489",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:02+00:00"
+      "synced_utc": "2026-11-13T15:37:25+00:00"
     },
     {
       "symbol": "600519",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:05+00:00"
+      "synced_utc": "2026-11-13T15:37:27+00:00"
     },
     {
       "symbol": "600547",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:09+00:00"
+      "synced_utc": "2026-11-13T15:37:29+00:00"
     },
     {
       "symbol": "600584",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:13+00:00"
+      "synced_utc": "2026-11-13T15:37:35+00:00"
     },
     {
       "symbol": "600600",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:17+00:00"
+      "synced_utc": "2026-11-13T15:37:37+00:00"
     },
     {
       "symbol": "600660",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:24+00:00"
+      "synced_utc": "2026-11-13T15:37:39+00:00"
     },
     {
       "symbol": "600674",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:27+00:00"
+      "synced_utc": "2026-11-13T15:37:41+00:00"
     },
     {
       "symbol": "600690",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:30+00:00"
+      "synced_utc": "2026-11-13T15:37:44+00:00"
     },
     {
       "symbol": "600729",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:34+00:00"
+      "synced_utc": "2026-11-13T15:37:48+00:00"
     },
     {
       "symbol": "600757",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:37+00:00"
+      "synced_utc": "2026-11-13T15:37:50+00:00"
     },
     {
       "symbol": "600809",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:39+00:00"
+      "synced_utc": "2026-11-13T15:37:54+00:00"
     },
     {
       "symbol": "600845",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:43+00:00"
+      "synced_utc": "2026-11-13T15:37:57+00:00"
     },
     {
       "symbol": "600886",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:46+00:00"
+      "synced_utc": "2026-11-13T15:38:00+00:00"
     },
     {
       "symbol": "600887",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:48+00:00"
+      "synced_utc": "2026-11-13T15:38:05+00:00"
     },
     {
       "symbol": "600900",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:50+00:00"
+      "synced_utc": "2026-11-13T15:38:08+00:00"
     },
     {
       "symbol": "600919",
       "latest_trading_day": "2026-11-13",
       "rows": 2490,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:53+00:00"
+      "synced_utc": "2026-11-13T15:38:12+00:00"
     },
     {
       "symbol": "600926",
       "latest_trading_day": "2026-11-13",
       "rows": 2441,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:56+00:00"
+      "synced_utc": "2026-11-13T15:38:15+00:00"
     },
     {
       "symbol": "600938",
       "latest_trading_day": "2026-11-13",
       "rows": 1107,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:29:57+00:00"
+      "synced_utc": "2026-11-13T15:38:17+00:00"
     },
     {
       "symbol": "600941",
       "latest_trading_day": "2026-11-13",
       "rows": 1176,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:00+00:00"
+      "synced_utc": "2026-11-13T15:38:19+00:00"
     },
     {
       "symbol": "600989",
       "latest_trading_day": "2026-11-13",
       "rows": 1820,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:04+00:00"
+      "synced_utc": "2026-11-13T15:38:21+00:00"
     },
     {
       "symbol": "601009",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:07+00:00"
+      "synced_utc": "2026-11-13T15:38:23+00:00"
     },
     {
       "symbol": "601019",
       "latest_trading_day": "2026-11-13",
       "rows": 2178,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:10+00:00"
+      "synced_utc": "2026-11-13T15:38:25+00:00"
     },
     {
       "symbol": "601021",
       "latest_trading_day": "2026-11-13",
       "rows": 2846,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:12+00:00"
+      "synced_utc": "2026-11-13T15:38:28+00:00"
     },
     {
       "symbol": "601088",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:16+00:00"
+      "synced_utc": "2026-11-13T15:38:30+00:00"
     },
     {
       "symbol": "601098",
       "latest_trading_day": "2026-11-13",
       "rows": 3893,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:19+00:00"
+      "synced_utc": "2026-11-13T15:38:33+00:00"
     },
     {
       "symbol": "601100",
       "latest_trading_day": "2026-11-13",
       "rows": 3613,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:22+00:00"
+      "synced_utc": "2026-11-13T15:38:36+00:00"
     },
     {
       "symbol": "601117",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:25+00:00"
+      "synced_utc": "2026-11-13T15:38:39+00:00"
     },
     {
       "symbol": "601138",
       "latest_trading_day": "2026-11-13",
       "rows": 2046,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:28+00:00"
+      "synced_utc": "2026-11-13T15:38:41+00:00"
     },
     {
       "symbol": "601166",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:32+00:00"
+      "synced_utc": "2026-11-13T15:38:45+00:00"
     },
     {
       "symbol": "601186",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:35+00:00"
+      "synced_utc": "2026-11-13T15:38:48+00:00"
     },
     {
       "symbol": "601225",
       "latest_trading_day": "2026-11-13",
       "rows": 3109,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:38+00:00"
+      "synced_utc": "2026-11-13T15:38:51+00:00"
     },
     {
       "symbol": "601288",
       "latest_trading_day": "2026-11-13",
       "rows": 3962,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:42+00:00"
+      "synced_utc": "2026-11-13T15:38:53+00:00"
     },
     {
       "symbol": "601318",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:47+00:00"
+      "synced_utc": "2026-11-13T15:38:55+00:00"
     },
     {
       "symbol": "601336",
       "latest_trading_day": "2026-11-13",
       "rows": 3592,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:51+00:00"
+      "synced_utc": "2026-11-13T15:38:58+00:00"
     },
     {
       "symbol": "601390",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:54+00:00"
+      "synced_utc": "2026-11-13T15:39:01+00:00"
     },
     {
       "symbol": "601398",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:30:58+00:00"
+      "synced_utc": "2026-11-13T15:39:04+00:00"
     },
     {
       "symbol": "601600",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:01+00:00"
+      "synced_utc": "2026-11-13T15:39:06+00:00"
     },
     {
       "symbol": "601601",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:07+00:00"
+      "synced_utc": "2026-11-13T15:39:09+00:00"
     },
     {
       "symbol": "601607",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:10+00:00"
+      "synced_utc": "2026-11-13T15:39:11+00:00"
     },
     {
       "symbol": "601658",
       "latest_trading_day": "2026-11-13",
       "rows": 1679,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:13+00:00"
+      "synced_utc": "2026-11-13T15:39:16+00:00"
     },
     {
       "symbol": "601668",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:15+00:00"
+      "synced_utc": "2026-11-13T15:39:18+00:00"
     },
     {
       "symbol": "601689",
       "latest_trading_day": "2026-11-13",
       "rows": 2824,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:18+00:00"
+      "synced_utc": "2026-11-13T15:39:20+00:00"
     },
     {
       "symbol": "601728",
       "latest_trading_day": "2026-11-13",
       "rows": 1266,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:20+00:00"
+      "synced_utc": "2026-11-13T15:39:22+00:00"
     },
     {
       "symbol": "601766",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:23+00:00"
+      "synced_utc": "2026-11-13T15:39:24+00:00"
     },
     {
       "symbol": "601799",
       "latest_trading_day": "2026-11-13",
       "rows": 3779,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:28+00:00"
+      "synced_utc": "2026-11-13T15:39:26+00:00"
     },
     {
       "symbol": "601801",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:30+00:00"
+      "synced_utc": "2026-11-13T15:39:28+00:00"
     },
     {
       "symbol": "601811",
       "latest_trading_day": "2026-11-13",
       "rows": 2492,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:33+00:00"
+      "synced_utc": "2026-11-13T15:39:30+00:00"
     },
     {
       "symbol": "601816",
       "latest_trading_day": "2026-11-13",
       "rows": 1653,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:36+00:00"
+      "synced_utc": "2026-11-13T15:39:32+00:00"
     },
     {
       "symbol": "601888",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:38+00:00"
+      "synced_utc": "2026-11-13T15:39:35+00:00"
     },
     {
       "symbol": "601899",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:41+00:00"
+      "synced_utc": "2026-11-13T15:39:37+00:00"
     },
     {
       "symbol": "601900",
       "latest_trading_day": "2026-11-13",
       "rows": 2495,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:44+00:00"
+      "synced_utc": "2026-11-13T15:39:39+00:00"
     },
     {
       "symbol": "601921",
       "latest_trading_day": "2026-11-13",
       "rows": 1286,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:46+00:00"
+      "synced_utc": "2026-11-13T15:39:43+00:00"
     },
     {
       "symbol": "601928",
       "latest_trading_day": "2026-11-13",
       "rows": 3576,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:50+00:00"
+      "synced_utc": "2026-11-13T15:39:45+00:00"
     },
     {
       "symbol": "601939",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:52+00:00"
+      "synced_utc": "2026-11-13T15:39:48+00:00"
     },
     {
       "symbol": "601949",
       "latest_trading_day": "2026-11-13",
       "rows": 2240,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:54+00:00"
+      "synced_utc": "2026-11-13T15:39:51+00:00"
     },
     {
       "symbol": "601985",
       "latest_trading_day": "2026-11-13",
       "rows": 2777,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:31:58+00:00"
+      "synced_utc": "2026-11-13T15:39:54+00:00"
     },
     {
       "symbol": "601988",
       "latest_trading_day": "2026-11-13",
       "rows": 4000,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:01+00:00"
+      "synced_utc": "2026-11-13T15:39:56+00:00"
     },
     {
       "symbol": "603019",
       "latest_trading_day": "2026-11-13",
       "rows": 2895,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:04+00:00"
+      "synced_utc": "2026-11-13T15:39:59+00:00"
     },
     {
       "symbol": "603195",
       "latest_trading_day": "2026-11-13",
       "rows": 1644,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:07+00:00"
+      "synced_utc": "2026-11-13T15:40:01+00:00"
     },
     {
       "symbol": "603259",
       "latest_trading_day": "2026-11-13",
       "rows": 2069,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:11+00:00"
+      "synced_utc": "2026-11-13T15:40:06+00:00"
     },
     {
       "symbol": "603288",
       "latest_trading_day": "2026-11-13",
       "rows": 3104,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:13+00:00"
+      "synced_utc": "2026-11-13T15:40:09+00:00"
     },
     {
       "symbol": "603338",
       "latest_trading_day": "2026-11-13",
       "rows": 2817,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:18+00:00"
+      "synced_utc": "2026-11-13T15:40:14+00:00"
     },
     {
       "symbol": "603444",
       "latest_trading_day": "2026-11-13",
       "rows": 2393,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:20+00:00"
+      "synced_utc": "2026-11-13T15:40:18+00:00"
     },
     {
       "symbol": "603501",
       "latest_trading_day": "2026-11-13",
       "rows": 2144,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:23+00:00"
+      "synced_utc": "2026-11-13T15:40:20+00:00"
     },
     {
       "symbol": "603605",
       "latest_trading_day": "2026-11-13",
       "rows": 2183,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:26+00:00"
+      "synced_utc": "2026-11-13T15:40:22+00:00"
     },
     {
       "symbol": "603833",
       "latest_trading_day": "2026-11-13",
       "rows": 2333,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:30+00:00"
+      "synced_utc": "2026-11-13T15:40:25+00:00"
     },
     {
       "symbol": "603899",
       "latest_trading_day": "2026-11-13",
       "rows": 2866,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:32+00:00"
+      "synced_utc": "2026-11-13T15:40:27+00:00"
     },
     {
       "symbol": "603939",
       "latest_trading_day": "2026-11-13",
       "rows": 2735,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:34+00:00"
+      "synced_utc": "2026-11-13T15:40:30+00:00"
     },
     {
       "symbol": "603986",
       "latest_trading_day": "2026-11-13",
       "rows": 2278,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:36+00:00"
+      "synced_utc": "2026-11-13T15:40:32+00:00"
     },
     {
       "symbol": "603993",
       "latest_trading_day": "2026-11-13",
       "rows": 3403,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:40+00:00"
+      "synced_utc": "2026-11-13T15:40:34+00:00"
     },
     {
       "symbol": "605117",
       "latest_trading_day": "2026-11-13",
       "rows": 1350,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:42+00:00"
+      "synced_utc": "2026-11-13T15:40:39+00:00"
     },
     {
       "symbol": "605499",
       "latest_trading_day": "2026-11-13",
       "rows": 1326,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:44+00:00"
+      "synced_utc": "2026-11-13T15:40:42+00:00"
     },
     {
       "symbol": "688041",
       "latest_trading_day": "2026-11-13",
       "rows": 1020,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:48+00:00"
+      "synced_utc": "2026-11-13T15:40:44+00:00"
     },
     {
       "symbol": "688111",
       "latest_trading_day": "2026-11-13",
       "rows": 1695,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:52+00:00"
+      "synced_utc": "2026-11-13T15:40:48+00:00"
     },
     {
       "symbol": "688271",
       "latest_trading_day": "2026-11-13",
       "rows": 1024,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:54+00:00"
+      "synced_utc": "2026-11-13T15:40:50+00:00"
     },
     {
       "symbol": "688981",
       "latest_trading_day": "2026-11-13",
       "rows": 1529,
       "source": "AKShare/Sina 前复权",
-      "synced_utc": "2026-11-13T15:32:57+00:00"
+      "synced_utc": "2026-11-13T15:40:54+00:00"
     }
   ]
 }
