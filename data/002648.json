@@ -1,8 +1,8 @@
 {
   "symbol": "002648",
-  "source": "AKShare/Sina 前复权",
-  "rows": 3585,
-  "latest_trading_day": "2026-11-13",
-  "synced_utc": "2026-11-13T15:35:23+00:00",
+  "source": "Yahoo Finance",
+  "rows": 3612,
+  "latest_trading_day": "2026-11-16",
+  "synced_utc": "2026-11-16T11:56:34+00:00",
   "sync_mode": "regular_daily"
 }

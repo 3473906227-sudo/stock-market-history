@@ -1,8 +1,8 @@
 {
   "symbol": "002371",
-  "source": "AKShare/Sina 前复权",
-  "rows": 3966,
+  "source": "Yahoo Finance",
+  "rows": 4000,
   "latest_trading_day": "2026-11-13",
-  "synced_utc": "2026-11-13T15:34:52+00:00",
+  "synced_utc": "2026-11-16T11:56:25+00:00",
   "sync_mode": "regular_daily"
 }
