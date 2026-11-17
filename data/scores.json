@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-11-18 02:02:47",
+  "generated_at": "2026-11-18 02:09:10",
   "quote_asof": "2026-11-18",
   "report_period": "20260930",
   "source": "AKShare / 东方财富全市场业绩报表与估值快照 + GitHub Actions真实日线与官方行业历史",
@@ -4520,7 +4520,7 @@
     {
       "symbol": "600150",
       "name": "中国船舶",
-      "industry": "航海装备Ⅱ",
+      "industry": "航海装备Ⅲ",
       "score": 54.0,
       "label": "谨慎观察",
       "complete": true,
