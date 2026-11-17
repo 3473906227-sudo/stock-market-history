@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_utc": "2026-11-17T17:00:42+00:00",
+  "generated_utc": "2026-11-17T17:37:08+00:00",
   "count": 158,
   "stocks": [
     {
@@ -8,7 +8,7 @@
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:20+00:00"
+      "synced_utc": "2026-11-17T17:34:10+00:00"
     },
     {
       "symbol": "000157",
@@ -22,21 +22,21 @@
       "latest_trading_day": "2026-11-16",
       "rows": 3196,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:22+00:00"
+      "synced_utc": "2026-11-17T17:34:12+00:00"
     },
     {
       "symbol": "000338",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:22+00:00"
+      "synced_utc": "2026-11-17T17:34:13+00:00"
     },
     {
       "symbol": "000400",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:23+00:00"
+      "synced_utc": "2026-11-17T17:34:14+00:00"
     },
     {
       "symbol": "000425",
@@ -50,77 +50,77 @@
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:25+00:00"
+      "synced_utc": "2026-11-17T17:34:17+00:00"
     },
     {
       "symbol": "000568",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:26+00:00"
+      "synced_utc": "2026-11-17T17:34:18+00:00"
     },
     {
       "symbol": "000596",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:27+00:00"
+      "synced_utc": "2026-11-17T17:34:19+00:00"
     },
     {
       "symbol": "000651",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:28+00:00"
+      "synced_utc": "2026-11-17T17:34:20+00:00"
     },
     {
       "symbol": "000719",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:29+00:00"
+      "synced_utc": "2026-11-17T17:34:21+00:00"
     },
     {
       "symbol": "000858",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:30+00:00"
+      "synced_utc": "2026-11-17T17:34:23+00:00"
     },
     {
       "symbol": "000895",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:31+00:00"
+      "synced_utc": "2026-11-17T17:34:24+00:00"
     },
     {
       "symbol": "000938",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:32+00:00"
+      "synced_utc": "2026-11-17T17:34:25+00:00"
     },
     {
       "symbol": "000963",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:33+00:00"
+      "synced_utc": "2026-11-17T17:34:26+00:00"
     },
     {
       "symbol": "000977",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:34+00:00"
+      "synced_utc": "2026-11-17T17:34:28+00:00"
     },
     {
       "symbol": "000999",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:35+00:00"
+      "synced_utc": "2026-11-17T17:34:29+00:00"
     },
     {
       "symbol": "002001",
@@ -134,42 +134,42 @@
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:37+00:00"
+      "synced_utc": "2026-11-17T17:34:31+00:00"
     },
     {
       "symbol": "002028",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:37+00:00"
+      "synced_utc": "2026-11-17T17:34:32+00:00"
     },
     {
       "symbol": "002050",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:38+00:00"
+      "synced_utc": "2026-11-17T17:34:33+00:00"
     },
     {
       "symbol": "002078",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:39+00:00"
+      "synced_utc": "2026-11-17T17:34:35+00:00"
     },
     {
       "symbol": "002138",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:40+00:00"
+      "synced_utc": "2026-11-17T17:34:36+00:00"
     },
     {
       "symbol": "002142",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:41+00:00"
+      "synced_utc": "2026-11-17T17:34:37+00:00"
     },
     {
       "symbol": "002179",
@@ -183,35 +183,35 @@
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:43+00:00"
+      "synced_utc": "2026-11-17T17:34:39+00:00"
     },
     {
       "symbol": "002236",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:44+00:00"
+      "synced_utc": "2026-11-17T17:34:40+00:00"
     },
     {
       "symbol": "002241",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:45+00:00"
+      "synced_utc": "2026-11-17T17:34:42+00:00"
     },
     {
       "symbol": "002311",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:46+00:00"
+      "synced_utc": "2026-11-17T17:34:43+00:00"
     },
     {
       "symbol": "002352",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:46+00:00"
+      "synced_utc": "2026-11-17T17:34:44+00:00"
     },
     {
       "symbol": "002371",
@@ -225,56 +225,56 @@
       "latest_trading_day": "2026-11-16",
       "rows": 3995,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:48+00:00"
+      "synced_utc": "2026-11-17T17:34:46+00:00"
     },
     {
       "symbol": "002422",
       "latest_trading_day": "2026-11-16",
       "rows": 3995,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:49+00:00"
+      "synced_utc": "2026-11-17T17:34:47+00:00"
     },
     {
       "symbol": "002463",
       "latest_trading_day": "2026-11-16",
       "rows": 3943,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:50+00:00"
+      "synced_utc": "2026-11-17T17:34:48+00:00"
     },
     {
       "symbol": "002475",
       "latest_trading_day": "2026-11-16",
       "rows": 3923,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:51+00:00"
+      "synced_utc": "2026-11-17T17:34:50+00:00"
     },
     {
       "symbol": "002517",
       "latest_trading_day": "2026-11-16",
       "rows": 3870,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:52+00:00"
+      "synced_utc": "2026-11-17T17:34:51+00:00"
     },
     {
       "symbol": "002555",
       "latest_trading_day": "2026-11-16",
       "rows": 3817,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:53+00:00"
+      "synced_utc": "2026-11-17T17:34:52+00:00"
     },
     {
       "symbol": "002558",
       "latest_trading_day": "2026-11-16",
       "rows": 3817,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:54+00:00"
+      "synced_utc": "2026-11-17T17:34:53+00:00"
     },
     {
       "symbol": "002594",
       "latest_trading_day": "2026-11-16",
       "rows": 3735,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:54+00:00"
+      "synced_utc": "2026-11-17T17:34:54+00:00"
     },
     {
       "symbol": "002602",
@@ -295,42 +295,42 @@
       "latest_trading_day": "2026-11-16",
       "rows": 3110,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:57+00:00"
+      "synced_utc": "2026-11-17T17:34:57+00:00"
     },
     {
       "symbol": "002841",
       "latest_trading_day": "2026-11-16",
       "rows": 2383,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:58+00:00"
+      "synced_utc": "2026-11-17T17:34:58+00:00"
     },
     {
       "symbol": "002850",
       "latest_trading_day": "2026-11-16",
       "rows": 2358,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:59+00:00"
+      "synced_utc": "2026-11-17T17:34:59+00:00"
     },
     {
       "symbol": "002916",
       "latest_trading_day": "2026-11-16",
       "rows": 2164,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:58:59+00:00"
+      "synced_utc": "2026-11-17T17:35:01+00:00"
     },
     {
       "symbol": "002920",
       "latest_trading_day": "2026-11-16",
       "rows": 2155,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:00+00:00"
+      "synced_utc": "2026-11-17T17:35:02+00:00"
     },
     {
       "symbol": "002938",
       "latest_trading_day": "2026-11-16",
       "rows": 1976,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:01+00:00"
+      "synced_utc": "2026-11-17T17:35:03+00:00"
     },
     {
       "symbol": "003816",
@@ -344,28 +344,28 @@
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:03+00:00"
+      "synced_utc": "2026-11-17T17:35:05+00:00"
     },
     {
       "symbol": "300033",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:04+00:00"
+      "synced_utc": "2026-11-17T17:35:06+00:00"
     },
     {
       "symbol": "300058",
       "latest_trading_day": "2026-11-16",
       "rows": 4000,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:05+00:00"
+      "synced_utc": "2026-11-17T17:35:07+00:00"
     },
     {
       "symbol": "300124",
       "latest_trading_day": "2026-11-16",
       "rows": 3917,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:05+00:00"
+      "synced_utc": "2026-11-17T17:35:08+00:00"
     },
     {
       "symbol": "300274",
@@ -379,28 +379,28 @@
       "latest_trading_day": "2026-11-16",
       "rows": 3548,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:07+00:00"
+      "synced_utc": "2026-11-17T17:35:11+00:00"
     },
     {
       "symbol": "300394",
       "latest_trading_day": "2026-11-16",
       "rows": 2852,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:08+00:00"
+      "synced_utc": "2026-11-17T17:35:12+00:00"
     },
     {
       "symbol": "300413",
       "latest_trading_day": "2026-11-16",
       "rows": 2871,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:09+00:00"
+      "synced_utc": "2026-11-17T17:35:13+00:00"
     },
     {
       "symbol": "300502",
       "latest_trading_day": "2026-11-16",
       "rows": 2601,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:10+00:00"
+      "synced_utc": "2026-11-17T17:35:14+00:00"
     },
     {
       "symbol": "300750",
@@ -414,7 +414,7 @@
       "latest_trading_day": "2026-11-16",
       "rows": 1962,
       "source": "Yahoo Finance",
-      "synced_utc": "2026-11-17T16:59:11+00:00"
+      "synced_utc": "2026-11-17T17:35:16+00:00"
     },
     {
       "symbol": "600018",
