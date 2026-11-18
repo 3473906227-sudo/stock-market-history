@@ -1,14 +1,14 @@
 {
   "code": "sh000001",
   "name": "上证指数",
-  "latest_trading_day": "2026-11-17",
+  "latest_trading_day": "2026-11-18",
   "rows": 800,
   "source": "Yahoo Finance",
   "source_dates": [
-    "Yahoo Finance=2026-11-17"
+    "Yahoo Finance=2026-11-18"
   ],
-  "updated_utc": "2026-11-17T11:55:09+00:00",
+  "updated_utc": "2026-11-18T11:46:27+00:00",
   "session": "final",
-  "collected_at_cn": "2026-11-17T19:55:08+08:00",
+  "collected_at_cn": "2026-11-18T19:46:26+08:00",
   "status": "ok"
 }
