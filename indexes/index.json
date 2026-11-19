@@ -1,34 +1,34 @@
 {
-  "updated_utc": "2026-11-18T11:46:28+00:00",
+  "updated_utc": "2026-11-19T11:43:30+00:00",
   "success_count": 2,
   "failed_codes": [],
   "indices": [
     {
       "code": "sh000001",
       "name": "上证指数",
-      "latest_trading_day": "2026-11-18",
+      "latest_trading_day": "2026-11-19",
       "rows": 800,
       "source": "Yahoo Finance",
       "source_dates": [
-        "Yahoo Finance=2026-11-18"
+        "Yahoo Finance=2026-11-19"
       ],
-      "updated_utc": "2026-11-18T11:46:27+00:00",
+      "updated_utc": "2026-11-19T11:43:29+00:00",
       "session": "final",
-      "collected_at_cn": "2026-11-18T19:46:26+08:00",
+      "collected_at_cn": "2026-11-19T19:43:28+08:00",
       "status": "ok"
     },
     {
       "code": "sz399001",
       "name": "深证成指",
-      "latest_trading_day": "2026-11-18",
+      "latest_trading_day": "2026-11-19",
       "rows": 800,
       "source": "Yahoo Finance",
       "source_dates": [
-        "Yahoo Finance=2026-11-18"
+        "Yahoo Finance=2026-11-19"
       ],
-      "updated_utc": "2026-11-18T11:46:28+00:00",
+      "updated_utc": "2026-11-19T11:43:29+00:00",
       "session": "final",
-      "collected_at_cn": "2026-11-18T19:46:26+08:00",
+      "collected_at_cn": "2026-11-19T19:43:28+08:00",
       "status": "ok"
     }
   ]
