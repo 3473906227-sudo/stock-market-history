@@ -25,7 +25,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: a-share-industry-boards
+  group: a-share-industry-boards-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
