@@ -17,6 +17,10 @@ on:
     paths:
       - sector_sync.py
       - .github/workflows/stock-sector-sync.yml
+  pull_request:
+    paths:
+      - sector_sync.py
+      - .github/workflows/stock-sector-sync.yml
 
 permissions:
   contents: write
@@ -25,7 +29,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Python syntax before any market requests
+        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py
   sync:
+    needs: syntax-check
+    # PR/测试分支只跑语法检查，绝不向主分支发布行情或触发高频抓取。
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
@@ -51,7 +65,7 @@ jobs:
           if [ "$MANUAL_QUOTES" = "true" ] || [ "$TRIGGER_CRON" = '40 3 * * 1-5' ]; then
             python sector_sync.py --quotes-only
           else
-            python sector_sync.py --workers 3
+            python sector_sync.py --workers 1 --max-boards 28 --max-members 4
           fi
       - name: Publish only verified industry files (parallel-safe)
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
@@ -83,3 +97,7 @@ jobs:
           done
           echo '::error::行业行情发布失败（已重试4次）'
           exit 1
+      - name: Validate actual completed trading day coverage
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        # 先安全发布已核验的数据、再判定整轮健康：部分补采可积累，但不能显示绿色成功。
+        run: python sector_sync.py --validate-status
