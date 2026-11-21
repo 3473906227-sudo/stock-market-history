@@ -14,12 +14,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import time
 
 import akshare as ak
 import pandas as pd
+
+from tools.github_schedule_trigger import a_share_trading_status
 
 CN = timezone(timedelta(hours=8))
 OUT = Path(__file__).resolve().parent / 'data' / 'sectors'
@@ -65,8 +68,98 @@ def save_json(path, value):
     tmp.replace(path)
 
 
+
+# 统一行情请求节流；一旦连续出现东方财富连接拒绝/限流，就熔断本轮任务，
+# 而不是将失败请求放大到 496 个板块（先前会产生近千次请求）。
+_API_LAST = 0.0
+_API_SUSPECT = 0
+_API_BLOCKED = False
+_API_CALLS = 0
+_API_GAP = max(1.0, min(float(os.environ.get('SECTOR_REQUEST_GAP_SECONDS', '2.2')), 15.0))
+
+class MarketRateLimited(RuntimeError):
+    """上游临时限流，必须结束本轮采集，不能继续重试整个板块池。"""
+
+def _throttling_error(exc):
+    msg = str(exc).lower()
+    return any(key in msg for key in (
+        'push2', '限流', '频繁', 'rate limit', 'too many requests',
+        'remotedisconnected', 'remote end closed', 'connection aborted',
+        'connection reset', '远程主机', '断开连接', '暂时无法连接'
+    ))
+
+def _call_market(fn, *args, **kwargs):
+    global _API_LAST, _API_SUSPECT, _API_BLOCKED, _API_CALLS
+    if _API_BLOCKED:
+        raise MarketRateLimited('行情源连续限流，本轮已熔断；保留已有有效数据')
+    gap = _API_GAP - (time.monotonic() - _API_LAST)
+    if gap > 0:
+        time.sleep(gap)
+    _API_LAST = time.monotonic()
+    _API_CALLS += 1
+    try:
+        data = fn(*args, **kwargs)
+        _API_SUSPECT = 0
+        return data
+    except Exception as exc:
+        if _throttling_error(exc):
+            _API_SUSPECT += 1
+            if _API_SUSPECT >= 2:
+                _API_BLOCKED = True
+                raise MarketRateLimited('东方财富接口连续限流，已停止后续板块请求：' + str(exc)[:130]) from None
+            # 一次限流后短暂退避，下一次依然失败才熔断。
+            time.sleep(5)
+        raise
+
+def _expected_day():
+    """仅将交易所已知休市日与 15:20 盘后收盘判定作为目标日期。"""
+    now = clock()
+    day = now.date()
+    if (now.hour, now.minute) < (15, 20):
+        day -= timedelta(days=1)
+    for _ in range(18):
+        state, _ = a_share_trading_status(day)
+        if state == 'open':
+            return day.isoformat()
+        if state == 'unknown':
+            return ''
+        day -= timedelta(days=1)
+    return ''
+
+def _history_asof(name):
+    file = HIST / (digest(name) + '.csv')
+    if not file.exists():
+        return ''
+    try:
+        # csv 正常以日期升序写入；只读取日期列即可校验实际收盘交易日。
+        data = pd.read_csv(file, usecols=['date'])
+        if data.empty:
+            return ''
+        return str(data['date'].iloc[-1])[:10]
+    except (OSError, ValueError, KeyError, IndexError):
+        return ''
+
+# 仅在官方行业名称吻合时优先采集；不把自定义17个分组伪装成官方行情。
+CORE_BOARDS = {
+    '半导体', '元件', '消费电子', '通信设备', '通信服务', '计算机设备',
+    '软件开发', 'IT服务', '电池', '光伏设备', '电网设备', '汽车整车',
+    '汽车零部件', '汽车服务', '通用设备', '专用设备', '工程机械',
+    '中药', '化学制药', '生物制品', '医疗器械', '白酒', '银行',
+    '证券', '保险及其他', '电力', '环保', '物流', '航运港口',
+    '游戏Ⅱ', '游戏Ⅲ', '传媒', '广告营销', '商业百货', '食品加工制造',
+}
+
+def _tracked_sectors():
+    """结合已跟踪个股实际的官方行业名称，优先补齐强弱状态所需行业日K。"""
+    wanted = set(CORE_BOARDS)
+    snapshot = load_json(OUT.parent / 'stock_strength.json')
+    for row in snapshot.get('stocks', []):
+        if isinstance(row, dict) and row.get('sector'):
+            wanted.add(str(row['sector']).strip())
+    return wanted
+
 def live_quotes():
-    df = ak.stock_board_industry_name_em()
+    df = _call_market(ak.stock_board_industry_name_em)
     if df is None or len(df) < 30:
         raise ValueError('有效行业数量少于30，拒绝覆写行情')
     rows = []
@@ -91,7 +184,7 @@ def live_quotes():
 
 def history(name, board_code=None):
     now = clock()
-    df = ak.stock_board_industry_hist_em(
+    df = _call_market(ak.stock_board_industry_hist_em,
         symbol=(board_code if board_code and str(board_code).startswith('BK') else name), period='日k',
         start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
         end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
@@ -131,7 +224,7 @@ def history(name, board_code=None):
 
 
 def members(name, board_code=None):
-    df = ak.stock_board_industry_cons_em(symbol=(board_code if board_code and str(board_code).startswith('BK') else name))
+    df = _call_market(ak.stock_board_industry_cons_em,symbol=(board_code if board_code and str(board_code).startswith('BK') else name))
     if df is None or df.empty or '代码' not in df:
         raise ValueError('行业成分股列表为空')
     codes = set()
@@ -199,12 +292,49 @@ def returns(boards):
             continue
 
 
+
+def _write_status(payload):
+    save_json(OUT / 'status.json', payload)
+
+def _validate_status():
+    state = load_json(OUT / 'status.json')
+    # 防止读取其他工作流上次残留的成功状态。
+    current_run = os.environ.get('GITHUB_RUN_ID', '').strip()
+    if current_run and str(state.get('github_run_id', '')) != current_run:
+        print('::error::未找到本次GitHub任务的采集状态，拒绝误报成功', flush=True)
+        return 2
+    if not state.get('ok'):
+        print('::error::行业行情未达到最新交易日覆盖标准：' +
+              str(state.get('reason') or '采集不完整'), flush=True)
+        return 2
+    print('行业采集质量验收通过：' + str(state.get('reason', '')), flush=True)
+    return 0
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--quotes-only', action='store_true')
-    parser.add_argument('--workers', type=int, default=3)
+    parser.add_argument('--validate-status', action='store_true',
+                        help='发布完成后校验本轮数据质量；缺数或熔断让Actions显示失败')
+    parser.add_argument('--workers', type=int, default=1,
+                        help='兼容旧参数；限流保护强制串行，不再并发访问行情源')
+    parser.add_argument('--max-boards', type=int, default=28,
+                        help='每轮至多补采的历史板块数，分批完成496板块')
+    parser.add_argument('--max-members', type=int, default=4,
+                        help='每轮至多更新的成分股板块数')
     args = parser.parse_args()
+    if args.validate_status:
+        return _validate_status()
     OUT.mkdir(parents=True, exist_ok=True)
+    run_id = os.environ.get('GITHUB_RUN_ID', '')
+    expected = _expected_day()
+    old_status = load_json(OUT / 'status.json')
+    attempts = dict(old_status.get('history_last_attempt') or {})
+    attempts = {str(k): str(v) for k,v in attempts.items()}
+    base_status = {
+        'run_at': stamp(), 'github_run_id': run_id,
+        'expected_trading_day': expected, 'rate_limited': False,
+        'request_count': 0, 'ok': False,
+    }
     prior = load_json(OUT / 'quotes.json')
     new_live = False
     try:
@@ -213,63 +343,160 @@ def main():
         print('行情快照读取成功：', len(boards), stamp(), flush=True)
     except Exception as exc:
         print('行情快照失败，旧数据保留：', str(exc)[:250], flush=True)
-        if args.quotes_only:
-            return 2
         boards = prior.get('boards', [])
         if not isinstance(boards, list) or len(boards) < 30:
-            return 2
+            _write_status({**base_status, 'mode': 'quotes' if args.quotes_only else 'full',
+                           'reason': '无法获取有效行业快照且本地没有可用数据',
+                           'rate_limited': _API_BLOCKED, 'request_count': _API_CALLS})
+            return 0
     if args.quotes_only:
-        older = {r['name']: r for r in prior.get('boards', []) if isinstance(r, dict) and r.get('name')}
-        for b in boards:
-            before = older.get(b['name'], {})
-            for key in ('ret5', 'ret20', 'history_asof', 'history_close', 'ma20', 'ma60', 'trend', 'volume_ratio'):
-                if key in before:
-                    b[key] = before[key]
-        save_json(OUT / 'quotes.json', {
-            'ok': True, 'source': '东方财富行业板块行情 / AKShare',
-            'fetched_at': stamp(),
-            'session': 'intraday' if (clock().hour, clock().minute) < (15, 20) else 'final_or_delayed',
-            'boards': boards})
+        # 盘中报价与历史日线日期分开表示；绝不冒充最新完整日K。
+        if new_live:
+            older = {r['name']: r for r in prior.get('boards', [])
+                     if isinstance(r, dict) and r.get('name')}
+            for board in boards:
+                before = older.get(board['name'], {})
+                for key in ('ret5', 'ret20', 'history_asof', 'history_close',
+                            'ma20', 'ma60', 'trend', 'volume_ratio'):
+                    if key in before:
+                        board[key] = before[key]
+            save_json(OUT / 'quotes.json', {
+                'ok': True, 'source': '东方财富行业板块行情 / AKShare',
+                'fetched_at': stamp(),
+                'session': 'intraday' if (clock().hour, clock().minute) < (15, 20) else 'final_or_delayed',
+                'boards': boards
+            })
+        _write_status({**base_status, 'mode': 'quotes', 'ok': new_live,
+                       'quotes_updated': new_live, 'board_count': len(boards),
+                       'request_count': _API_CALLS,
+                       'reason': '盘中报价成功；历史日K另行校验' if new_live else '报价源失败，保留旧快照'})
         return 0
 
     names = sorted({b['name'] for b in boards if isinstance(b, dict) and b.get('name')})
-    existing = load_json(OUT / 'symbols.json').get('symbols', {})
-    mapping = dict(existing) if isinstance(existing, dict) else {}
-    succeeded_hist = 0
-    succeeded_members = 0
+    board_codes = {str(b.get('name')): str(b.get('code') or '')
+                   for b in boards if isinstance(b, dict)}
+    target_sectors = _tracked_sectors()
+    core = sorted(set(names) & target_sectors)
+    if not expected:
+        _write_status({**base_status, 'mode': 'full', 'board_count': len(names),
+                       'reason': '未能确认最近完整交易日，拒绝将旧行情标记为最新',
+                       'request_count': _API_CALLS})
+        return 0
+
+    old_dates = {name: _history_asof(name) for name in names}
+    pending = [name for name in names if old_dates[name] < expected]
+    # 核心行业优先；未命中的板块按上一次尝试时间轮转，避免每轮只请求同一批失败对象。
+    pending.sort(key=lambda name: (
+        0 if name in target_sectors else 1,
+        attempts.get(name, ''), old_dates.get(name, ''), name
+    ))
+    limit = max(1, min(args.max_boards, 55))
+    selected = pending[:limit]
+    previous_symbols = load_json(OUT / 'symbols.json').get('symbols', {})
+    mapping = dict(previous_symbols) if isinstance(previous_symbols, dict) else {}
+    mapping_names = set(mapping.values())
+    max_members = max(0, min(args.max_members, 12))
+    history_success = 0
+    history_fresh_success = 0
+    members_success = 0
     failed = []
-    with ThreadPoolExecutor(max_workers=max(1, min(args.workers, 4))) as pool:
-        board_codes = {str(b.get('name')): str(b.get('code') or '') for b in boards if isinstance(b, dict)}
-        jobs = {pool.submit(fetch_both, name, board_codes.get(name)): name for name in names}
-        for job in as_completed(jobs):
-            name, ok_hist, codes, errors = job.result()
-            if ok_hist:
-                succeeded_hist += 1
-            if codes:
-                succeeded_members += 1
-                mapping = {code: industry for code, industry in mapping.items() if industry != name}
-                for code in codes:
-                    mapping[code] = name
-            if errors:
-                failed.append({'name': name, 'error': '; '.join(errors)})
-            print(f'{name}: 历史={ok_hist}; 成分={len(codes) if codes else 0}; 错误={errors}', flush=True)
-    if succeeded_members:
+    attempted = []
+    breaker_reason = ''
+    for name in selected:
+        if _API_BLOCKED:
+            breaker_reason = '东方财富连续限流，已停止后续行业请求'
+            break
+        attempts[name] = stamp()
+        attempted.append(name)
+        try:
+            total = history(name, board_codes.get(name))
+            history_success += 1
+            newest = _history_asof(name)
+            if newest >= expected:
+                history_fresh_success += 1
+            else:
+                failed.append({'name': name, 'error': '历史日线只到 ' + (newest or '未知') +
+                               '，预期 ' + expected})
+            print(f'{name}: 完整日K {total} 条，最新日期 {newest}，预期 {expected}', flush=True)
+        except MarketRateLimited as exc:
+            breaker_reason = str(exc)
+            failed.append({'name': name, 'error': breaker_reason})
+            break
+        except Exception as exc:
+            failed.append({'name': name, 'error': 'history: ' + str(exc)[:170]})
+            print(f'{name}: 历史抓取失败：{str(exc)[:140]}', flush=True)
+            if _API_BLOCKED:
+                breaker_reason = '行情上游连续限流'
+                break
+        # 成分映射未建立才优先补全，且每轮最多4个，避免每个历史请求再追加一个高频API。
+        if members_success < max_members and name not in mapping_names and not _API_BLOCKED:
+            try:
+                codes = members(name, board_codes.get(name))
+                mapping = {code: sector for code, sector in mapping.items() if sector != name}
+                mapping.update({code: name for code in codes})
+                mapping_names.add(name)
+                members_success += 1
+            except MarketRateLimited as exc:
+                breaker_reason = str(exc)
+                failed.append({'name': name, 'error': 'members: ' + breaker_reason})
+                break
+            except Exception as exc:
+                failed.append({'name': name, 'error': 'members: ' + str(exc)[:160]})
+                if _API_BLOCKED:
+                    breaker_reason = '行情上游连续限流'
+                    break
+
+    if members_success:
         save_json(OUT / 'symbols.json', {
             'ok': True, 'source': '东方财富行业成分股 / AKShare',
-            'fetched_at': stamp(), 'symbols': mapping})
+            'fetched_at': stamp(), 'symbols': mapping
+        })
     returns(boards)
     if new_live:
         save_json(OUT / 'quotes.json', {
             'ok': True, 'source': '东方财富行业板块行情 / AKShare',
             'fetched_at': stamp(), 'session': 'final_or_delayed',
-            'boards': boards})
-    save_json(OUT / 'status.json', {
-        'run_at': stamp(), 'mode': 'full', 'board_count': len(names),
-        'history_success': succeeded_hist, 'members_success': succeeded_members,
-        'failed_count': len(failed), 'failed': failed[:60],
-        'quotes_updated': new_live})
-    print(f'行业全量更新完成：历史 {succeeded_hist}/{len(names)}，成分 {succeeded_members}/{len(names)}', flush=True)
-    return 0 if succeeded_hist > 0 else 2
+            'boards': boards,
+        })
+    actual_dates = {name: _history_asof(name) for name in names}
+    fresh_count = sum(d >= expected for d in actual_dates.values())
+    missing_core = [name for name in core if actual_dates[name] < expected]
+    remaining = [name for name in names if actual_dates[name] < expected]
+    # 严格区分「本轮有少量成功」与「实际跟踪的核心板块已达最近收盘日」。
+    # 任何一次上游熔断或核心缺数都不能绿灯；数据可分批安全发布并继续补齐。
+    ok = (new_live and not _API_BLOCKED and not missing_core and
+          (not selected or history_fresh_success >= max(1, int(len(attempted) * .8))))
+    if _API_BLOCKED:
+        reason = '上游限流熔断；不再密集重试，保留历史有效数据'
+    elif missing_core:
+        reason = f'{len(missing_core)}个核心板块仍未更新到 {expected}（本轮已补采 {history_fresh_success} 个）'
+    elif selected and history_fresh_success < max(1, int(len(attempted) * .8)):
+        reason = f'本轮有效补采 {history_fresh_success}/{len(attempted)}，未达到80%验收线'
+    elif not new_live:
+        reason = '无法确认最新板块报价，已保留旧数据'
+    elif remaining:
+        reason = f'核心行业行情已达 {expected}；其余 {len(remaining)} 个待分批补齐'
+    else:
+        reason = f'{len(names)}个行业最新交易日均已更新到 {expected}'
+    status = {
+        **base_status, 'mode': 'full', 'ok': bool(ok), 'reason': reason,
+        'board_count': len(names), 'core_board_count': len(core),
+        'core_stale_count': len(missing_core), 'core_stale_sample': missing_core[:40],
+        'expected_trading_day': expected,
+        'history_fresh_count': fresh_count, 'history_pending_count': len(remaining),
+        'history_success': history_success, 'history_fresh_success': history_fresh_success,
+        'history_attempted': len(attempted), 'history_selected': len(selected),
+        'members_success': members_success,
+        'failed_count': len(failed), 'failed': failed[:35],
+        'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
+        'quotes_updated': new_live, 'request_count': _API_CALLS,
+        'history_last_attempt': attempts,
+    }
+    _write_status(status)
+    print('行业分批采集：' + reason, flush=True)
+    print(f'有效历史覆盖 {fresh_count}/{len(names)}；核心缺数 {len(missing_core)}；'
+          f'本轮有效补采 {history_fresh_success}/{len(attempted)}；上游调用 {_API_CALLS}', flush=True)
+    return 0
 
 
 if __name__ == '__main__':
