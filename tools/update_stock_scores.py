@@ -66,6 +66,15 @@ def report_period_candidates() -> list[str]:
     return result
 
 
+def _rate_limited(exc):
+    message = str(exc).lower()
+    return any(k in message for k in (
+        'push2', 'ratelimit', 'rate limit', '限流',
+        'too many requests', '频繁', 'remotedisconnected',
+        'remote end closed', 'connection aborted',
+    ))
+
+
 def load_financials(ak):
     errors = []
     for period in report_period_candidates():
@@ -89,12 +98,25 @@ def load_financials(ak):
                 errors.append(f"{period}: rows={len(frame)}")
         except Exception as exc:
             errors.append(f"{period}: {type(exc).__name__} {str(exc)[:140]}")
-        time.sleep(0.4)
+            if _rate_limited(exc):
+                raise RuntimeError(
+                    "东方财富财报接口发生限流，已熔断本轮评分，不再循环请求多个报告期；"
+                    "保留GitHub已有评分文件，下一交易日由定时任务重新尝试。"
+                ) from None
+        time.sleep(1.2)
     raise RuntimeError("近年业绩报表均未取得有效全市场数据：" + " | ".join(errors[-5:]))
 
 
 def load_spot(ak):
-    frame = ak.stock_zh_a_spot_em()
+    try:
+        frame = ak.stock_zh_a_spot_em()
+    except Exception as exc:
+        if _rate_limited(exc):
+            raise RuntimeError(
+                "东方财富估值快照接口被限流，本轮综合评分停止，不会使用旧PE/PB伪装新数据；"
+                "已发布的旧评分文件保持不变，下一交易日重试。"
+            ) from None
+        raise
     if frame is None or frame.empty or not {"代码", "市盈率-动态", "市净率"}.issubset(frame.columns):
         raise ValueError("A股估值快照为空或缺少PE/PB字段")
     frame = frame.copy()
