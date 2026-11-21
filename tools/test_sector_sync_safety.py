@@ -20,8 +20,11 @@ class SectorSafetyTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.addCleanup(patch.stopall)
-        patch.object(s, 'OUT', Path(self.tmp.name)).start()
-        patch.object(s, 'HIST', Path(self.tmp.name) / 'history').start()
+        self.root = Path(self.tmp.name) / 'repo'
+        self.output = self.root / 'data' / 'sectors'
+        self.output.mkdir(parents=True, exist_ok=True)
+        patch.object(s, 'OUT', self.output).start()
+        patch.object(s, 'HIST', self.output / 'history').start()
         patch.object(s, 'clock', lambda: datetime(2026,11,21,20,tzinfo=timezone(timedelta(hours=8)))).start()
         s._API_BLOCKED = False
         s._API_LAST = 0
@@ -58,6 +61,40 @@ class SectorSafetyTests(unittest.TestCase):
         with patch.dict(os.environ,{'GITHUB_RUN_ID':'a'}):
             self.assertEqual(s._validate_status(),2)
 
+
+    def test_selection_keeps_17_groups_plus_stock_industry(self):
+        groups = {'第%02d组'%i:['行业%02d'%i] for i in range(17)}
+        s.save_json(s.OUT / 'selection.json', {'groups':groups})
+        (self.root / 'stock_symbols.txt').write_text('000063\n000157\n',encoding='utf8')
+        s.save_json(s.OUT / 'symbols.json',{'symbols':{
+            '000063':'通信设备','000157':'工程机械','000999':'其他无关'}})
+        allowed, tracked, refs, stocks = s._selection()
+        self.assertEqual(len(refs),17)
+        self.assertEqual(tracked,{'000063','000157'})
+        self.assertEqual(stocks,{'通信设备','工程机械'})
+        self.assertEqual(len(allowed),19)
+
+    def test_prune_removes_unrelated_history_and_untracked_symbols(self):
+        s.save_json(s.OUT / 'quotes.json', {'ok':True,'boards':[
+            {'name':'通信设备'},{'name':'工程机械'},{'name':'无关板块'}]})
+        s.save_json(s.OUT / 'symbols.json', {'symbols':{
+            '000063':'通信设备','000157':'工程机械','000999':'无关板块'}})
+        s.HIST.mkdir(parents=True,exist_ok=True)
+        for name in ('通信设备','工程机械','无关板块'):
+            (s.HIST/(s.digest(name)+'.csv')).write_text('date,close\n2026-11-17,1\n')
+        result = s._prune_storage({'通信设备','工程机械'},{'000063','000157'})
+        self.assertEqual(result['boards_removed'],1)
+        self.assertEqual(result['symbols_removed'],1)
+        self.assertEqual(result['history_files_removed'],1)
+        self.assertEqual(len(list(s.HIST.glob('*.csv'))),2)
+        self.assertEqual(len(s.load_json(s.OUT/'quotes.json')['boards']),2)
+        self.assertNotIn('000999',s.load_json(s.OUT/'symbols.json')['symbols'])
+
+    def test_selection_rejects_missing_whitelist(self):
+        (self.root/'stock_symbols.txt').write_text('000063\n',encoding='utf8')
+        with self.assertRaises(ValueError):
+            s._selection()
+
     def _fake_full(self, *, fresh):
         from collections import defaultdict
         current = defaultdict(lambda:'2026-11-17')
@@ -74,6 +111,8 @@ class SectorSafetyTests(unittest.TestCase):
              patch.object(s, 'returns', lambda board:None),\
              patch.object(s, '_history_asof', get_asof),\
              patch.object(s, '_tracked_sectors', lambda:{'通信设备'}),\
+             patch.object(s, '_selection', lambda:(set(x['name'] for x in boards),set(),set(),set())),\
+             patch.object(s, '_prune_storage', lambda *args:{}),\
              patch.object(sys, 'argv',['sector_sync.py','--max-boards','28','--max-members','0']):
             self.assertEqual(s.main(),0)
         return s.load_json(s.OUT / 'status.json')
