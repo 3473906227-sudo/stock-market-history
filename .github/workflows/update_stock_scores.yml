@@ -2,14 +2,8 @@ name: A-share composite research scoring
 on:
   workflow_dispatch:
   schedule:
-    # UTC 11:40 = 北京时间19:40；在个股和行业盘后同步后生成评分。
-    - cron: '40 11 * * 1-5'
-  workflow_run:
-    workflows:
-      - Daily stock OHLCV sync
-      - A-share industry boards sync
-    types: [completed]
-    branches: [main]
+    # UTC 12:45 = 北京时间20:45；每天盘后只运行一次，避免与板块、个股同步争夺东方财富限流额度。
+    - cron: '45 12 * * 1-5'
   push:
     paths:
       - tools/update_stock_scores.py
@@ -24,8 +18,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify research scoring Python source
+        run: python -m py_compile tools/update_stock_scores.py
   score:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    needs: syntax-check
+    # 仅A股工作日定时一次或管理员手动触发。代码推送只做语法检查。
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
