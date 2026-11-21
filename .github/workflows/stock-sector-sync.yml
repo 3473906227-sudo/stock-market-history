@@ -36,6 +36,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate Python syntax before any market requests
         run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py
+      - name: Run offline rate-limit and freshness regression tests
+        run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
   sync:
     needs: syntax-check
     # PR/测试分支只跑语法检查，绝不向主分支发布行情或触发高频抓取。
