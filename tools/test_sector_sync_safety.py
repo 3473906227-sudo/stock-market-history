@@ -63,16 +63,16 @@ class SectorSafetyTests(unittest.TestCase):
 
 
     def test_selection_keeps_17_groups_plus_stock_industry(self):
-        groups = {'第%02d组'%i:['行业%02d'%i] for i in range(17)}
+        groups = {'第%02d组'%i:['行业%02d'%i,'备用行业%02d'%i] for i in range(17)}
         s.save_json(s.OUT / 'selection.json', {'groups':groups})
         (self.root / 'stock_symbols.txt').write_text('000063\n000157\n',encoding='utf8')
         s.save_json(s.OUT / 'symbols.json',{'symbols':{
             '000063':'通信设备','000157':'工程机械','000999':'其他无关'}})
         allowed, tracked, refs, stocks = s._selection()
-        self.assertEqual(len(refs),17)
+        self.assertEqual(len(refs),34)
         self.assertEqual(tracked,{'000063','000157'})
         self.assertEqual(stocks,{'通信设备','工程机械'})
-        self.assertEqual(len(allowed),19)
+        self.assertEqual(len(allowed),36)
 
     def test_prune_removes_unrelated_history_and_untracked_symbols(self):
         s.save_json(s.OUT / 'quotes.json', {'ok':True,'boards':[
