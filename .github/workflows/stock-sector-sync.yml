@@ -57,6 +57,9 @@ jobs:
       - name: Install market-data libraries
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         run: python -m pip install --upgrade 'akshare>=1.16' 'pandas>=2.0'
+      - name: Prune unrelated sector files (17 groups + tracked stocks only)
+        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        run: python sector_sync.py --prune-only
       - name: Download verified industry quotes / history / constituents
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         env:
@@ -83,8 +86,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             mkdir -p data/sectors
+            # 删除旧历史目录后重新放回白名单文件，确保无关板块在仓库真正删除。
+            rm -rf data/sectors/history
             cp -a "$staging/." data/sectors/
-            git add data/sectors/
+            git add -A data/sectors/
             if git diff --cached --quiet; then
               echo '行业数据无变化，不提交。'
               exit 0

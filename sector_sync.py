@@ -139,24 +139,84 @@ def _history_asof(name):
     except (OSError, ValueError, KeyError, IndexError):
         return ''
 
-# 仅在官方行业名称吻合时优先采集；不把自定义17个分组伪装成官方行情。
-CORE_BOARDS = {
-    '半导体', '元件', '消费电子', '通信设备', '通信服务', '计算机设备',
-    '软件开发', 'IT服务', '电池', '光伏设备', '电网设备', '汽车整车',
-    '汽车零部件', '汽车服务', '通用设备', '专用设备', '工程机械',
-    '中药', '化学制药', '生物制品', '医疗器械', '白酒', '银行',
-    '证券', '保险及其他', '电力', '环保', '物流', '航运港口',
-    '游戏Ⅱ', '游戏Ⅲ', '传媒', '广告营销', '商业百货', '食品加工制造',
-}
+# 官方行业白名单由 data/sectors/selection.json 的17个看板分组维护，
+# 额外保留 stock_symbols.txt 中158只已跟踪股票实际所属行业；
+# 原始板块列表仅用于获取官方代码，绝不再把496个行业全部缓存。
+def _selection():
+    conf = load_json(OUT / 'selection.json')
+    groups = conf.get('groups')
+    if not isinstance(groups, dict) or len(groups) != 17:
+        raise ValueError('行业白名单缺失或不是17个看板分组，已拒绝清理数据')
+    references = {
+        name.strip() for values in groups.values() if isinstance(values, list)
+        for name in values if isinstance(name, str) and name.strip()
+    }
+    stock_file = OUT.parent.parent / 'stock_symbols.txt'
+    try:
+        raw = stock_file.read_text('utf-8')
+    except OSError:
+        raise ValueError('未找到stock_symbols.txt，拒绝删除任何行业历史') from None
+    stocks = {line.strip() for line in raw.splitlines()
+              if re.fullmatch(r'\d{6}', line.strip())}
+    if not stocks:
+        raise ValueError('跟踪股票清单为空，拒绝清理行业历史')
+    raw_mapping = load_json(OUT / 'symbols.json').get('symbols', {})
+    if not isinstance(raw_mapping, dict):
+        raise ValueError('股票官方行业映射无效，拒绝清理历史数据')
+    tracked = {str(raw_mapping[code]).strip() for code in stocks
+               if isinstance(raw_mapping.get(code), str) and str(raw_mapping[code]).strip()}
+    allowed = references | tracked
+    if len(allowed) < 30:
+        raise ValueError('有效行业白名单不足30个，拒绝危险清理')
+    missing_codes = sorted(stocks - raw_mapping.keys())
+    if missing_codes:
+        print('警告：有股票尚未映射到官方行业：' + ','.join(missing_codes[:12]),flush=True)
+    return allowed, stocks, references, tracked
 
 def _tracked_sectors():
-    """结合已跟踪个股实际的官方行业名称，优先补齐强弱状态所需行业日K。"""
-    wanted = set(CORE_BOARDS)
-    snapshot = load_json(OUT.parent / 'stock_strength.json')
-    for row in snapshot.get('stocks', []):
-        if isinstance(row, dict) and row.get('sector'):
-            wanted.add(str(row['sector']).strip())
-    return wanted
+    """返回官方行业白名单；17个分组为展示口径，不冒充真实指数。"""
+    return _selection()[0]
+
+def _prune_storage(allowed, tracked_codes):
+    """只清理仓库托管的行业行情及映射，不接触个股日线或两市指数。"""
+    old_quotes = load_json(OUT / 'quotes.json')
+    old_rows = old_quotes.get('boards', [])
+    removed_quotes = 0
+    if isinstance(old_rows, list):
+        selected = [item for item in old_rows if isinstance(item, dict)
+                    and item.get('name') in allowed]
+        removed_quotes = len(old_rows) - len(selected)
+        if removed_quotes:
+            new_quotes = dict(old_quotes)
+            new_quotes['boards'] = selected
+            new_quotes['selection_policy'] = '17个看板分组与跟踪个股官方行业'
+            save_json(OUT / 'quotes.json', new_quotes)
+    symbols_obj = load_json(OUT / 'symbols.json')
+    existing = symbols_obj.get('symbols', {})
+    removed_symbols = 0
+    if isinstance(existing, dict):
+        filtered = {str(code): sector for code, sector in existing.items()
+                    if code in tracked_codes and sector in allowed}
+        removed_symbols = len(existing) - len(filtered)
+        if removed_symbols:
+            next_symbols = dict(symbols_obj)
+            next_symbols['symbols'] = filtered
+            next_symbols['selection_policy'] = 'stock_symbols.txt当前跟踪股票'
+            save_json(OUT / 'symbols.json', next_symbols)
+    # 历史文件 SHA 由行业真实名称生成，避免删除任何保留行业的缓存。
+    keep_hashes = {digest(name) for name in allowed}
+    removed_files = 0
+    if HIST.exists():
+        for file in HIST.glob('*.csv'):
+            if file.stem not in keep_hashes:
+                file.unlink()
+                removed_files += 1
+    report = {'boards_removed': removed_quotes, 'symbols_removed': removed_symbols,
+              'history_files_removed': removed_files,
+              'selected_official_names': len(allowed)}
+    print('行业白名单整理：'+json.dumps(report,ensure_ascii=False),flush=True)
+    return report
+
 
 def live_quotes():
     df = _call_market(ak.stock_board_industry_name_em)
@@ -313,6 +373,8 @@ def _validate_status():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--quotes-only', action='store_true')
+    parser.add_argument('--prune-only', action='store_true',
+                        help='仅清理非看板及非个股所需行业的行情文件，不发起网络请求')
     parser.add_argument('--validate-status', action='store_true',
                         help='发布完成后校验本轮数据质量；缺数或熔断让Actions显示失败')
     parser.add_argument('--workers', type=int, default=1,
@@ -325,6 +387,10 @@ def main():
     if args.validate_status:
         return _validate_status()
     OUT.mkdir(parents=True, exist_ok=True)
+    allowed, tracked_codes, references, tracked = _selection()
+    cleanup = _prune_storage(allowed, tracked_codes)
+    if args.prune_only:
+        return 0
     run_id = os.environ.get('GITHUB_RUN_ID', '')
     expected = _expected_day()
     old_status = load_json(OUT / 'status.json')
@@ -339,12 +405,16 @@ def main():
     new_live = False
     try:
         boards = live_quotes()
+        boards = [item for item in boards if item.get('name') in allowed]
+        if len(boards) < 30:
+            raise ValueError('可用白名单行业不足30个，保留历史数据')
         new_live = True
         print('行情快照读取成功：', len(boards), stamp(), flush=True)
     except Exception as exc:
         print('行情快照失败，旧数据保留：', str(exc)[:250], flush=True)
-        boards = prior.get('boards', [])
-        if not isinstance(boards, list) or len(boards) < 30:
+        boards = [item for item in prior.get('boards', [])
+                  if isinstance(item, dict) and item.get('name') in allowed]
+        if len(boards) < 30:
             _write_status({**base_status, 'mode': 'quotes' if args.quotes_only else 'full',
                            'reason': '无法获取有效行业快照且本地没有可用数据',
                            'rate_limited': _API_BLOCKED, 'request_count': _API_CALLS})
@@ -393,7 +463,8 @@ def main():
     limit = max(1, min(args.max_boards, 55))
     selected = pending[:limit]
     previous_symbols = load_json(OUT / 'symbols.json').get('symbols', {})
-    mapping = dict(previous_symbols) if isinstance(previous_symbols, dict) else {}
+    mapping = {code:industry for code,industry in previous_symbols.items()
+               if code in tracked_codes and industry in allowed} if isinstance(previous_symbols, dict) else {}
     mapping_names = set(mapping.values())
     max_members = max(0, min(args.max_members, 12))
     history_success = 0
@@ -429,11 +500,11 @@ def main():
                 breaker_reason = '行情上游连续限流'
                 break
         # 成分映射未建立才优先补全，且每轮最多4个，避免每个历史请求再追加一个高频API。
-        if members_success < max_members and name not in mapping_names and not _API_BLOCKED:
+        if (tracked_codes - mapping.keys()) and members_success < max_members and name not in mapping_names and not _API_BLOCKED:
             try:
                 codes = members(name, board_codes.get(name))
                 mapping = {code: sector for code, sector in mapping.items() if sector != name}
-                mapping.update({code: name for code in codes})
+                mapping.update({code: name for code in codes if code in tracked_codes})
                 mapping_names.add(name)
                 members_success += 1
             except MarketRateLimited as exc:
@@ -490,7 +561,9 @@ def main():
         'failed_count': len(failed), 'failed': failed[:35],
         'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
         'quotes_updated': new_live, 'request_count': _API_CALLS,
-        'history_last_attempt': attempts,
+        'history_last_attempt': {name: value for name,value in attempts.items() if name in allowed},
+        'selected_group_count': 17, 'selection_official_count': len(allowed),
+        'selected_stock_count': len(tracked_codes), 'prune_report': cleanup,
     }
     _write_status(status)
     print('行业分批采集：' + reason, flush=True)
