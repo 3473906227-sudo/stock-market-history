@@ -105,8 +105,8 @@ def _call_market(fn, *args, **kwargs):
         _API_SUSPECT = 0
         return data
     except Exception as exc:
-        if _throttling_error(exc):
-            # 一旦确认Push2限流，立即停止本轮，不再向同一受限IP持续请求。
+        if isinstance(exc, MarketRateLimited) or _throttling_error(exc):
+            # 一旦确认历史或实时报价源不可用，立即停止本轮，防止扩大为上百次请求。
             _API_SUSPECT += 1
             _API_BLOCKED = True
             raise MarketRateLimited('东方财富行情源拒绝请求，本轮立即熔断：' + str(exc)[:145]) from None
@@ -281,7 +281,7 @@ def _direct_industry_history(board_code, start_day, now):
         raise MarketRateLimited('东方财富官方历史日K响应格式异常')
     data = payload.get('data')
     if not isinstance(data,dict):
-        raise ValueError('行业历史日K查询结果为空：'+code)
+        raise MarketRateLimited('官方行业历史日K接口为空响应或暂不可用，限流熔断：'+code)
     response_code = str(data.get('code') or '').strip()
     if response_code and response_code != code:
         raise ValueError('历史板块代码不一致，拒绝混淆行情：'+code)
