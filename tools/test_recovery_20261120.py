@@ -2,6 +2,11 @@
 """应急行情抓取离线回归：绝不拼造收盘价或历史K线。"""
 import unittest
 from datetime import date
+import json
+from pathlib import Path
+import tempfile
+from unittest.mock import patch
+from tools import recover_sectors_20261120 as rec
 from tools.recover_sectors_20261120 import parse_verified_html,reference_dates
 
 BASE="""<html><body>
@@ -22,6 +27,29 @@ class RecoveryValidation(unittest.TestCase):
                      BASE.replace("收盘</div><div>2,872.97","收盘</div><div>3,872.97")):
             with self.assertRaises(ValueError):
                 parse_verified_html(case,"集成电路制造","BK1329")
+    def test_official_complete_history_recovers_without_network(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            quote_file=root/"quotes.json"
+            status_file=root/"status.json"
+            board={"name":"官方已有日K","code":"BK1234","history_asof":"2026-11-17"}
+            items=[board]+[{"name":"already"+str(i),"code":"BK%04d"%(1000+i),
+                            "history_asof":"2026-11-20"} for i in range(116)]
+            quote_file.write_text(json.dumps({"boards":items},ensure_ascii=False),encoding="utf8")
+            refs=reference_dates("2026-11-20",back_counts=(1,5,20))
+            past={refs[1]:100,refs[5]:95,refs[20]:80,"2026-11-20":102}
+            with patch.object(rec,'QUOTES',quote_file),patch.object(rec,'STATUS',status_file),\\
+                 patch.object(rec,'historical_reference',return_value=past),\\
+                 patch.object(rec,'get_page',side_effect=AssertionError("不得请求第三方")):
+                self.assertEqual(rec.main(),0)
+            updated=json.loads(quote_file.read_text("utf8"))
+            stat=json.loads(status_file.read_text("utf8"))
+            self.assertEqual(updated["boards"][0]["history_asof"],"2026-11-20")
+            self.assertEqual(updated["boards"][0]["quote_basis"],"official_daily_close")
+            self.assertEqual(updated["boards"][0]["history_ohlcv_asof"],"2026-11-20")
+            self.assertEqual(stat["official_recovered_count"],1)
+            self.assertEqual(stat["fresh_total"],117)
+            self.assertEqual(stat["network_requests"],0)
     def test_exchange_calendar_reference_dates_not_guesswork(self):
         days=reference_dates("2026-11-20")
         self.assertEqual(days[5],"2026-11-13")
