@@ -38,9 +38,12 @@ class RecoveryValidation(unittest.TestCase):
             quote_file.write_text(json.dumps({"boards":items},ensure_ascii=False),encoding="utf8")
             refs=reference_dates("2026-11-20",back_counts=(1,5,20))
             past={refs[1]:100,refs[5]:95,refs[20]:80,"2026-11-20":102}
-            with patch.object(rec,'QUOTES',quote_file),patch.object(rec,'STATUS',status_file),\\
-                 patch.object(rec,'historical_reference',return_value=past),\\
-                 patch.object(rec,'get_page',side_effect=AssertionError("不得请求第三方")):
+            with (
+                patch.object(rec,'QUOTES',quote_file),
+                patch.object(rec,'STATUS',status_file),
+                patch.object(rec,'historical_reference',return_value=past),
+                patch.object(rec,'get_page',side_effect=AssertionError("不得请求第三方")),
+            ):
                 self.assertEqual(rec.main(),0)
             updated=json.loads(quote_file.read_text("utf8"))
             stat=json.loads(status_file.read_text("utf8"))
