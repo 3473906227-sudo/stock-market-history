@@ -28,5 +28,7 @@ for code in ('BK1329','BK0422'):
         print('VISIBLE',code,text[:2100],flush=True)
         print('HAS20261120', '2026-11-20' in text,'NUMBERS',re.findall(r'[-+]?\\d[\\d,]*\\.\\d{1,3}%',text[:400])[:10],flush=True)
         print('RAW_SCRIPT_URLS',re.findall(r'https?[^"\\s]+',raw)[:6],flush=True)
+        for needle in ('2026-11-18','2026-11-19','2026-11-20','chartData','ohlcv','__NEXT_DATA__','\\"series\\"'):
+            print('FOUND',code,needle,'count',raw.count(needle),'sample',raw[max(0,raw.find(needle)-120):raw.find(needle)+250] if needle in raw else 'NONE',flush=True)
     except Exception as exc:
         print('PROBE_ERROR',code,type(exc).__name__,str(exc)[:240],flush=True)
