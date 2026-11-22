@@ -3,7 +3,8 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - .github/workflows/sector_recover_once_20261120.yml
+      # 唯一允许自动触发的补采令牌文件。工作流代码修改不再重复触发。
+      - tools/run_recovery_once_20261120.flag
 permissions:
   contents: write
 concurrency:
@@ -55,9 +56,10 @@ jobs:
           python - <<'PY'
           import json,sys
           stat=json.load(open('data/sectors/recovery_20261120_status.json',encoding='utf-8'))
-          recovered=stat['recovered_count']; total=stat['requested_count']
-          print('11月20日收盘核验:',recovered,'/',total,'；失败:',stat['unavailable_count'])
-          if recovered + stat['already_official_count'] < total:
+          fresh=stat['fresh_total']; total=stat['requested_count']
+          print('11月20日收盘核验:',fresh,'/',total,'；本次新增:',stat['recovered_count'],
+                '；仍缺:',stat['remaining_count'])
+          if fresh < total:
               print('::warning::部分板块缺少11月20日可核验收盘数据，已安全保留旧日行情')
               sys.exit(2)
           print('全部BK板块的11月20日收盘报价已核验写入')
