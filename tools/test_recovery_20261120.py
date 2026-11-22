@@ -53,6 +53,23 @@ class RecoveryValidation(unittest.TestCase):
             self.assertEqual(stat["official_recovered_count"],1)
             self.assertEqual(stat["fresh_total"],117)
             self.assertEqual(stat["network_requests"],0)
+    def test_verified_same_bk_code_allows_site_alias(self):
+        altered=BASE.replace("集成电路制造","集成电路制造Ⅲ")
+        quote=parse_verified_html(altered,"集成电路制造","BK1329")
+        self.assertEqual(quote["source_label"],"集成电路制造Ⅲ")
+        self.assertEqual(quote["close"],2872.97)
+
+    def test_missing_historic_reference_does_not_reuse_stale_returns(self):
+        board={"name":"示例","code":"BK1329","ret5":8.8,"ret20":9.9}
+        ref={1:"2026-11-19",5:"2026-11-13",20:"2026-10-23"}
+        rec._apply_quote(board,close=2872.97,pct=-3.91,past={},reference=ref,
+                         source="核验来源",basis="third_party_verified_eastmoney_BK_close")
+        self.assertEqual(board["history_asof"],"2026-11-20")
+        self.assertEqual(board["change_pct"],-3.91)
+        self.assertIsNone(board["ret5"])
+        self.assertIsNone(board["ret20"])
+        self.assertEqual(board["history_ohlcv_asof"],"")
+
     def test_exchange_calendar_reference_dates_not_guesswork(self):
         days=reference_dates("2026-11-20")
         self.assertEqual(days[5],"2026-11-13")
