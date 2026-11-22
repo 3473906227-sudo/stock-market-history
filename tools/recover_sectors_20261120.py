@@ -50,7 +50,7 @@ def parse_verified_html(raw, name, code):
     if not re.fullmatch(r"BK\d{4,6}",code):
         raise ValueError("板块代码非可信BK代码")
     # 页面展示名可能有别名，BK代码作为官方指数唯一身份；保留原页面标签供审计。
-    heading=r"行业板块\\s*\\|\\s*·\\s*\\|\\s*"+re.escape(code)+r"\\s*\\|\\s*· CN\\s*\\|\\s*([^|]{1,48})\\s*\\|"
+    heading=r"行业板块\s*\|\s*·\s*\|\s*"+re.escape(code)+r"\s*\|\s*· CN\s*\|\s*([^|]{1,48})\s*\|"
     source_name=re.search(heading,visible)
     if not source_name:
         raise ValueError("BK代码与第三方页面身份无法核验")
