@@ -23,6 +23,7 @@ on:
       - tools/sector_daily_gate.py
       - tools/test_sector_sync_safety.py
       - .github/workflows/stock-sector-sync.yml
+      - tools/probe_sector_sources.py
 
 permissions:
   contents: write
@@ -40,6 +41,10 @@ jobs:
         run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
+      - name: Probe independent 2026-11-20 sector close source
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: python tools/probe_sector_sources.py
   sync:
     needs: syntax-check
     # push和PR只做语法测试；实际抓取只能由每日schedule或明确手动触发启动。
