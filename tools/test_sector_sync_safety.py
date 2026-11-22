@@ -171,9 +171,9 @@ class SectorSafetyTests(unittest.TestCase):
         self.assertEqual(status['core_stale_count'],1)
         self.assertEqual(status['history_fresh_success'],0)
 
-    def test_core_verified_batch_can_advance_and_marks_pending(self):
+    def test_core_verified_batch_advances_but_pending_is_not_full_success(self):
         status = self._fake_full(fresh=True)
-        self.assertTrue(status['ok'])
+        self.assertFalse(status['ok'])
         self.assertEqual(status['core_stale_count'],0)
         self.assertEqual(status['history_fresh_success'],28)
         self.assertEqual(status['history_pending_count'],2)
