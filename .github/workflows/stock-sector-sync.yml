@@ -16,13 +16,12 @@ on:
   schedule:
     # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
     - cron: '5 9 * * 1-5'
-  push:
-    paths:
-      - sector_sync.py
-      - .github/workflows/stock-sector-sync.yml
+  # 主分支代码push不触发行情采集；仅按交易日定时或显式手动请求执行。
   pull_request:
     paths:
       - sector_sync.py
+      - tools/sector_daily_gate.py
+      - tools/test_sector_sync_safety.py
       - .github/workflows/stock-sector-sync.yml
 
 permissions:
