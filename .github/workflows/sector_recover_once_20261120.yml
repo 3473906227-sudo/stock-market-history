@@ -1,6 +1,9 @@
 name: One-time verified sector close recovery 2026-11-20
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/sector_recover_once_20261120.yml
 permissions:
   contents: write
 concurrency:
