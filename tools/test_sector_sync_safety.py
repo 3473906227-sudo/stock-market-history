@@ -94,6 +94,42 @@ class SectorSafetyTests(unittest.TestCase):
             s._selection()
 
 
+
+    def test_official_bk_history_endpoint_without_industry_list(self):
+        from unittest.mock import MagicMock
+        import json
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = json.dumps({'data':{
+            'code':'BK1329', 'klines':['2026-11-20,100,101,102,99,10000,123456']
+        }}).encode('utf-8')
+        response.__enter__.return_value = response
+        calls = []
+        with patch.object(s,'urlopen',return_value=response) as web,\
+             patch.object(s.pd,'DataFrame',side_effect=lambda rows,columns: (calls.append((rows,columns)) or rows),create=True):
+            rows = s._direct_industry_history('BK1329',
+                        datetime(2026,11,17,tzinfo=timezone(timedelta(hours=8))),
+                        datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
+        self.assertEqual(rows[0][0],'2026-11-20')
+        self.assertEqual(rows[0][2],'101')
+        self.assertEqual(len(calls),1)
+        self.assertIn('90.BK1329', web.call_args.args[0].full_url)
+
+    def test_official_bk_history_rejects_mismatch(self):
+        from unittest.mock import MagicMock
+        import json
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = json.dumps({'data':{
+            'code':'BK0000','klines':['2026-11-20,100,101,102,99,10000']
+        }}).encode('utf-8')
+        response.__enter__.return_value = response
+        with patch.object(s,'urlopen',return_value=response):
+            with self.assertRaises(ValueError):
+                s._direct_industry_history('BK1329',
+                    datetime(2026,11,17,tzinfo=timezone(timedelta(hours=8))),
+                    datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
+
     def test_daily_gate_one_attempt_per_trade_day(self):
         from tools.sector_daily_gate import should_run, expected_close_day, CN
         friday = datetime(2026, 11, 20, 17, 15, tzinfo=CN)
