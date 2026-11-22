@@ -58,7 +58,10 @@ jobs:
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         env:
           SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
-        run: python tools/sector_daily_gate.py
+        run: |
+          git fetch origin main
+          git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
+          SECTOR_STATUS_FILE=/tmp/sector_remote_status.json python tools/sector_daily_gate.py
       - uses: actions/setup-python@v5
         if: steps.daily_gate.outputs.run_needed == 'true'
         with:
