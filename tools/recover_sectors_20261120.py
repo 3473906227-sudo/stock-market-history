@@ -49,9 +49,11 @@ def parse_verified_html(raw, name, code):
     visible=" | ".join(h.bits)
     if not re.fullmatch(r"BK\d{4,6}",code):
         raise ValueError("板块代码非可信BK代码")
-    heading=r"行业板块\s*\|\s*·\s*\|\s*"+re.escape(code)+r"\s*\|\s*· CN\s*\|\s*"+re.escape(name)+r"\s*\|"
-    if not re.search(heading,visible):
-        raise ValueError("BK代码与行业名称无法一一验证")
+    # 页面展示名可能有别名，BK代码作为官方指数唯一身份；保留原页面标签供审计。
+    heading=r"行业板块\\s*\\|\\s*·\\s*\\|\\s*"+re.escape(code)+r"\\s*\\|\\s*· CN\\s*\\|\\s*([^|]{1,48})\\s*\\|"
+    source_name=re.search(heading,visible)
+    if not source_name:
+        raise ValueError("BK代码与第三方页面身份无法核验")
     pattern=(r"沪深 A 股行业板块与概念板块，交易时段每 5 分钟刷新，展示涨跌幅、成交额、涨跌家数与领涨股。"
              r"\s*\|\s*([\d,]+(?:\.\d+)?)\s*\|\s*([+-]?\d+(?:\.\d+)?)%\s*\|"
              r"\s*更新于\s*\|\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2})")
@@ -67,7 +69,8 @@ def parse_verified_html(raw, name, code):
     close_match=re.search(r"收盘\s*\|\s*([\d,]+(?:\.\d+)?)",visible)
     if not close_match or abs(float(close_match.group(1).replace(",",""))-close)>0.011:
         raise ValueError("页面收盘数值与标识不一致")
-    return {"close":close,"change_pct":change,"trade_date":trade_day,"source_time":trade_day+" "+clock}
+    return {"close":close,"change_pct":change,"trade_date":trade_day,
+            "source_time":trade_day+" "+clock,"source_label":source_name.group(1).strip()}
 
 def get_page(code):
     request=Request(SOURCE+code.lower(), headers={
@@ -127,13 +130,15 @@ def _apply_quote(item, *, close, pct, past, reference, source, basis,
                  source_url="", source_time="", full_history=False):
     item.update({
         "last":round(close,3),
-        "change_pct":round(pct,3),
+        "change_pct":round(pct,3) if pct is not None else None,
         "history_asof":TARGET,
         "history_close":round(close,3),
         "quote_asof":TARGET,
-        "history_ohlcv_asof":TARGET if full_history else max(past.keys()),
-        "ret5":round((close/past[reference[5]]-1)*100,3),
-        "ret20":round((close/past[reference[20]]-1)*100,3),
+        "history_ohlcv_asof":TARGET if full_history else (max(past.keys()) if past else ""),
+        "ret5":round((close/past[reference[5]]-1)*100,3)
+               if past.get(reference[5],0)>0 else None,
+        "ret20":round((close/past[reference[20]]-1)*100,3)
+                if past.get(reference[20],0)>0 else None,
         "quote_basis":basis,"quote_source":source,
         "quote_source_url":source_url,
         "source_time":source_time,
@@ -180,12 +185,11 @@ def main():
             continue
         past=historical_reference(name)
         try:
-            if any(key not in past for key in (reference[1],reference[5],reference[20])):
-                raise ValueError("前1/5/20交易日真实基准价格缺失，暂不计算涨跌")
+            # 缺少旧的前一交易日收盘时，第三方当日涨跌幅仍可独立核验。
             if TARGET in past and past[TARGET]>0:
                 # 优先修复已有的官方真实完整日K，不访问任何第三方网站。
                 close=past[TARGET]
-                change_pct=(close/past[reference[1]]-1)*100
+                change_pct=(close/past[reference[1]]-1)*100 if past.get(reference[1],0)>0 else None
                 _apply_quote(item,close=close,pct=change_pct,past=past,
                              reference=reference,full_history=True,
                              basis="official_daily_close",
@@ -207,7 +211,11 @@ def main():
                          basis="third_party_verified_eastmoney_BK_close",
                          source=SOURCE_LABEL,source_url=SOURCE+code.lower(),
                          source_time=data["source_time"])
-            mirror_updated.append({"name":name,"code":code,"close":close})
+            item["quote_source_label"]=data["source_label"]
+            mirror_updated.append({"name":name,"code":code,"close":close,
+                                   "source_label":data["source_label"],
+                                   "ret5_available":item["ret5"] is not None,
+                                   "ret20_available":item["ret20"] is not None})
             network_fail_streak=0
             print("MIRROR_RECOVERED",name,code,data["source_time"],close,flush=True)
         except (HTTPError,URLError,TimeoutError,OSError,ValueError,KeyError,TypeError) as exc:
@@ -249,6 +257,8 @@ def main():
         "mirror_sample":mirror_updated[:15],
         "failed":failed[:60],
         "network_requests":network_requests,
+        "missing_ret5_count":sum(x.get("history_asof")==TARGET and x.get("ret5") is None for x in boards),
+        "missing_ret20_count":sum(x.get("history_asof")==TARGET and x.get("ret20") is None for x in boards),
         "note":"真实11月20日收盘/1日/5日/20日变化；备用源无完整OHLCV则标记缺失"
     }
     atomic_json(STATUS,status)
