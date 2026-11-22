@@ -103,12 +103,10 @@ def _call_market(fn, *args, **kwargs):
         return data
     except Exception as exc:
         if _throttling_error(exc):
+            # 一旦确认Push2限流，立即停止本轮，不再向同一受限IP持续请求。
             _API_SUSPECT += 1
-            if _API_SUSPECT >= 2:
-                _API_BLOCKED = True
-                raise MarketRateLimited('东方财富接口连续限流，已停止后续板块请求：' + str(exc)[:130]) from None
-            # 一次限流后短暂退避，下一次依然失败才熔断。
-            time.sleep(5)
+            _API_BLOCKED = True
+            raise MarketRateLimited('东方财富行情源拒绝请求，本轮立即熔断：' + str(exc)[:145]) from None
         raise
 
 def _expected_day():
@@ -244,9 +242,24 @@ def live_quotes():
 
 def history(name, board_code=None):
     now = clock()
+    # 读取已核验旧历史；日常只请求增量，避免每天反复下载九年日K。
+    dest = HIST / (digest(name) + '.csv')
+    old_frame = None
+    start_day = now - timedelta(days=365 * 9)
+    if dest.is_file():
+        try:
+            cached = pd.read_csv(dest)
+            if {'date','open','high','low','close','volume'}.issubset(cached.columns) and len(cached) >= 260:
+                old_frame = cached.copy()
+                old_frame['date'] = pd.to_datetime(old_frame['date'],errors='coerce')
+                newest = old_frame['date'].dropna().max()
+                if pd.notna(newest):
+                    start_day = max(start_day, newest.to_pydatetime().replace(tzinfo=now.tzinfo) - timedelta(days=15))
+        except (OSError,ValueError,TypeError,KeyError):
+            old_frame = None
     df = _call_market(ak.stock_board_industry_hist_em,
         symbol=(board_code if board_code and str(board_code).startswith('BK') else name), period='日k',
-        start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
+        start_date=start_day.strftime('%Y%m%d'),
         end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
     required = {'日期', '开盘', '最高', '最低', '收盘', '成交量'}
     if df is None or df.empty or not required.issubset(set(df.columns)):
@@ -265,12 +278,15 @@ def history(name, board_code=None):
                       (frame['high'] >= frame[['open','close','low']].max(axis=1)) &
                       (frame['low'] <= frame[['open','close','high']].min(axis=1))]
     frame = frame.drop_duplicates('date', keep='last').sort_values('date')
+    if old_frame is not None:
+        frame = pd.concat([old_frame, frame],ignore_index=True)
+        frame = frame.dropna(subset=['date','close'])
+        frame = frame.drop_duplicates('date',keep='last').sort_values('date')
     frame = frame[frame['date'].dt.date <= now.date()]
     if (now.hour, now.minute) < (15, 20):
         frame = frame[frame['date'].dt.date < now.date()]
     if len(frame) < 260:
         raise ValueError('行业有效历史不足260交易日')
-    dest = HIST / (digest(name) + '.csv')
     if dest.exists():
         old = pd.read_csv(dest, usecols=['date', 'close'])
         old_dates = pd.to_datetime(old['date'], errors='coerce').dropna()
@@ -315,8 +331,8 @@ def fetch_both(name, board_code=None):
     return name, hist_ok, codes, errors
 
 
-def returns(boards):
-    """从已落盘的完整收盘日K计算收益、均线趋势和量能，不使用盘中未完成K线。"""
+def returns(boards, *, expected='', use_history_prices=False):
+    """从实测完整收盘K线计算5/20日表现；报价失败仍可用真实日线收盘补齐。"""
     for b in boards:
         file = HIST / (digest(b['name']) + '.csv')
         if not file.is_file():
@@ -325,6 +341,13 @@ def returns(boards):
             frame = pd.read_csv(file, usecols=['date', 'close', 'volume']).dropna().sort_values('date')
             v = pd.to_numeric(frame['close'], errors='coerce')
             volume = pd.to_numeric(frame['volume'], errors='coerce')
+            hist_date = str(frame.iloc[-1]['date'])[:10] if not frame.empty else ''
+            if len(v) >= 2 and v.iloc[-2] > 0 and (
+                    use_history_prices or (expected and hist_date >= expected)):
+                b['change_pct'] = round((v.iloc[-1] / v.iloc[-2] - 1) * 100, 3)
+                b['last'] = round(float(v.iloc[-1]), 3)
+                b['quote_asof'] = hist_date
+                b['quote_basis'] = 'official_daily_close'
             if len(v) >= 21 and v.iloc[-6] > 0 and v.iloc[-21] > 0:
                 b['ret5'] = round((v.iloc[-1] / v.iloc[-6] - 1) * 100, 3)
                 b['ret20'] = round((v.iloc[-1] / v.iloc[-21] - 1) * 100, 3)
@@ -379,8 +402,8 @@ def main():
                         help='发布完成后校验本轮数据质量；缺数或熔断让Actions显示失败')
     parser.add_argument('--workers', type=int, default=1,
                         help='兼容旧参数；限流保护强制串行，不再并发访问行情源')
-    parser.add_argument('--max-boards', type=int, default=28,
-                        help='每轮至多补采的历史板块数，分批完成496板块')
+    parser.add_argument('--max-boards', type=int, default=140,
+                        help='默认一次覆盖所有117个保留板块，避免多轮重复触发')
     parser.add_argument('--max-members', type=int, default=4,
                         help='每轮至多更新的成分股板块数')
     args = parser.parse_args()
@@ -460,7 +483,7 @@ def main():
         0 if name in target_sectors else 1,
         attempts.get(name, ''), old_dates.get(name, ''), name
     ))
-    limit = max(1, min(args.max_boards, 55))
+    limit = max(1, min(args.max_boards, 150))
     selected = pending[:limit]
     previous_symbols = load_json(OUT / 'symbols.json').get('symbols', {})
     mapping = {code:industry for code,industry in previous_symbols.items()
@@ -522,11 +545,16 @@ def main():
             'ok': True, 'source': '东方财富行业成分股 / AKShare',
             'fetched_at': stamp(), 'symbols': mapping
         })
-    returns(boards)
-    if new_live:
+    returns(boards, expected=expected, use_history_prices=not new_live)
+    # 历史日线成功补采时，必须同步当日/5日/20日与最新日期到网页快照。
+    if new_live or history_success:
         save_json(OUT / 'quotes.json', {
-            'ok': True, 'source': '东方财富行业板块行情 / AKShare',
+            'ok': True,
+            'source': ('东方财富行业板块行情 / AKShare' if new_live else
+                       '东方财富已验证历史日K补采 / AKShare（非实时）'),
             'fetched_at': stamp(), 'session': 'final_or_delayed',
+            'expected_trade_date': expected,
+            'historical_recovery_only': bool(not new_live),
             'boards': boards,
         })
     actual_dates = {name: _history_asof(name) for name in names}
@@ -560,7 +588,7 @@ def main():
         'members_success': members_success,
         'failed_count': len(failed), 'failed': failed[:35],
         'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
-        'quotes_updated': new_live, 'request_count': _API_CALLS,
+        'quotes_updated': bool(new_live or history_success), 'request_count': _API_CALLS,
         'history_last_attempt': {name: value for name,value in attempts.items() if name in allowed},
         'selected_group_count': 17, 'selection_official_count': len(allowed),
         'selected_stock_count': len(tracked_codes), 'prune_report': cleanup,
