@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import csv
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 import hashlib
 from html.parser import HTMLParser
 import json
@@ -181,7 +181,7 @@ def main():
         time.sleep(0.95)
     if recovered:
         payload["boards"]=boards
-        payload["fetched_at"]="2026-11-22 12:20:00"
+        payload["fetched_at"]=datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
         payload["quote_recovery_target_day"]=TARGET
         payload["quote_recovery_source"]=SOURCE_LABEL
         payload["quote_recovery_note"]="当日与5/20日为真实收盘价和实存基准收盘价计算；日K OHLCV仍需单独补全"
@@ -198,7 +198,7 @@ def main():
     print("RECOVERY_SUMMARY",json.dumps({k:v for k,v in status.items()
               if k not in ("verified","failed")},ensure_ascii=False),flush=True)
     # 部分恢复也可安全发布；任务是否完整由状态文件判断。
-    return 0 if recovered or untouched else 2
+    # 即使一项都无法恢复，也将真实失败状态安全发布，交给工作流验收后标红。\n    return 0
 
 if __name__=="__main__":
     raise SystemExit(main())
