@@ -1,0 +1,61 @@
+name: One-time verified sector close recovery 2026-11-20
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sector-recovery-20261120-only
+  cancel-in-progress: false
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify recovery source code and offline tests
+        run: |
+          python -m py_compile tools/recover_sectors_20261120.py
+          python -m unittest discover -s tools -p 'test_recovery_20261120.py' -v
+      - name: Fetch once and verify 2026-11-20 BK closes from backup mirror
+        run: python tools/recover_sectors_20261120.py
+      - name: Publish only checked 2026-11-20 quotes and explicit recovery report
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s data/sectors/recovery_20261120_status.json
+          test -s data/sectors/quotes.json
+          staging="$(mktemp -d)"
+          cp data/sectors/quotes.json "$staging/quotes.json"
+          cp data/sectors/recovery_20261120_status.json "$staging/recovery_20261120_status.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$staging/quotes.json" data/sectors/quotes.json
+            cp "$staging/recovery_20261120_status.json" data/sectors/recovery_20261120_status.json
+            git add data/sectors/quotes.json data/sectors/recovery_20261120_status.json
+            if git diff --cached --quiet; then
+              echo '本轮没有新变化。'
+              break
+            fi
+            git commit -m 'data: recover verified November 20 industry closes (one-time)'
+            if git push origin HEAD:main; then
+              echo '已发布一次性核验过的行业收盘数据'
+              break
+            fi
+            if [ "$attempt" = 4 ]; then echo '::error::推送行情失败'; exit 1; fi
+            sleep "$((attempt * 2))"
+          done
+      - name: Assess verified completion without fabricating missing quotes
+        run: |
+          python - <<'PY'
+          import json,sys
+          stat=json.load(open('data/sectors/recovery_20261120_status.json',encoding='utf-8'))
+          recovered=stat['recovered_count']; total=stat['requested_count']
+          print('11月20日收盘核验:',recovered,'/',total,'；失败:',stat['unavailable_count'])
+          if recovered + stat['already_official_count'] < total:
+              print('::warning::部分板块缺少11月20日可核验收盘数据，已安全保留旧日行情')
+              sys.exit(2)
+          print('全部BK板块的11月20日收盘报价已核验写入')
+          PY
