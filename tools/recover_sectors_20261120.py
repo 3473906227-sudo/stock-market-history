@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 from datetime import date, timedelta, datetime, timezone
 import hashlib
 from html.parser import HTMLParser
@@ -77,12 +78,20 @@ def get_page(code):
         "User-Agent":"Mozilla/5.0 (compatible; AShareVerifiedCloseRepair/1.0)",
         "Accept-Language":"zh-CN,zh;q=0.9","Accept":"text/html"
     })
-    with urlopen(request, timeout=13) as response:
+    with urlopen(request, timeout=22) as response:
         if response.status!=200:
             raise IOError("HTTP "+str(response.status))
         raw=response.read(1500001)
     if len(raw)>1500000 or len(raw)<2000:
         raise IOError("异常或空的网页快照")
+    if raw.startswith(bytes.fromhex("1f8b")):
+        # 部分BK板块返回未标注的gzip正文（此前当作乱码而跳过）。
+        try:
+            raw=gzip.decompress(raw)
+        except (OSError,ValueError):
+            raise IOError("备用源gzip网页损坏，拒绝写入") from None
+    if len(raw)>1500000 or len(raw)<2000:
+        raise IOError("解压后行业页面大小异常")
     return raw.decode("utf-8","replace")
 
 def reference_dates(target,back_counts=(5,20)):

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       # 唯一允许自动触发的补采令牌文件。工作流代码修改不再重复触发。
-      - tools/run_final_missing_sectors_20261120.flag
+      - tools/run_verified_last_five_20261120.flag
 permissions:
   contents: write
 concurrency:

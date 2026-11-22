@@ -3,6 +3,8 @@
 import unittest
 from datetime import date
 import json
+import gzip
+from unittest.mock import MagicMock
 from pathlib import Path
 import tempfile
 from unittest.mock import patch
@@ -69,6 +71,19 @@ class RecoveryValidation(unittest.TestCase):
         self.assertIsNone(board["ret5"])
         self.assertIsNone(board["ret20"])
         self.assertEqual(board["history_ohlcv_asof"],"")
+
+    def test_gzip_page_decodes_without_guessing_prices(self):
+        html=BASE+"".join("<p>行情采集片段%d_%d</p>"%(i,i*i*17) for i in range(400))
+        compressed=gzip.compress(html.encode("utf-8"))
+        self.assertGreater(len(compressed),2000)
+        response=MagicMock()
+        response.status=200
+        response.read.return_value=compressed
+        response.__enter__.return_value=response
+        with patch.object(rec,"urlopen",return_value=response):
+            recovered=rec.get_page("BK1553")
+        self.assertIn("2026-11-20 15:10",recovered)
+        self.assertIn("2,872.97",recovered)
 
     def test_exchange_calendar_reference_dates_not_guesswork(self):
         days=reference_dates("2026-11-20")
