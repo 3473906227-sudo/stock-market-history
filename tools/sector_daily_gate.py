@@ -11,7 +11,7 @@ from tools.github_schedule_trigger import a_share_trading_status
 
 CN = ZoneInfo("Asia/Shanghai")
 ROOT = Path(__file__).resolve().parents[1]
-STATUS = ROOT / "data" / "sectors" / "status.json"
+STATUS = Path(os.environ.get("SECTOR_STATUS_FILE") or (ROOT / "data" / "sectors" / "status.json"))
 
 def expected_close_day(now: datetime):
     day = now.astimezone(CN).date()
