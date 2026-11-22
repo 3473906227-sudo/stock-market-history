@@ -42,14 +42,12 @@ class SectorSafetyTests(unittest.TestCase):
             n[0] += 1
             raise RuntimeError('东方财富 push2 行情服务器断开连接')
         with patch.object(s.time, 'sleep', lambda _:None):
-            with self.assertRaises(RuntimeError):
-                s._call_market(blocked)
             with self.assertRaises(s.MarketRateLimited):
                 s._call_market(blocked)
             with self.assertRaises(s.MarketRateLimited):
                 s._call_market(blocked)
-        self.assertEqual(n[0],2)
-        self.assertEqual(s._API_CALLS,2)
+        self.assertEqual(n[0],1)
+        self.assertEqual(s._API_CALLS,1)
 
     def test_validate_checks_run_id_and_quality(self):
         s._write_status({'github_run_id':'a', 'ok':True, 'reason':'测试'})
@@ -95,6 +93,20 @@ class SectorSafetyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             s._selection()
 
+
+    def test_daily_gate_one_attempt_per_trade_day(self):
+        from tools.sector_daily_gate import should_run, expected_close_day, CN
+        friday = datetime(2026, 11, 20, 17, 15, tzinfo=CN)
+        weekend = datetime(2026, 11, 22, 9, 0, tzinfo=CN)
+        self.assertEqual(expected_close_day(friday), '2026-11-20')
+        self.assertEqual(expected_close_day(weekend), '2026-11-20')
+        old = {'expected_trading_day':'2026-11-20', 'mode':'full', 'ok':False}
+        self.assertFalse(should_run('2026-11-20',old,event='schedule')[0])
+        self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch')[0])
+        self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch',force=True)[0])
+        self.assertTrue(should_run('2026-11-23',old,event='schedule')[0])
+        self.assertFalse(should_run('2026-11-20',old,event='schedule',force=True)[0])
+
     def _fake_full(self, *, fresh):
         from collections import defaultdict
         current = defaultdict(lambda:'2026-11-17')
@@ -108,7 +120,7 @@ class SectorSafetyTests(unittest.TestCase):
             return 400
         with patch.object(s, 'live_quotes', lambda:boards),\
              patch.object(s, 'history', fake_history),\
-             patch.object(s, 'returns', lambda board:None),\
+             patch.object(s, 'returns', lambda *a,**kw:None),\
              patch.object(s, '_history_asof', get_asof),\
              patch.object(s, '_tracked_sectors', lambda:{'通信设备'}),\
              patch.object(s, '_selection', lambda:(set(x['name'] for x in boards),set(),set(),set())),\
