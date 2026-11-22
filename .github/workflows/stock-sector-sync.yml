@@ -24,6 +24,8 @@ on:
       - tools/test_sector_sync_safety.py
       - .github/workflows/stock-sector-sync.yml
       - tools/probe_sector_sources.py
+      - tools/recover_sectors_20261120.py
+      - tools/test_recovery_20261120.py
 
 permissions:
   contents: write
@@ -41,6 +43,8 @@ jobs:
         run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
+      - name: Test November 20 validated recovery without network
+        run: python -m unittest discover -s tools -p 'test_recovery_20261120.py' -v
       - name: Probe independent 2026-11-20 sector close source
         if: github.event_name == 'pull_request'
         continue-on-error: true
