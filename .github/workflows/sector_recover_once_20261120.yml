@@ -20,7 +20,7 @@ jobs:
           python -m py_compile tools/recover_sectors_20261120.py
           python -m unittest discover -s tools -p 'test_recovery_20261120.py' -v
       - name: Fetch once and verify 2026-11-20 BK closes from backup mirror
-        run: python tools/recover_sectors_20261120.py
+        run: python -m tools.recover_sectors_20261120
       - name: Publish only checked 2026-11-20 quotes and explicit recovery report
         shell: bash
         run: |
