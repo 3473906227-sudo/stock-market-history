@@ -18,6 +18,9 @@ import os
 from pathlib import Path
 import re
 import time
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 import akshare as ak
 import pandas as pd
@@ -102,13 +105,11 @@ def _call_market(fn, *args, **kwargs):
         _API_SUSPECT = 0
         return data
     except Exception as exc:
-        if _throttling_error(exc):
+        if isinstance(exc, MarketRateLimited) or _throttling_error(exc):
+            # 一旦确认历史或实时报价源不可用，立即停止本轮，防止扩大为上百次请求。
             _API_SUSPECT += 1
-            if _API_SUSPECT >= 2:
-                _API_BLOCKED = True
-                raise MarketRateLimited('东方财富接口连续限流，已停止后续板块请求：' + str(exc)[:130]) from None
-            # 一次限流后短暂退避，下一次依然失败才熔断。
-            time.sleep(5)
+            _API_BLOCKED = True
+            raise MarketRateLimited('东方财富行情源拒绝请求，本轮立即熔断：' + str(exc)[:145]) from None
         raise
 
 def _expected_day():
@@ -242,12 +243,84 @@ def live_quotes():
     return rows
 
 
+def _direct_industry_history(board_code, start_day, now):
+    """直接向东财官方历史日K端点按BK代码取数，跳过需全市场列表的push2接口。
+
+    本接口使用已核验过的板块代码；与同花顺等不同分类的指数不混用。
+    网络中断只请求一次，不能连锁访问一百多个被限制的接口。
+    """
+    code = str(board_code or '').strip()
+    if not re.fullmatch(r'BK\d{4,6}', code):
+        raise ValueError('无可信的东方财富BK行业代码，不能调用直接历史端点')
+    params = {
+        'secid': '90.' + code, 'klt':'101', 'fqt':'0',
+        'beg':start_day.strftime('%Y%m%d'),
+        'end':(now + timedelta(days=1)).strftime('%Y%m%d'),
+        'fields1':'f1,f2,f3,f4,f5,f6',
+        'fields2':'f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61',
+        'ut':'fa5fd1943c7b386f172d6893dbfba10b',
+    }
+    url = 'https://push2his.eastmoney.com/api/qt/stock/kline/get?' + urlencode(params)
+    request = Request(url, headers={'User-Agent':'Mozilla/5.0 (compatible; VerifiedSectorDaily/1.0)',
+                                    'Referer':'https://quote.eastmoney.com/',
+                                    'Accept':'application/json'})
+    try:
+        with urlopen(request,timeout=14) as resp:
+            if resp.status != 200:
+                raise MarketRateLimited('东方财富历史日K接口拒绝HTTP '+str(resp.status))
+            body = resp.read(2_000_001)
+    except (HTTPError, URLError, TimeoutError, ConnectionError, OSError) as exc:
+        raise MarketRateLimited('东方财富官方历史日K连接失败：'+str(exc)[:120]) from None
+    if len(body) > 2_000_000 or not body:
+        raise MarketRateLimited('东方财富官方历史日K响应为空或异常超长')
+    try:
+        payload = json.loads(body.decode('utf-8-sig'))
+    except (UnicodeError, ValueError):
+        raise MarketRateLimited('东方财富官方历史日K响应不是合法JSON') from None
+    if not isinstance(payload,dict):
+        raise MarketRateLimited('东方财富官方历史日K响应格式异常')
+    data = payload.get('data')
+    if not isinstance(data,dict):
+        raise MarketRateLimited('官方行业历史日K接口为空响应或暂不可用，限流熔断：'+code)
+    response_code = str(data.get('code') or '').strip()
+    if response_code and response_code != code:
+        raise ValueError('历史板块代码不一致，拒绝混淆行情：'+code)
+    rows = data.get('klines')
+    if not isinstance(rows,list) or not rows:
+        raise ValueError('行业历史日K没有有效数据：'+code)
+    parsed = []
+    for raw in rows:
+        parts = str(raw).split(',')
+        if len(parts) < 6:
+            continue
+        parsed.append(parts[:6])
+    if not parsed:
+        raise ValueError('行业历史日K无有效OHLCV记录：'+code)
+    return pd.DataFrame(parsed, columns=['日期','开盘','收盘','最高','最低','成交量'])
+
+
 def history(name, board_code=None):
     now = clock()
-    df = _call_market(ak.stock_board_industry_hist_em,
-        symbol=(board_code if board_code and str(board_code).startswith('BK') else name), period='日k',
-        start_date=(now - timedelta(days=365 * 9)).strftime('%Y%m%d'),
-        end_date=(now + timedelta(days=1)).strftime('%Y%m%d'), adjust='')
+    # 读取已核验旧历史；日常只请求增量，避免每天反复下载九年日K。
+    dest = HIST / (digest(name) + '.csv')
+    old_frame = None
+    start_day = now - timedelta(days=365 * 9)
+    if dest.is_file():
+        try:
+            cached = pd.read_csv(dest)
+            if {'date','open','high','low','close','volume'}.issubset(cached.columns) and len(cached) >= 260:
+                old_frame = cached.copy()
+                old_frame['date'] = pd.to_datetime(old_frame['date'],errors='coerce')
+                newest = old_frame['date'].dropna().max()
+                if pd.notna(newest):
+                    start_day = max(start_day, newest.to_pydatetime().replace(tzinfo=now.tzinfo) - timedelta(days=15))
+        except (OSError,ValueError,TypeError,KeyError):
+            old_frame = None
+    if board_code and re.fullmatch(r'BK\d{4,6}', str(board_code)):
+        # 直连push2his历史端点，绕过经常被限流的push2行业列表接口。
+        df = _call_market(_direct_industry_history, board_code, start_day, now)
+    else:
+        raise ValueError('缺少历史BK板块代码，拒绝触发全市场列表请求')
     required = {'日期', '开盘', '最高', '最低', '收盘', '成交量'}
     if df is None or df.empty or not required.issubset(set(df.columns)):
         raise ValueError('缺少行业历史OHLCV字段（日期/开盘/最高/最低/收盘/成交量）')
@@ -265,12 +338,15 @@ def history(name, board_code=None):
                       (frame['high'] >= frame[['open','close','low']].max(axis=1)) &
                       (frame['low'] <= frame[['open','close','high']].min(axis=1))]
     frame = frame.drop_duplicates('date', keep='last').sort_values('date')
+    if old_frame is not None:
+        frame = pd.concat([old_frame, frame],ignore_index=True)
+        frame = frame.dropna(subset=['date','close'])
+        frame = frame.drop_duplicates('date',keep='last').sort_values('date')
     frame = frame[frame['date'].dt.date <= now.date()]
     if (now.hour, now.minute) < (15, 20):
         frame = frame[frame['date'].dt.date < now.date()]
     if len(frame) < 260:
         raise ValueError('行业有效历史不足260交易日')
-    dest = HIST / (digest(name) + '.csv')
     if dest.exists():
         old = pd.read_csv(dest, usecols=['date', 'close'])
         old_dates = pd.to_datetime(old['date'], errors='coerce').dropna()
@@ -315,8 +391,8 @@ def fetch_both(name, board_code=None):
     return name, hist_ok, codes, errors
 
 
-def returns(boards):
-    """从已落盘的完整收盘日K计算收益、均线趋势和量能，不使用盘中未完成K线。"""
+def returns(boards, *, expected='', use_history_prices=False):
+    """从实测完整收盘K线计算5/20日表现；报价失败仍可用真实日线收盘补齐。"""
     for b in boards:
         file = HIST / (digest(b['name']) + '.csv')
         if not file.is_file():
@@ -325,6 +401,13 @@ def returns(boards):
             frame = pd.read_csv(file, usecols=['date', 'close', 'volume']).dropna().sort_values('date')
             v = pd.to_numeric(frame['close'], errors='coerce')
             volume = pd.to_numeric(frame['volume'], errors='coerce')
+            hist_date = str(frame.iloc[-1]['date'])[:10] if not frame.empty else ''
+            if len(v) >= 2 and v.iloc[-2] > 0 and (
+                    use_history_prices or (expected and hist_date >= expected)):
+                b['change_pct'] = round((v.iloc[-1] / v.iloc[-2] - 1) * 100, 3)
+                b['last'] = round(float(v.iloc[-1]), 3)
+                b['quote_asof'] = hist_date
+                b['quote_basis'] = 'official_daily_close'
             if len(v) >= 21 and v.iloc[-6] > 0 and v.iloc[-21] > 0:
                 b['ret5'] = round((v.iloc[-1] / v.iloc[-6] - 1) * 100, 3)
                 b['ret20'] = round((v.iloc[-1] / v.iloc[-21] - 1) * 100, 3)
@@ -379,8 +462,8 @@ def main():
                         help='发布完成后校验本轮数据质量；缺数或熔断让Actions显示失败')
     parser.add_argument('--workers', type=int, default=1,
                         help='兼容旧参数；限流保护强制串行，不再并发访问行情源')
-    parser.add_argument('--max-boards', type=int, default=28,
-                        help='每轮至多补采的历史板块数，分批完成496板块')
+    parser.add_argument('--max-boards', type=int, default=140,
+                        help='默认一次覆盖所有117个保留板块，避免多轮重复触发')
     parser.add_argument('--max-members', type=int, default=4,
                         help='每轮至多更新的成分股板块数')
     args = parser.parse_args()
@@ -403,22 +486,30 @@ def main():
     }
     prior = load_json(OUT / 'quotes.json')
     new_live = False
-    try:
-        boards = live_quotes()
-        boards = [item for item in boards if item.get('name') in allowed]
-        if len(boards) < 30:
-            raise ValueError('可用白名单行业不足30个，保留历史数据')
-        new_live = True
-        print('行情快照读取成功：', len(boards), stamp(), flush=True)
-    except Exception as exc:
-        print('行情快照失败，旧数据保留：', str(exc)[:250], flush=True)
-        boards = [item for item in prior.get('boards', [])
-                  if isinstance(item, dict) and item.get('name') in allowed]
-        if len(boards) < 30:
-            _write_status({**base_status, 'mode': 'quotes' if args.quotes_only else 'full',
-                           'reason': '无法获取有效行业快照且本地没有可用数据',
-                           'rate_limited': _API_BLOCKED, 'request_count': _API_CALLS})
-            return 0
+    boards = [dict(item) for item in prior.get('boards', [])
+              if isinstance(item, dict) and item.get('name') in allowed]
+    cached_codes_ok = len(boards) >= 30 and all(
+        re.fullmatch(r'BK\d{4,6}',str(x.get('code') or '')) for x in boards)
+    if not args.quotes_only and cached_codes_ok:
+        # 每日盘后无需重新查询push2全市场行业列表，直接按缓存的官方BK代码查真实日K。
+        print('复用已验证BK行业代码：',len(boards),
+              '；本轮只采一次官方收盘日K，不重复拉取全市场实时列表',flush=True)
+    else:
+        try:
+            boards = [b for b in live_quotes() if b.get('name') in allowed]
+            if len(boards) < 30:
+                raise ValueError('可用白名单行业不足30个，保留历史数据')
+            new_live = True
+            print('行情快照读取成功：', len(boards), stamp(), flush=True)
+        except Exception as exc:
+            print('行情快照失败，旧数据保留：', str(exc)[:250], flush=True)
+            boards = [dict(item) for item in prior.get('boards', [])
+                      if isinstance(item, dict) and item.get('name') in allowed]
+            if len(boards) < 30:
+                _write_status({**base_status, 'mode': 'quotes' if args.quotes_only else 'full',
+                               'reason': '无法获取有效行业快照且本地没有可用数据',
+                               'rate_limited': _API_BLOCKED, 'request_count': _API_CALLS})
+                return 0
     if args.quotes_only:
         # 盘中报价与历史日线日期分开表示；绝不冒充最新完整日K。
         if new_live:
@@ -460,7 +551,7 @@ def main():
         0 if name in target_sectors else 1,
         attempts.get(name, ''), old_dates.get(name, ''), name
     ))
-    limit = max(1, min(args.max_boards, 55))
+    limit = max(1, min(args.max_boards, 150))
     selected = pending[:limit]
     previous_symbols = load_json(OUT / 'symbols.json').get('symbols', {})
     mapping = {code:industry for code,industry in previous_symbols.items()
@@ -522,11 +613,16 @@ def main():
             'ok': True, 'source': '东方财富行业成分股 / AKShare',
             'fetched_at': stamp(), 'symbols': mapping
         })
-    returns(boards)
-    if new_live:
+    returns(boards, expected=expected, use_history_prices=not new_live)
+    # 历史日线成功补采时，必须同步当日/5日/20日与最新日期到网页快照。
+    if new_live or history_success:
         save_json(OUT / 'quotes.json', {
-            'ok': True, 'source': '东方财富行业板块行情 / AKShare',
+            'ok': True,
+            'source': ('东方财富行业板块行情 / AKShare' if new_live else
+                       '东方财富已验证历史日K补采 / AKShare（非实时）'),
             'fetched_at': stamp(), 'session': 'final_or_delayed',
+            'expected_trade_date': expected,
+            'historical_recovery_only': bool(not new_live),
             'boards': boards,
         })
     actual_dates = {name: _history_asof(name) for name in names}
@@ -535,16 +631,16 @@ def main():
     remaining = [name for name in names if actual_dates[name] < expected]
     # 严格区分「本轮有少量成功」与「实际跟踪的核心板块已达最近收盘日」。
     # 任何一次上游熔断或核心缺数都不能绿灯；数据可分批安全发布并继续补齐。
-    ok = (new_live and not _API_BLOCKED and not missing_core and
-          (not selected or history_fresh_success >= max(1, int(len(attempted) * .8))))
+    ok = (not _API_BLOCKED and not missing_core and not remaining and
+          (new_live or fresh_count == len(names)))
     if _API_BLOCKED:
         reason = '上游限流熔断；不再密集重试，保留历史有效数据'
     elif missing_core:
         reason = f'{len(missing_core)}个核心板块仍未更新到 {expected}（本轮已补采 {history_fresh_success} 个）'
     elif selected and history_fresh_success < max(1, int(len(attempted) * .8)):
         reason = f'本轮有效补采 {history_fresh_success}/{len(attempted)}，未达到80%验收线'
-    elif not new_live:
-        reason = '无法确认最新板块报价，已保留旧数据'
+    elif not new_live and not history_success and remaining:
+        reason = '官方历史日K未取得更新，旧日线仍保留'
     elif remaining:
         reason = f'核心行业行情已达 {expected}；其余 {len(remaining)} 个待分批补齐'
     else:
@@ -560,7 +656,7 @@ def main():
         'members_success': members_success,
         'failed_count': len(failed), 'failed': failed[:35],
         'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
-        'quotes_updated': new_live, 'request_count': _API_CALLS,
+        'quotes_updated': bool(new_live or history_success), 'request_count': _API_CALLS,
         'history_last_attempt': {name: value for name,value in attempts.items() if name in allowed},
         'selected_group_count': 17, 'selection_official_count': len(allowed),
         'selected_stock_count': len(tracked_codes), 'prune_report': cleanup,

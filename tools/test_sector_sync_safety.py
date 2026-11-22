@@ -42,14 +42,12 @@ class SectorSafetyTests(unittest.TestCase):
             n[0] += 1
             raise RuntimeError('东方财富 push2 行情服务器断开连接')
         with patch.object(s.time, 'sleep', lambda _:None):
-            with self.assertRaises(RuntimeError):
-                s._call_market(blocked)
             with self.assertRaises(s.MarketRateLimited):
                 s._call_market(blocked)
             with self.assertRaises(s.MarketRateLimited):
                 s._call_market(blocked)
-        self.assertEqual(n[0],2)
-        self.assertEqual(s._API_CALLS,2)
+        self.assertEqual(n[0],1)
+        self.assertEqual(s._API_CALLS,1)
 
     def test_validate_checks_run_id_and_quality(self):
         s._write_status({'github_run_id':'a', 'ok':True, 'reason':'测试'})
@@ -95,6 +93,56 @@ class SectorSafetyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             s._selection()
 
+
+
+    def test_official_bk_history_endpoint_without_industry_list(self):
+        from unittest.mock import MagicMock
+        import json
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = json.dumps({'data':{
+            'code':'BK1329', 'klines':['2026-11-20,100,101,102,99,10000,123456']
+        }}).encode('utf-8')
+        response.__enter__.return_value = response
+        calls = []
+        with patch.object(s,'urlopen',return_value=response) as web,\
+             patch.object(s.pd,'DataFrame',side_effect=lambda rows,columns: (calls.append((rows,columns)) or rows),create=True):
+            rows = s._direct_industry_history('BK1329',
+                        datetime(2026,11,17,tzinfo=timezone(timedelta(hours=8))),
+                        datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
+        self.assertEqual(rows[0][0],'2026-11-20')
+        self.assertEqual(rows[0][2],'101')
+        self.assertEqual(len(calls),1)
+        self.assertIn('90.BK1329', web.call_args.args[0].full_url)
+
+    def test_official_bk_history_rejects_mismatch(self):
+        from unittest.mock import MagicMock
+        import json
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = json.dumps({'data':{
+            'code':'BK0000','klines':['2026-11-20,100,101,102,99,10000']
+        }}).encode('utf-8')
+        response.__enter__.return_value = response
+        with patch.object(s,'urlopen',return_value=response):
+            with self.assertRaises(ValueError):
+                s._direct_industry_history('BK1329',
+                    datetime(2026,11,17,tzinfo=timezone(timedelta(hours=8))),
+                    datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
+
+    def test_daily_gate_one_attempt_per_trade_day(self):
+        from tools.sector_daily_gate import should_run, expected_close_day, CN
+        friday = datetime(2026, 11, 20, 17, 15, tzinfo=CN)
+        weekend = datetime(2026, 11, 22, 9, 0, tzinfo=CN)
+        self.assertEqual(expected_close_day(friday), '2026-11-20')
+        self.assertEqual(expected_close_day(weekend), '2026-11-20')
+        old = {'expected_trading_day':'2026-11-20', 'mode':'full', 'ok':False}
+        self.assertFalse(should_run('2026-11-20',old,event='schedule')[0])
+        self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch')[0])
+        self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch',force=True)[0])
+        self.assertTrue(should_run('2026-11-23',old,event='schedule')[0])
+        self.assertFalse(should_run('2026-11-20',old,event='schedule',force=True)[0])
+
     def _fake_full(self, *, fresh):
         from collections import defaultdict
         current = defaultdict(lambda:'2026-11-17')
@@ -108,7 +156,7 @@ class SectorSafetyTests(unittest.TestCase):
             return 400
         with patch.object(s, 'live_quotes', lambda:boards),\
              patch.object(s, 'history', fake_history),\
-             patch.object(s, 'returns', lambda board:None),\
+             patch.object(s, 'returns', lambda *a,**kw:None),\
              patch.object(s, '_history_asof', get_asof),\
              patch.object(s, '_tracked_sectors', lambda:{'通信设备'}),\
              patch.object(s, '_selection', lambda:(set(x['name'] for x in boards),set(),set(),set())),\
@@ -123,9 +171,9 @@ class SectorSafetyTests(unittest.TestCase):
         self.assertEqual(status['core_stale_count'],1)
         self.assertEqual(status['history_fresh_success'],0)
 
-    def test_core_verified_batch_can_advance_and_marks_pending(self):
+    def test_core_verified_batch_advances_but_pending_is_not_full_success(self):
         status = self._fake_full(fresh=True)
-        self.assertTrue(status['ok'])
+        self.assertFalse(status['ok'])
         self.assertEqual(status['core_stale_count'],0)
         self.assertEqual(status['history_fresh_success'],28)
         self.assertEqual(status['history_pending_count'],2)

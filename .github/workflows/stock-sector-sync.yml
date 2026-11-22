@@ -8,25 +8,27 @@ on:
         type: boolean
         required: false
         default: false
+      force:
+        description: 'Force a manual repair even if today was already attempted'
+        type: boolean
+        required: false
+        default: false
   schedule:
-    # UTC -> 北京时间11:40（盘中行情），15:55、16:45（盘后历史/成分/补采）
-    - cron: '40 3 * * 1-5'
-    - cron: '55 7 * * 1-5'
-    - cron: '45 8 * * 1-5'
-  push:
-    paths:
-      - sector_sync.py
-      - .github/workflows/stock-sector-sync.yml
+    # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
+    - cron: '5 9 * * 1-5'
+  # 主分支代码push不触发行情采集；仅按交易日定时或显式手动请求执行。
   pull_request:
     paths:
       - sector_sync.py
+      - tools/sector_daily_gate.py
+      - tools/test_sector_sync_safety.py
       - .github/workflows/stock-sector-sync.yml
 
 permissions:
   contents: write
 concurrency:
   group: a-share-industry-boards-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   syntax-check:
@@ -35,13 +37,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Python syntax before any market requests
-        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py
+        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
   sync:
     needs: syntax-check
-    # PR/测试分支只跑语法检查，绝不向主分支发布行情或触发高频抓取。
-    if: github.ref == 'refs/heads/main'
+    # push和PR只做语法测试；实际抓取只能由每日schedule或明确手动触发启动。
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
@@ -50,30 +52,39 @@ jobs:
         id: calendar
         if: github.event_name == 'schedule'
         run: python tools/github_schedule_trigger.py --check-trading-day
-      - uses: actions/setup-python@v5
+      - name: Check one update per trading day
+        id: daily_gate
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        env:
+          SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
+        run: |
+          git fetch origin main
+          git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
+          SECTOR_STATUS_FILE=/tmp/sector_remote_status.json python tools/sector_daily_gate.py
+      - uses: actions/setup-python@v5
+        if: steps.daily_gate.outputs.run_needed == 'true'
         with:
           python-version: '3.11'
       - name: Install market-data libraries
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: steps.daily_gate.outputs.run_needed == 'true'
         run: python -m pip install --upgrade 'akshare>=1.16' 'pandas>=2.0'
       - name: Prune unrelated sector files (17 groups + tracked stocks only)
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: steps.daily_gate.outputs.run_needed == 'true'
         run: python sector_sync.py --prune-only
       - name: Download verified industry quotes / history / constituents
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: steps.daily_gate.outputs.run_needed == 'true'
         env:
           TRIGGER_CRON: ${{ github.event.schedule }}
           MANUAL_QUOTES: ${{ inputs.quotes_only || 'false' }}
         run: |
           set -euo pipefail
-          if [ "$MANUAL_QUOTES" = "true" ] || [ "$TRIGGER_CRON" = '40 3 * * 1-5' ]; then
+          if [ "$MANUAL_QUOTES" = "true" ]; then
             python sector_sync.py --quotes-only
           else
-            python sector_sync.py --workers 1 --max-boards 28 --max-members 4
+            python sector_sync.py --workers 1 --max-boards 140 --max-members 0
           fi
       - name: Publish only verified industry files (parallel-safe)
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: steps.daily_gate.outputs.run_needed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -105,6 +116,6 @@ jobs:
           echo '::error::行业行情发布失败（已重试4次）'
           exit 1
       - name: Validate actual completed trading day coverage
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: steps.daily_gate.outputs.run_needed == 'true'
         # 先安全发布已核验的数据、再判定整轮健康：部分补采可积累，但不能显示绿色成功。
         run: python sector_sync.py --validate-status
