@@ -27,9 +27,10 @@ def expected_close_day(now: datetime):
     raise ValueError("无法找到最近交易日")
 
 def should_run(expected: str, old_status: dict, *, event: str, force=False):
-    # force 仅对明确手动触发有效；schedule 不允许绕过每日上限。
-    if event == "workflow_dispatch" and force:
-        return True, "管理员明确强制补采"
+    # force 仅对显式手动或一次性修复令牌push有效；schedule不允许绕过每日上限。
+    # push只由工作流白名单中的单次令牌文件触发，普通代码push不能调用此job。
+    if event in ("workflow_dispatch", "push") and force:
+        return True, "管理员手动或受控一次性修复"
     if (old_status.get("expected_trading_day") == expected and
             old_status.get("mode") in ("full", "quotes")):
         return False, "该交易日已有采集记录（即使源端失败也不自动重试）"

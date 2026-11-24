@@ -556,8 +556,47 @@ def main():
                        'request_count': _API_CALLS})
         return 0
 
+    # 优先使用东方财富官方批量BK收盘报价：117板块只需两次请求，
+    # 与逐板块历史OHLCV独立；本日已验证收盘价不再回退。
+    batch = {'recovered':0,'attempted':0,'valid_rows':0,'failed':[]}
+    try:
+        from tools.sector_batch_snapshot import update as update_batch_closes
+        batch = update_batch_closes(
+            boards, expected_day=expected, history_dir=HIST,
+            close_dir=OUT / 'close_history', chunk_size=60)
+    except Exception as exc:
+        batch['failed'] = [{'error':'官方批量收盘请求失败：'+type(exc).__name__+': '+str(exc)[:180]}]
+        print('批量BK收盘数据失败：',str(exc)[:180],flush=True)
+    batch_fresh = sum(str(b.get('history_asof') or '') >= expected for b in boards)
+    if batch['recovered']:
+        save_json(OUT / 'quotes.json', {
+            'ok':True, 'source':'东方财富官方BK批量收盘报价（不包含完整OHLCV）',
+            'fetched_at':stamp(), 'session':'final_or_delayed',
+            'expected_trade_date':expected, 'verified_batch_count':batch['recovered'],
+            'boards':boards,
+        })
+    if batch_fresh == len(names) and batch['recovered']:
+        full_history_fresh = sum(_history_asof(name) >= expected for name in names)
+        _write_status({
+            **base_status, 'ok':True, 'mode':'full',
+            'reason':(f'{batch_fresh}/{len(names)}个板块已由东方财富官方批量报价'
+                      f'核验到{expected}收盘；完整OHLCV已覆盖{full_history_fresh}个'),
+            'board_count':len(names), 'quote_fresh_count':batch_fresh,
+            'quote_stale_count':0, 'history_fresh_count':full_history_fresh,
+            'history_pending_count':len(names)-full_history_fresh,
+            'ohlcv_complete':full_history_fresh==len(names),
+            'official_batch_recovered':batch['recovered'],
+            'official_batch_requests':batch['attempted'], 'official_batch_failures':batch['failed'],
+            'quotes_updated':True, 'request_count':batch['attempted'],
+        })
+        print('行业行情一次批量同步完成，'+str(batch_fresh)+'个已核验到最新收盘日；'
+              '无需继续向上游逐板块请求',flush=True)
+        return 0
+
     old_dates = {name: _history_asof(name) for name in names}
-    pending = [name for name in names if old_dates[name] < expected]
+    board_by_name={b['name']:b for b in boards}
+    pending = [name for name in names if old_dates[name] < expected and
+               str(board_by_name[name].get('history_asof') or '') < expected]
     # 核心行业优先；未命中的板块按上一次尝试时间轮转，避免每轮只请求同一批失败对象。
     pending.sort(key=lambda name: (
         0 if name in target_sectors else 1,
@@ -637,11 +676,10 @@ def main():
             backup['failed'] = [{'error':'备用收盘快照处理失败：'+type(exc).__name__+': '+str(exc)[:150]}]
             print('备用行情校验失败：',str(exc)[:180],flush=True)
     # 仅发布实际可验的日期与涨跌；保留行情源和OHLCV完整性标识。
-    if new_live or history_success or backup['recovered']:
+    if new_live or history_success or batch['recovered'] or backup['recovered']:
         save_json(OUT / 'quotes.json', {
             'ok': True,
-            'source': ('官方BK历史日K / 已验证第三方BK收盘快照（按单板块注明来源）'
-                       if backup['recovered'] else '东方财富官方BK历史日K'),
+            'source': '官方BK日K/官方批量收盘/第三方已核验快照（逐板块source字段注明）',
             'fetched_at': stamp(), 'session': 'final_or_delayed',
             'expected_trade_date': expected,
             'historical_recovery_only': bool(not new_live),
@@ -686,10 +724,13 @@ def main():
         'members_success': members_success,
         'failed_count': len(failed), 'failed': failed[:35],
         'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
-        'quotes_updated': bool(new_live or history_success or backup['recovered']),
+        'quotes_updated': bool(new_live or history_success or batch['recovered'] or backup['recovered']),
         'request_count': _API_CALLS,
         'quote_fresh_count': quote_fresh_count,
         'quote_stale_count': quote_stale_count,
+        'official_batch_recovered': batch['recovered'],
+        'official_batch_requests': batch['attempted'],
+        'official_batch_failures': batch['failed'],
         'backup_recovered_count': backup['recovered'],
         'backup_attempted': backup['attempted'],
         'backup_source_stale': backup['stale_source'],
