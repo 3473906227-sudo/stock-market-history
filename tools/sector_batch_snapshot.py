@@ -22,6 +22,7 @@ from tools.sector_daily_backup import historical_prices, reference_days
 
 CN=ZoneInfo("Asia/Shanghai")
 ENDPOINT="https://push2.eastmoney.com/api/qt/ulist.np/get"
+DELAY_ENDPOINT="https://push2delay.eastmoney.com/api/qt/ulist.np/get"
 SOURCE="东方财富官方BK行业批量收盘报价"
 FIELDS="f2,f3,f12,f13,f14,f124"
 
@@ -33,28 +34,38 @@ def _api_rows(codes):
         "fields":FIELDS, "fltt":"2","invt":"2",
         "ut":"bd1d9ddb04089700cf9c27f6f7426281",
     }
-    url=ENDPOINT+"?"+urlencode(params)
-    request=Request(url, headers={
-        "User-Agent":"Mozilla/5.0 (compatible; VerifiedBKClose/1.0)",
-        "Referer":"https://quote.eastmoney.com/",
-        "Accept":"application/json",
-    })
-    with urlopen(request,timeout=15) as response:
-        if response.status!=200:
-            raise IOError("东方财富批量接口HTTP "+str(response.status))
-        body=response.read(750001)
-    if len(body)>750000 or not body:
-        raise IOError("东方财富批量接口返回空或超长响应")
-    doc=json.loads(body.decode("utf-8-sig"))
-    if not isinstance(doc,dict) or doc.get("rc") not in (0,"0"):
-        raise ValueError("批量接口返回非成功状态")
-    data=doc.get("data")
-    rows=data.get("diff") if isinstance(data,dict) else None
-    if isinstance(rows,dict):
-        rows=list(rows.values())
-    if not isinstance(rows,list):
-        raise ValueError("批量接口没有行情数组")
-    return rows
+    encoded=urlencode(params)
+    errors=[]
+    # 官方两条HTTPS入口各最多请求一次；仅当首入口连不上时使用延迟入口。
+    # 所有返回值仍需通过真实交易日15:00、BK代码和价格校验。
+    for endpoint in (ENDPOINT, DELAY_ENDPOINT):
+        url=endpoint+"?"+encoded
+        request=Request(url, headers={
+            "User-Agent":"Mozilla/5.0 (compatible; VerifiedBKClose/1.0)",
+            "Referer":"https://quote.eastmoney.com/",
+            "Accept":"application/json",
+        })
+        try:
+            with urlopen(request,timeout=12) as response:
+                if response.status!=200:
+                    raise IOError("东方财富批量接口HTTP "+str(response.status))
+                body=response.read(750001)
+            if len(body)>750000 or not body:
+                raise IOError("东方财富批量接口返回空或超长响应")
+            doc=json.loads(body.decode("utf-8-sig"))
+            if not isinstance(doc,dict) or doc.get("rc") not in (0,"0"):
+                raise ValueError("批量接口返回非成功状态")
+            data=doc.get("data")
+            rows=data.get("diff") if isinstance(data,dict) else None
+            if isinstance(rows,dict):
+                rows=list(rows.values())
+            if not isinstance(rows,list):
+                raise ValueError("批量接口没有行情数组")
+            return rows
+        except (OSError,TimeoutError,ValueError,TypeError) as exc:
+            errors.append(endpoint.split("//",1)[1].split("/",1)[0]+": "+
+                          type(exc).__name__+" "+str(exc)[:120])
+    raise IOError("两条东方财富官方批量接口均不可用；"+ "; ".join(errors))
 
 def validate_row(row, codes, expected):
     if not isinstance(row,dict):
