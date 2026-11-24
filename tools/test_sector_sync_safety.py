@@ -146,6 +146,8 @@ class SectorSafetyTests(unittest.TestCase):
         self.assertFalse(should_run('2026-11-20',old,event='schedule')[0])
         self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch')[0])
         self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch',force=True)[0])
+        self.assertTrue(should_run('2026-11-20',old,event='push',force=True)[0])
+        self.assertFalse(should_run('2026-11-20',old,event='push')[0])
         self.assertTrue(should_run('2026-11-23',old,event='schedule')[0])
         self.assertFalse(should_run('2026-11-20',old,event='schedule',force=True)[0])
 
