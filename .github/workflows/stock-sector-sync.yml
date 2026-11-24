@@ -26,6 +26,7 @@ on:
       - sector_sync.py
       - tools/sector_daily_gate.py
       - tools/test_sector_sync_safety.py
+      - tools/probe_batch_sector_api.py
       - .github/workflows/stock-sector-sync.yml
       - tools/probe_sector_sources.py
       - tools/recover_sectors_20261120.py
@@ -65,6 +66,10 @@ jobs:
           except Exception as e:
               print('BACKUP_NOT_READY',code,day,type(e).__name__,str(e)[:200])
           PY
+      - name: One-request diagnostic for Eastmoney batch BK close endpoint
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: python -m tools.probe_batch_sector_api
       - name: Verify daily gate module starts from repository root
         env:
           SECTOR_STATUS_FILE: /tmp/sector_gate_smoke_test.json
