@@ -402,6 +402,9 @@ def returns(boards, *, expected='', use_history_prices=False):
             v = pd.to_numeric(frame['close'], errors='coerce')
             volume = pd.to_numeric(frame['volume'], errors='coerce')
             hist_date = str(frame.iloc[-1]['date'])[:10] if not frame.empty else ''
+            # 重要：11月24日曾因旧CSV覆盖11月20日已核验快照；永远禁止回退日期。
+            if hist_date < str(b.get('history_asof') or ''):
+                continue
             if len(v) >= 2 and v.iloc[-2] > 0 and (
                     use_history_prices or (expected and hist_date >= expected)):
                 b['change_pct'] = round((v.iloc[-1] / v.iloc[-2] - 1) * 100, 3)
@@ -618,27 +621,45 @@ def main():
             'fetched_at': stamp(), 'symbols': mapping
         })
     returns(boards, expected=expected, use_history_prices=not new_live)
-    # 历史日线成功补采时，必须同步当日/5日/20日与最新日期到网页快照。
-    if new_live or history_success:
+    # 官网API达到单日限流时，最多一次调用有严格BK代码/真实收盘日期验证的备用源；
+    # 备用源若仍停留于旧交易日，前5个未通过即停止，不再循环重试。
+    backup = {'recovered':0,'attempted':0,'stale_source':False,'failed':[]}
+    if any(str(b.get('history_asof') or '') < expected for b in boards):
+        try:
+            from tools.sector_daily_backup import update_missing
+            backup = update_missing(boards, expected_day=expected, history_dir=HIST)
+        except Exception as exc:
+            backup['failed'] = [{'error':'备用收盘快照处理失败：'+type(exc).__name__+': '+str(exc)[:150]}]
+            print('备用行情校验失败：',str(exc)[:180],flush=True)
+    # 仅发布实际可验的日期与涨跌；保留行情源和OHLCV完整性标识。
+    if new_live or history_success or backup['recovered']:
         save_json(OUT / 'quotes.json', {
             'ok': True,
-            'source': ('东方财富行业板块行情 / AKShare' if new_live else
-                       '东方财富已验证历史日K补采 / AKShare（非实时）'),
+            'source': ('官方BK历史日K / 已验证第三方BK收盘快照（按单板块注明来源）'
+                       if backup['recovered'] else '东方财富官方BK历史日K'),
             'fetched_at': stamp(), 'session': 'final_or_delayed',
             'expected_trade_date': expected,
             'historical_recovery_only': bool(not new_live),
+            'verified_backup_count':backup['recovered'],
             'boards': boards,
         })
     actual_dates = {name: _history_asof(name) for name in names}
     fresh_count = sum(d >= expected for d in actual_dates.values())
     missing_core = [name for name in core if actual_dates[name] < expected]
     remaining = [name for name in names if actual_dates[name] < expected]
+    quote_fresh_count = sum(str(b.get('history_asof') or '') >= expected for b in boards)
+    quote_stale_count = len(names) - quote_fresh_count
     # 严格区分「本轮有少量成功」与「实际跟踪的核心板块已达最近收盘日」。
     # 任何一次上游熔断或核心缺数都不能绿灯；数据可分批安全发布并继续补齐。
     ok = (not _API_BLOCKED and not missing_core and not remaining and
           (new_live or fresh_count == len(names)))
     if _API_BLOCKED:
-        reason = '上游限流熔断；不再密集重试，保留历史有效数据'
+        reason = (f'官方日K接口限流；备用收盘快照本轮核验更新{backup["recovered"]}个，'
+                  f'当前报价已更新{quote_fresh_count}/{len(names)}个至{expected}；'
+                  f'完整历史日K已更新{fresh_count}/{len(names)}个')
+        if backup['stale_source']:
+            reason += '；备用源自身尚未发布最新交易日'
+
     elif missing_core:
         reason = f'{len(missing_core)}个核心板块仍未更新到 {expected}（本轮已补采 {history_fresh_success} 个）'
     elif selected and history_fresh_success < max(1, int(len(attempted) * .8)):
@@ -660,15 +681,22 @@ def main():
         'members_success': members_success,
         'failed_count': len(failed), 'failed': failed[:35],
         'rate_limited': _API_BLOCKED, 'breaker_reason': breaker_reason,
-        'quotes_updated': bool(new_live or history_success), 'request_count': _API_CALLS,
+        'quotes_updated': bool(new_live or history_success or backup['recovered']),
+        'request_count': _API_CALLS,
+        'quote_fresh_count': quote_fresh_count,
+        'quote_stale_count': quote_stale_count,
+        'backup_recovered_count': backup['recovered'],
+        'backup_attempted': backup['attempted'],
+        'backup_source_stale': backup['stale_source'],
+        'backup_failures': backup['failed'][:25],
         'history_last_attempt': {name: value for name,value in attempts.items() if name in allowed},
         'selected_group_count': 17, 'selection_official_count': len(allowed),
         'selected_stock_count': len(tracked_codes), 'prune_report': cleanup,
     }
     _write_status(status)
     print('行业分批采集：' + reason, flush=True)
-    print(f'有效历史覆盖 {fresh_count}/{len(names)}；核心缺数 {len(missing_core)}；'
-          f'本轮有效补采 {history_fresh_success}/{len(attempted)}；上游调用 {_API_CALLS}', flush=True)
+    print(f'已核验最新报价 {quote_fresh_count}/{len(names)}；完整历史日K {fresh_count}/{len(names)}；'
+          f'本轮备用源恢复 {backup["recovered"]}；官方请求 {_API_CALLS}', flush=True)
     return 0
 
 
