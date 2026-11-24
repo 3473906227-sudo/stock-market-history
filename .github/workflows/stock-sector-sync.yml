@@ -17,6 +17,7 @@ on:
     paths:
       # 仅这一个修复令牌文件触发一次性行情恢复；平常push、改代码不会触发行情。
       - tools/run_sector_repair_20261124.flag
+      - tools/run_sector_batch_20261124_once.flag
   schedule:
     # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
     - cron: '5 9 * * 1-5'
@@ -26,6 +27,8 @@ on:
       - sector_sync.py
       - tools/sector_daily_gate.py
       - tools/test_sector_sync_safety.py
+      - tools/sector_batch_snapshot.py
+      - tools/test_sector_batch_snapshot.py
       - .github/workflows/stock-sector-sync.yml
       - tools/probe_sector_sources.py
       - tools/recover_sectors_20261120.py
@@ -44,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Python syntax before any market requests
-        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py
+        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py tools/sector_batch_snapshot.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
       - name: Verify backup snapshot never fabricates dates or returns
@@ -65,6 +68,8 @@ jobs:
           except Exception as e:
               print('BACKUP_NOT_READY',code,day,type(e).__name__,str(e)[:200])
           PY
+      - name: Verify official BK batch quotes and timestamp without network
+        run: python -m unittest discover -s tools -p 'test_sector_batch_snapshot.py' -v
       - name: Verify daily gate module starts from repository root
         env:
           SECTOR_STATUS_FILE: /tmp/sector_gate_smoke_test.json
@@ -91,7 +96,7 @@ jobs:
         id: daily_gate
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         env:
-          SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
+          SECTOR_FORCE_UPDATE: ${{ github.event_name == 'push' && 'true' || inputs.force || 'false' }}
         run: |
           git fetch origin main
           git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
