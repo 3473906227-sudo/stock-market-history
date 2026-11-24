@@ -162,8 +162,10 @@ class SectorSafetyTests(unittest.TestCase):
             if fresh:
                 current[name]='2026-11-20'
             return 400
-        from tools import sector_daily_backup
-        with patch.object(sector_daily_backup, 'update_missing',
+        from tools import sector_daily_backup, sector_batch_snapshot
+        with patch.object(sector_batch_snapshot, 'update',
+                          return_value={'recovered':0,'attempted':0,'valid_rows':0,'failed':[]}),\
+             patch.object(sector_daily_backup, 'update_missing',
                           return_value={'recovered':0,'attempted':0,'stale_source':False,'failed':[]}),\
              patch.object(s, 'live_quotes', lambda:boards),\
              patch.object(s, 'history', fake_history),\
