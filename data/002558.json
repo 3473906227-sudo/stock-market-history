@@ -3,6 +3,6 @@
   "source": "Yahoo Finance",
   "rows": 3822,
   "latest_trading_day": "2026-11-23",
-  "synced_utc": "2026-11-24T19:45:06+00:00",
+  "synced_utc": "2026-11-24T20:13:37+00:00",
   "sync_mode": "preclose_history_only"
 }
