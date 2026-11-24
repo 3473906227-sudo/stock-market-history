@@ -31,6 +31,12 @@ class SectorSafetyTests(unittest.TestCase):
         s._API_SUSPECT = 0
         s._API_CALLS = 0
 
+    def test_never_roll_back_verified_daily_closes(self):
+        self.assertFalse(s._history_may_replace_quote('2026-11-17','2026-11-20'))
+        self.assertFalse(s._history_may_replace_quote('2026-11-20','2026-11-24'))
+        self.assertTrue(s._history_may_replace_quote('2026-11-24','2026-11-20'))
+        self.assertTrue(s._history_may_replace_quote('2026-11-24','2026-11-24'))
+
     def test_weekend_expected_close_is_friday(self):
         self.assertEqual(s._expected_day(), '2026-11-20')
         with patch.object(s, 'clock', lambda:datetime(2026,11,20,14,tzinfo=timezone(timedelta(hours=8)))):
@@ -154,7 +160,10 @@ class SectorSafetyTests(unittest.TestCase):
             if fresh:
                 current[name]='2026-11-20'
             return 400
-        with patch.object(s, 'live_quotes', lambda:boards),\
+        from tools import sector_daily_backup
+        with patch.object(sector_daily_backup, 'update_missing',
+                          return_value={'recovered':0,'attempted':0,'stale_source':False,'failed':[]}),\
+             patch.object(s, 'live_quotes', lambda:boards),\
              patch.object(s, 'history', fake_history),\
              patch.object(s, 'returns', lambda *a,**kw:None),\
              patch.object(s, '_history_asof', get_asof),\

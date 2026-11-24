@@ -44,9 +44,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Python syntax before any market requests
-        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py
+        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
+      - name: Verify backup snapshot never fabricates dates or returns
+        run: python -m unittest discover -s tools -p 'test_sector_daily_backup.py' -v
+      - name: Probe whether backup site has latest closed BK index
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          from tools.sector_daily_backup import download,parse_snapshot
+          code='BK1329'
+          day=datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
+          try:
+              quote=parse_snapshot(download(code),code,day)
+              print('BACKUP_LIVE_VERIFIED',code,quote)
+          except Exception as e:
+              print('BACKUP_NOT_READY',code,day,type(e).__name__,str(e)[:200])
+          PY
       - name: Verify daily gate module starts from repository root
         env:
           SECTOR_STATUS_FILE: /tmp/sector_gate_smoke_test.json
