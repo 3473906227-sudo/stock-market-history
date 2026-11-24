@@ -2,7 +2,7 @@
   "symbol": "600276",
   "source": "Yahoo Finance",
   "rows": 4000,
-  "latest_trading_day": "2026-11-23",
-  "synced_utc": "2026-11-23T22:05:17+00:00",
-  "sync_mode": "preclose_history_only"
+  "latest_trading_day": "2026-11-24",
+  "synced_utc": "2026-11-24T14:09:45+00:00",
+  "sync_mode": "regular_daily"
 }
