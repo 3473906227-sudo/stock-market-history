@@ -345,8 +345,8 @@ def history(name, board_code=None):
     frame = frame[frame['date'].dt.date <= now.date()]
     if (now.hour, now.minute) < (15, 20):
         frame = frame[frame['date'].dt.date < now.date()]
-    if len(frame) < 260:
-        raise ValueError('行业有效历史不足260交易日')
+    if len(frame) < 2:
+        raise ValueError('行业可核验的收盘记录不足2个交易日')
     if dest.exists():
         old = pd.read_csv(dest, usecols=['date', 'close'])
         old_dates = pd.to_datetime(old['date'], errors='coerce').dropna()
@@ -408,11 +408,15 @@ def returns(boards, *, expected='', use_history_prices=False):
                 b['last'] = round(float(v.iloc[-1]), 3)
                 b['quote_asof'] = hist_date
                 b['quote_basis'] = 'official_daily_close'
-            if len(v) >= 21 and v.iloc[-6] > 0 and v.iloc[-21] > 0:
-                b['ret5'] = round((v.iloc[-1] / v.iloc[-6] - 1) * 100, 3)
-                b['ret20'] = round((v.iloc[-1] / v.iloc[-21] - 1) * 100, 3)
-                b['history_asof'] = str(frame.iloc[-1]['date'])[:10]
+            # 行情交易日不能依赖21根K线才能更新；新板块历史不足时只把
+            # 实际可核验的收益显示出来，其余留空（不能沿用上次旧的5/20日值）。
+            if len(v) >= 2 and v.iloc[-1] > 0:
+                b['history_asof'] = hist_date
                 b['history_close'] = round(float(v.iloc[-1]), 3)
+                b['ret5'] = (round((v.iloc[-1] / v.iloc[-6] - 1) * 100, 3)
+                             if len(v) >= 6 and v.iloc[-6] > 0 else None)
+                b['ret20'] = (round((v.iloc[-1] / v.iloc[-21] - 1) * 100, 3)
+                              if len(v) >= 21 and v.iloc[-21] > 0 else None)
             if len(v) >= 60:
                 ma20 = float(v.iloc[-20:].mean())
                 ma60 = float(v.iloc[-60:].mean())
