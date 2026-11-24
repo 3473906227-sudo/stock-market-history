@@ -31,6 +31,12 @@ class SectorSafetyTests(unittest.TestCase):
         s._API_SUSPECT = 0
         s._API_CALLS = 0
 
+    def test_never_roll_back_verified_daily_closes(self):
+        self.assertFalse(s._history_may_replace_quote('2026-11-17','2026-11-20'))
+        self.assertFalse(s._history_may_replace_quote('2026-11-20','2026-11-24'))
+        self.assertTrue(s._history_may_replace_quote('2026-11-24','2026-11-20'))
+        self.assertTrue(s._history_may_replace_quote('2026-11-24','2026-11-24'))
+
     def test_weekend_expected_close_is_friday(self):
         self.assertEqual(s._expected_day(), '2026-11-20')
         with patch.object(s, 'clock', lambda:datetime(2026,11,20,14,tzinfo=timezone(timedelta(hours=8)))):
