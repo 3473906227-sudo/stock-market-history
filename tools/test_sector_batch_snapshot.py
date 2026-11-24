@@ -34,6 +34,26 @@ class TestBatchSnapshot(unittest.TestCase):
         self.assertEqual(web.call_count,1)
         self.assertIn("90.BK1329",web.call_args.args[0].full_url)
 
+    def test_secondary_official_host_after_primary_tls_timeout(self):
+        from urllib.error import URLError
+        reply={"rc":0,"data":{"total":1,"diff":[ROW]}}
+        response=MagicMock()
+        response.status=200
+        response.read.return_value=json.dumps(reply).encode()
+        response.__enter__.return_value=response
+        with patch.object(batch,"urlopen",side_effect=[TimeoutError("TLS handshake timed out"),response]) as web:
+            rows=batch._api_rows(["BK1329"])
+        self.assertEqual(rows[0]["f12"],"BK1329")
+        self.assertEqual(web.call_count,2)
+        self.assertIn("push2.eastmoney.com",web.call_args_list[0].args[0].full_url)
+        self.assertIn("push2delay.eastmoney.com",web.call_args_list[1].args[0].full_url)
+
+    def test_both_hosts_fail_closed_not_data_fabricated(self):
+        with patch.object(batch,"urlopen",side_effect=TimeoutError("TLS handshake timed out")) as web:
+            with self.assertRaises(IOError):
+                batch._api_rows(["BK1329"])
+        self.assertEqual(web.call_count,2)
+
     def test_one_daily_close_preserves_real_past_prices_and_old_snapshot(self):
         with tempfile.TemporaryDirectory() as root:
             hist=Path(root)/"history"
