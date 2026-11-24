@@ -391,6 +391,11 @@ def fetch_both(name, board_code=None):
     return name, hist_ok, codes, errors
 
 
+def _history_may_replace_quote(history_date, quote_date):
+    """历史日K只可以覆盖同日或更旧的快照，禁止日期回退。"""
+    return str(history_date or '') >= str(quote_date or '')
+
+
 def returns(boards, *, expected='', use_history_prices=False):
     """从实测完整收盘K线计算5/20日表现；报价失败仍可用真实日线收盘补齐。"""
     for b in boards:
@@ -403,7 +408,7 @@ def returns(boards, *, expected='', use_history_prices=False):
             volume = pd.to_numeric(frame['volume'], errors='coerce')
             hist_date = str(frame.iloc[-1]['date'])[:10] if not frame.empty else ''
             # 重要：11月24日曾因旧CSV覆盖11月20日已核验快照；永远禁止回退日期。
-            if hist_date < str(b.get('history_asof') or ''):
+            if not _history_may_replace_quote(hist_date, b.get('history_asof')):
                 continue
             if len(v) >= 2 and v.iloc[-2] > 0 and (
                     use_history_prices or (expected and hist_date >= expected)):
