@@ -51,6 +51,19 @@ class SectorHistoryTests(unittest.TestCase):
         rows, _ = sync.verified_rows(payload(ANCHOR, LATEST), BOARD, TARGET, self.local, set(self.local))
         self.assertEqual(len(rows), 2)
 
+    def test_backfill_requires_current_ohlcv_and_recorded_past_close_when_old_bars_conflict(self):
+        self.local[TARGET] = ('102', '111', '99', '103', '150')
+        gap = '2026-11-20,102,103,111,99,150'
+        source = payload(ANCHOR.replace(',120', ',140'), gap, LATEST)
+        with self.assertRaisesRegex(ValueError, '独立收盘价'):
+            sync.verified_rows(source, BOARD, TARGET, self.local, set(self.local))
+        sync._save_close_prices(BOARD, self.out / 'close_history', {'2026-11-20': 103})
+        attempts = [{'endpoint': sync.ENDPOINTS[0], 'payload': source}]
+        errors = []
+        additions, _ = sync.merge_board(BOARD, self.local, set(self.local), TARGET, attempts, errors)
+        self.assertEqual(set(additions), {'2026-11-20'})
+        self.assertIn('保留原记录', errors[0])
+
     def test_two_official_responses_disagree_on_new_bar(self):
         attempts = [{'endpoint': sync.ENDPOINTS[0], 'payload': payload(ANCHOR, LATEST)},
                     {'endpoint': sync.ENDPOINTS[1], 'payload': payload(ANCHOR, LATEST.replace(',150,', ',999,'))}]

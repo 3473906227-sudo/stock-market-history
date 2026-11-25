@@ -134,9 +134,17 @@ def verified_rows(payload, board, target, local, valid):
     overlap = rows.keys() & valid
     if valid and not overlap:
         raise ValueError('源数据与仓库完整历史没有共同交易日')
-    for day in overlap:
-        if tuple(map(Decimal, rows[day])) != tuple(map(Decimal, local[day])):
-            raise ValueError(f'{day} 官方源与已存完整日K不一致')
+    conflicts = {day for day in overlap if tuple(map(Decimal, rows[day])) != tuple(map(Decimal, local[day]))}
+    if conflicts:
+        if target not in overlap - conflicts:
+            raise ValueError(f'{min(conflicts)} 官方源与已存完整日K不一致')
+        # A matching current bar plus independent close-only records can validate
+        # a backfill even when the provider revises some already archived bars.
+        stored_closes = read_close_history(board)
+        references = (rows.keys() - valid) & stored_closes.keys()
+        if not references or any(abs(float(rows[day][3]) - stored_closes[day]) > 0.011 for day in references):
+            raise ValueError('历史重叠记录存在差异，补缺日期也未通过独立收盘价核验')
+        rejected.extend(f'{day} 官方历史与已存完整日K不一致，保留原记录' for day in sorted(conflicts))
     return rows, rejected
 
 
@@ -407,6 +415,8 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
         latest = max(valid, default='')
         missing = [day for day in required if day not in valid]
         latest_endpoint = sources.get(latest) or board.get('history_ohlcv_source_url')
+        if not latest_endpoint and quote_day(board) == latest and board.get('quote_source_url') in ENDPOINTS:
+            latest_endpoint = board['quote_source_url']
         if latest and latest_endpoint:
             board.update(history_ohlcv_source_url=latest_endpoint,
                          history_ohlcv_source=(SNAPSHOT_SOURCE if latest_endpoint in SNAPSHOT_ENDPOINTS else SOURCE))
@@ -416,8 +426,9 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
             history_fresh.append({'code': code, 'name': board['name']})
         if missing:
             gaps.append({'code': code, 'name': board['name'], 'latest': latest or None, 'dates': missing})
-            if errors:
-                error_summary[code] = list(dict.fromkeys(errors))[:4]
+        reported = errors if missing else [message for message in errors if '保留原记录' in message]
+        if reported:
+            error_summary[code] = list(dict.fromkeys(reported))[:4]
         if not quotes_only and latest <= target:
             new_quotes |= refresh_quote(board, local, valid, latest, latest_endpoint, required)
         if quote_day(board) < target:
