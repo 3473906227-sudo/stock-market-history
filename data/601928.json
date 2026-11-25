@@ -1,8 +1,8 @@
 {
   "symbol": "601928",
   "source": "Yahoo Finance",
-  "rows": 3638,
-  "latest_trading_day": "2026-11-24",
-  "synced_utc": "2026-11-24T14:10:38+00:00",
+  "rows": 3639,
+  "latest_trading_day": "2026-11-25",
+  "synced_utc": "2026-11-25T13:24:02+00:00",
   "sync_mode": "regular_daily"
 }
