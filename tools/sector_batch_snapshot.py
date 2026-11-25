@@ -242,7 +242,7 @@ def apply_previous_close(board, quote, expected, history_dir, close_dir, refs):
     _save_close_prices(board,close_dir,prices)
     return True
 
-def update(boards, *, expected_day, history_dir, close_dir, chunk_size=6):
+def update(boards, *, expected_day, history_dir, close_dir, chunk_size=3):
     """小批次递进采集，容忍单批请求失败；已有板块永远不重复抓取。
 
     上游批量接口对60只BK一次请求可能返回502/握手超时。默认10只一批；
@@ -258,6 +258,31 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=6):
                 "requested":0,"not_fresh":[],"source_incomplete":False}
     refs=reference_days(expected_day)
     codes=sorted(pending)
+    # f18昨收回补仅在紧邻下一交易日且官方本日已核实价作为锚点时允许。
+    # 例如2026-11-25上午的f18须与仓库BK0731的2026-11-24真实价1315.04一致。
+    prior_close_mode=False
+    try:
+        if _adjacent_trade_day(expected_day,1)==datetime.now(CN).date().isoformat():
+            anchors=[x for x in boards
+                     if x.get("history_asof")==expected_day and
+                     str(x.get("quote_basis") or "").startswith("official") and
+                     re.fullmatch(r"BK\d{4,6}",str(x.get("code") or ""))]
+            if anchors:
+                anchor=anchors[0]
+                probe=[anchor["code"]]+[x for x in codes if x!=anchor["code"]][:2]
+                probe_rows=_api_rows(probe)
+                match=next((x for x in probe_rows
+                            if str(x.get("f12") or "")==anchor["code"]),None)
+                q=validate_previous_close(match,set(probe),expected_day)
+                existing=float(anchor.get("history_close") or anchor.get("last") or 0)
+                if existing>0 and abs(q["close"]-existing)/existing<=.001:
+                    prior_close_mode=True
+                    print("OFFICIAL_F18_ANCHOR_VERIFIED",anchor["code"],
+                          expected_day,q["close"],flush=True)
+                else:
+                    print("OFFICIAL_F18_ANCHOR_MISMATCH",anchor["code"],expected_day,flush=True)
+    except Exception as exc:
+        print("OFFICIAL_F18_PREFLIGHT_UNAVAILABLE",type(exc).__name__,str(exc)[:130],flush=True)
     recovered=0
     valid=0
     attempts=0
@@ -288,15 +313,27 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=6):
         fresh_in_batch=0
         for item in rows:
             try:
-                quote=validate_row(item,set(part),expected_day)
+                try:
+                    quote=validate_row(item,set(part),expected_day)
+                    source_previous=False
+                except ValueError:
+                    if not prior_close_mode:
+                        raise
+                    quote=validate_previous_close(item,set(part),expected_day)
+                    source_previous=True
                 code=quote["code"]
                 if code in checked:
                     continue
                 checked.add(code)
                 valid+=1
                 fresh_in_batch+=1
-                if apply_batch_close(pending[code],quote,expected_day,history_dir,
-                                     close_dir,refs):
+                if source_previous:
+                    was_changed=apply_previous_close(pending[code],quote,expected_day,
+                                                    history_dir,close_dir,refs)
+                else:
+                    was_changed=apply_batch_close(pending[code],quote,expected_day,
+                                                 history_dir,close_dir,refs)
+                if was_changed:
                     recovered+=1
             except (ValueError,KeyError,TypeError,OverflowError) as exc:
                 errors.append({"code":str(item.get("f12")) if isinstance(item,dict) else "unknown",
@@ -331,6 +368,7 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=6):
     print("OFFICIAL_BATCH_COVERAGE",recovered,"/",len(codes),"requests",attempts,
           "missing",len(missing),flush=True)
     return {"recovered":recovered,"attempted":attempts,"valid_rows":valid,
+            "previous_close_mode":prior_close_mode,
             "failed":errors[:60],"requested":len(codes),"not_fresh":missing[:80],
             "missing_count":len(missing),"source_incomplete":bool(missing),
             "failure_batches":failed_batches,"stale_batches":stale_batches}
