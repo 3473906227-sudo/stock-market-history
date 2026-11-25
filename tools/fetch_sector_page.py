@@ -67,14 +67,15 @@ def fetch_page(page:int):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("--page",type=int,required=True)
+    parser.add_argument("--attempt",type=int,default=1)
     parser.add_argument("--output-dir",default="sector_pages")
     args=parser.parse_args()
     result=fetch_page(args.page)
     path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
-    (path/f"page_{args.page}.json").write_text(
+    (path/f"page_{args.page}_attempt_{args.attempt}.json").write_text(
         json.dumps(result,ensure_ascii=False,allow_nan=False),encoding="utf-8")
-    print("BK_PAGE_FETCH",args.page,"ok",result["ok"],
+    print("BK_PAGE_FETCH",args.page,"attempt",args.attempt,"ok",result["ok"],
           "rows",len(result["rows"]),"total",result.get("total"),
           "errors",result["errors"][:2],flush=True)
     # 将失败状态写入artifact而非阻止后续已通过校验的数据发布。
