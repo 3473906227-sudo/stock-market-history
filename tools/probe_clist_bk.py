@@ -9,26 +9,31 @@ codes={str(x.get("code") or "") for x in q["boards"]}
 print("EXPECTED_BK",len(codes),flush=True)
 hosts=["https://push2.eastmoney.com/api/qt/clist/get",
        "https://push2delay.eastmoney.com/api/qt/clist/get"]
+hits=set()
 for fs in ("m:90+t:2+f:!50","m:90+t:3+f:!50"):
-  for h in hosts:
-    params={"pn":"1","pz":"1800","po":"1","np":"1","ut":"bd1d9ddb04089700cf9c27f6f7426281",
-    "fltt":"2","invt":"2","fid":"f3","fs":fs,
+  for pn in range(1,10):
+    params={"pn":str(pn),"pz":"100","po":"1","np":"1","ut":"bd1d9ddb04089700cf9c27f6f7426281",
+    "fltt":"2","invt":"2","fid":"f12","fs":fs,
     "fields":"f12,f13,f14,f2,f3,f18,f124"}
+    h="https://push2.eastmoney.com/api/qt/clist/get"
     req=Request(h+"?"+urlencode(params),headers={"User-Agent":"Mozilla/5.0","Referer":"https://quote.eastmoney.com/","Accept":"application/json"})
-    t=time.monotonic()
+    begin=time.monotonic()
     try:
-      with urlopen(req,timeout=8) as r:
-        body=r.read(1200000)
-        st=r.status
-      d=json.loads(body.decode("utf-8-sig"))
-      rows=(d.get("data") or {}).get("diff") or []
-      if isinstance(rows,dict):rows=list(rows.values())
+      with urlopen(req,timeout=9) as res: raw=res.read(700001)
+      d=json.loads(raw.decode("utf-8-sig"))
+      data=d.get("data") or {}
+      rows=data.get("diff") or []
+      if isinstance(rows,dict): rows=list(rows.values())
       got={x.get("f12") for x in rows if isinstance(x,dict)}
-      hit=codes.intersection(got)
-      print("CLIST_OK",fs,h.split("/")[2],"http",st,"count",len(rows),"matching",len(hit),
-      "sec",round(time.monotonic()-t,2),"sample",json.dumps(rows[:2],ensure_ascii=False)[:410],
-      "missing",list(sorted(codes-hit))[:8],flush=True)
-      break
+      hits |= codes.intersection(got)
+      print("PAGE",fs,pn,"total",data.get("total"),"rows",len(rows),
+            "new hits",len(codes.intersection(got)),"cumulative",len(hits),
+            "first",rows[0].get("f12") if rows else "-",
+            "last",rows[-1].get("f12") if rows else "-",
+            "time",round(time.monotonic()-begin,2),flush=True)
+      if len(rows)<100:break
     except Exception as e:
-      print("CLIST_FAIL",fs,h.split("/")[2],type(e).__name__,str(e)[:180],
-      round(time.monotonic()-t,2),flush=True)
+      print("PAGE_FAIL",fs,pn,type(e).__name__,str(e)[:160],flush=True)
+      break
+    time.sleep(.4)
+print("FINAL_HITS",len(hits),"/",len(codes),"missing",list(sorted(codes-hits))[:30],flush=True)
