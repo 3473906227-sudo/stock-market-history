@@ -345,6 +345,8 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=3):
                                "reason":str(exc)[:155]})
         if fresh_in_batch==0:
             stale_batches+=1
+            print("OFFICIAL_BATCH_STALE",len(part),expected_day,flush=True)
+            return False
         print("OFFICIAL_BATCH_RESULT","size",len(part),"fresh",fresh_in_batch,
               "total_valid",valid,"updated",recovered,"expected",expected_day,flush=True)
         return True
