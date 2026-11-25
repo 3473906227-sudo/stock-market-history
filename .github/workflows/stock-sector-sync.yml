@@ -20,6 +20,7 @@ on:
       - tools/run_sector_batch_20261124_once.flag
       - tools/run_sector_backfill_20261124_once.flag
       - tools/run_sector_paged_20261124_once.flag
+      - tools/run_sector_paged_retry_20261124_once.flag
   schedule:
     # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
     - cron: '5 9 * * 1-5'
@@ -129,24 +130,30 @@ jobs:
           PY
 
   fetch_pages:
-    name: Official BK index page ${{ matrix.page }}
+    name: Official BK page ${{ matrix.page }} attempt ${{ matrix.attempt }}
     needs: daily_gate
     if: needs.daily_gate.outputs.run_needed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     strategy:
       fail-fast: false
       matrix:
         page: [1, 2, 3, 4, 5]
+        attempt: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch one verified industry page only
-        run: python tools/fetch_sector_page.py --page ${{ matrix.page }} --output-dir sector_pages
-      - name: Upload one-page verified source
+      - name: Stagger requests across independent hosted runners
+        env:
+          PAGE: ${{ matrix.page }}
+          ATTEMPT: ${{ matrix.attempt }}
+        run: sleep "$(( (ATTEMPT - 1) * 12 + PAGE ))"
+      - name: Fetch one verified official page on this runner
+        run: python tools/fetch_sector_page.py --page ${{ matrix.page }} --attempt ${{ matrix.attempt }} --output-dir sector_pages
+      - name: Upload independent single-attempt source
         uses: actions/upload-artifact@v4
         with:
-          name: stock-sector-page-${{ matrix.page }}
-          path: sector_pages/page_${{ matrix.page }}.json
+          name: stock-sector-page-${{ matrix.page }}-attempt-${{ matrix.attempt }}
+          path: sector_pages/page_${{ matrix.page }}_attempt_${{ matrix.attempt }}.json
           if-no-files-found: error
           retention-days: 3
 
