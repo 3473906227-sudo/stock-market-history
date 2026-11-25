@@ -1,20 +1,20 @@
 {
-  "run_at": "2026-11-25 23:17:18",
-  "github_run_id": "45643041665",
+  "run_at": "2026-11-25 23:18:35",
+  "github_run_id": "",
   "expected_trading_day": "2026-11-25",
   "mode": "full",
   "ok": false,
-  "reason": "2026-11-25 报价 117/117，最新完整日K 89/117，仍缺交易日的板块 28，新增完整日K 496 条",
+  "reason": "2026-11-25 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 26，新增完整日K 28 条",
   "board_count": 117,
   "quote_fresh_count": 117,
   "quote_stale_count": 0,
   "quote_missing_names": [],
   "quotes_updated": true,
   "ohlcv_complete": false,
-  "history_fresh_count": 89,
-  "history_pending_count": 28,
-  "official_paged_new": 116,
-  "official_paged_valid_rows": 116,
+  "history_fresh_count": 117,
+  "history_pending_count": 0,
+  "official_paged_new": 0,
+  "official_paged_valid_rows": 0,
   "official_paged_pages": [
     1,
     2,
@@ -26,9 +26,17 @@
   "official_paged_errors": [],
   "previous_day_f18_verified": false,
   "selected_group_count": 17,
-  "history_gap_board_count": 28,
+  "history_gap_board_count": 26,
   "history_required_from": "2026-11-18",
   "history_fresh_boards": [
+    {
+      "code": "BK1329",
+      "name": "集成电路制造"
+    },
+    {
+      "code": "BK1328",
+      "name": "集成电路封测"
+    },
     {
       "code": "BK1617",
       "name": "黄金"
@@ -42,8 +50,16 @@
       "name": "小家电"
     },
     {
+      "code": "BK1239",
+      "name": "白色家电"
+    },
+    {
       "code": "BK1450",
       "name": "空调"
+    },
+    {
+      "code": "BK1015",
+      "name": "能源金属"
     },
     {
       "code": "BK1615",
@@ -74,8 +90,20 @@
       "name": "氮肥"
     },
     {
+      "code": "BK1019",
+      "name": "化学原料"
+    },
+    {
+      "code": "BK1549",
+      "name": "旅游零售Ⅲ"
+    },
+    {
       "code": "BK1269",
       "name": "旅游零售Ⅱ"
+    },
+    {
+      "code": "BK0731",
+      "name": "农化制品"
     },
     {
       "code": "BK1419",
@@ -88,6 +116,14 @@
     {
       "code": "BK0450",
       "name": "航运港口"
+    },
+    {
+      "code": "BK0420",
+      "name": "航空机场"
+    },
+    {
+      "code": "BK0538",
+      "name": "化学制品"
     },
     {
       "code": "BK0456",
@@ -104,6 +140,10 @@
     {
       "code": "BK1470",
       "name": "房屋建设Ⅲ"
+    },
+    {
+      "code": "BK1479",
+      "name": "航空运输"
     },
     {
       "code": "BK1241",
@@ -146,6 +186,10 @@
       "name": "输变电设备"
     },
     {
+      "code": "BK0421",
+      "name": "铁路公路"
+    },
+    {
       "code": "BK0457",
       "name": "电网设备"
     },
@@ -162,12 +206,24 @@
       "name": "电力"
     },
     {
+      "code": "BK1597",
+      "name": "血液制品"
+    },
+    {
       "code": "BK0738",
       "name": "多元金融"
     },
     {
       "code": "BK0422",
       "name": "物流"
+    },
+    {
+      "code": "BK1263",
+      "name": "摩托车及其他"
+    },
+    {
+      "code": "BK0438",
+      "name": "食品饮料"
     },
     {
       "code": "BK0739",
@@ -192,6 +248,10 @@
     {
       "code": "BK1204",
       "name": "国防军工"
+    },
+    {
+      "code": "BK0440",
+      "name": "家居用品"
     },
     {
       "code": "BK1267",
@@ -222,6 +282,14 @@
       "name": "生物制品"
     },
     {
+      "code": "BK1027",
+      "name": "小金属"
+    },
+    {
+      "code": "BK0727",
+      "name": "医疗服务"
+    },
+    {
       "code": "BK1042",
       "name": "医药商业"
     },
@@ -236,6 +304,10 @@
     {
       "code": "BK1282",
       "name": "饮料乳品"
+    },
+    {
+      "code": "BK1207",
+      "name": "计算机"
     },
     {
       "code": "BK1240",
@@ -266,6 +338,10 @@
       "name": "逆变器"
     },
     {
+      "code": "BK1209",
+      "name": "建筑装饰"
+    },
+    {
       "code": "BK1394",
       "name": "轨交设备Ⅲ"
     },
@@ -280,6 +356,10 @@
     {
       "code": "BK0736",
       "name": "通信服务"
+    },
+    {
+      "code": "BK1383",
+      "name": "航海装备Ⅲ"
     },
     {
       "code": "BK0448",
@@ -326,6 +406,10 @@
       "name": "互联网电商"
     },
     {
+      "code": "BK0459",
+      "name": "元件"
+    },
+    {
       "code": "BK0481",
       "name": "汽车零部件"
     },
@@ -346,8 +430,28 @@
       "name": "教育出版"
     },
     {
+      "code": "BK1237",
+      "name": "自动化设备"
+    },
+    {
+      "code": "BK1553",
+      "name": "多业态零售"
+    },
+    {
+      "code": "BK1016",
+      "name": "汽车服务"
+    },
+    {
+      "code": "BK1551",
+      "name": "百货"
+    },
+    {
       "code": "BK1546",
       "name": "电商服务"
+    },
+    {
+      "code": "BK1292",
+      "name": "广告媒体"
     },
     {
       "code": "BK1301",
@@ -366,6 +470,10 @@
       "name": "视频媒体"
     },
     {
+      "code": "BK1289",
+      "name": "大众出版"
+    },
+    {
       "code": "BK0486",
       "name": "传媒"
     },
@@ -382,6 +490,10 @@
       "name": "稀土"
     },
     {
+      "code": "BK1222",
+      "name": "影视院线"
+    },
+    {
       "code": "BK1299",
       "name": "影视动漫制作"
     }
@@ -390,356 +502,315 @@
     {
       "code": "BK1329",
       "name": "集成电路制造",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1328",
       "name": "集成电路封测",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1239",
       "name": "白色家电",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1015",
       "name": "能源金属",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
-      ]
-    },
-    {
-      "code": "BK1019",
-      "name": "化学原料",
-      "latest": "2026-11-24",
-      "dates": [
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1549",
       "name": "旅游零售Ⅲ",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
-      ]
-    },
-    {
-      "code": "BK0731",
-      "name": "农化制品",
-      "latest": "2026-11-24",
-      "dates": [
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0420",
       "name": "航空机场",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0538",
       "name": "化学制品",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1479",
       "name": "航空运输",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0421",
       "name": "铁路公路",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1597",
       "name": "血液制品",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1263",
       "name": "摩托车及其他",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0438",
       "name": "食品饮料",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0440",
       "name": "家居用品",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1027",
       "name": "小金属",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0727",
       "name": "医疗服务",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1207",
       "name": "计算机",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1209",
       "name": "建筑装饰",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1383",
       "name": "航海装备Ⅲ",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK0459",
       "name": "元件",
-      "latest": "2026-11-20",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1237",
       "name": "自动化设备",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1553",
       "name": "多业态零售",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1016",
       "name": "汽车服务",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1551",
       "name": "百货",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1292",
       "name": "广告媒体",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1289",
       "name": "大众出版",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     },
     {
       "code": "BK1222",
       "name": "影视院线",
-      "latest": "2026-11-17",
+      "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
         "2026-11-19",
         "2026-11-20",
         "2026-11-23",
-        "2026-11-24",
-        "2026-11-25"
+        "2026-11-24"
       ]
     }
   ],
-  "history_added_rows": 496,
+  "history_added_rows": 28,
+  "history_added_snapshot_rows": 28,
   "history_source_errors": {
     "BK1329": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
@@ -757,15 +828,7 @@
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
-    "BK1019": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
     "BK1549": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK0731": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
@@ -774,8 +837,8 @@
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK0538": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK1479": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
@@ -790,20 +853,20 @@
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK1263": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK0438": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK0440": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK1027": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-17 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK0727": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
@@ -822,8 +885,8 @@
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK0459": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-20 官方源与已存完整日K不一致",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: ValueError: 2026-11-20 官方源与已存完整日K不一致"
+      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
+      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK1237": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
