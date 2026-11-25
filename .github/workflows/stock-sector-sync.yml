@@ -87,7 +87,7 @@ jobs:
         if: github.event_name == 'pull_request'
         continue-on-error: true
         run: python tools/probe_sector_sources.py
-  daily-gate:
+  daily_gate:
     needs: syntax-check
     if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     runs-on: ubuntu-latest
@@ -128,10 +128,10 @@ jobs:
               sys.exit(2)
           PY
 
-  fetch-pages:
+  fetch_pages:
     name: Official BK index page ${{ matrix.page }}
-    needs: daily-gate
-    if: needs.daily-gate.outputs.run_needed == 'true'
+    needs: daily_gate
+    if: needs.daily_gate.outputs.run_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
@@ -151,8 +151,8 @@ jobs:
           retention-days: 3
 
   aggregate-and-publish:
-    needs: [daily-gate, fetch-pages]
-    if: always() && needs.daily-gate.outputs.run_needed == 'true'
+    needs: [daily_gate, fetch_pages]
+    if: always() && needs.daily_gate.outputs.run_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -166,7 +166,7 @@ jobs:
       - name: Validate every BK index and update only fresh close data
         run: |
           python -m tools.apply_sector_pages --page-dir sector_pages \
-            --expected-day '${{ needs.daily-gate.outputs.expected_trade_day }}'
+            --expected-day '${{ needs.daily_gate.outputs.expected_trade_day }}'
       - name: Publish verified sector data safely
         shell: bash
         run: |
