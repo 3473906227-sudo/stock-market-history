@@ -101,6 +101,10 @@ def validate_row(row, codes, expected):
         "timestamp":trade_time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
+def current_china_date():
+    return datetime.now(CN).date().isoformat()
+
+
 def _adjacent_trade_day(value, direction):
     day=date.fromisoformat(value)
     for _ in range(25):
@@ -262,13 +266,14 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=3):
     # 例如2026-11-25上午的f18须与仓库BK0731的2026-11-24真实价1315.04一致。
     prior_close_mode=False
     try:
-        if _adjacent_trade_day(expected_day,1)==datetime.now(CN).date().isoformat():
+        if _adjacent_trade_day(expected_day,1)==current_china_date():
             anchors=[x for x in boards
                      if x.get("history_asof")==expected_day and
                      str(x.get("quote_basis") or "").startswith("official") and
                      re.fullmatch(r"BK\d{4,6}",str(x.get("code") or ""))]
             if anchors:
-                anchor=anchors[0]
+                anchor=sorted(anchors,key=lambda x: (str(x.get("code"))!="BK0731",
+                                                    str(x.get("code"))))[0]
                 probe=[anchor["code"]]+[x for x in codes if x!=anchor["code"]][:2]
                 probe_rows=_api_rows(probe)
                 match=next((x for x in probe_rows
