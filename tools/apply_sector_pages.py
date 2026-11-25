@@ -88,9 +88,13 @@ def read_pages(directory):
                 records[code]=row
     return records,received_pages,errors,total_expected
 
+def current_china_day():
+    return datetime.now(CN).date().isoformat()
+
+
 def anchor_is_verified(boards, rows, target):
     """必须与仓库至少一个同日官方已核验价一致才可把今天f18当昨天close。"""
-    if _adjacent_trade_day(target,1)!=datetime.now(CN).date().isoformat():
+    if _adjacent_trade_day(target,1)!=current_china_day():
         return False
     known=sorted(
         (b for b in boards if b.get("history_asof")==target and
