@@ -54,6 +54,55 @@ class TestBatchSnapshot(unittest.TestCase):
                 batch._api_rows(["BK1329"])
         self.assertEqual(web.call_count,2)
 
+
+    def test_bad_first_large_batch_splits_and_recovers_all(self):
+        code_list=["BK%04d"%(1000+i) for i in range(10)]
+        rows=[{**ROW,"f12":code,"f2":1000+i} for i,code in enumerate(code_list)]
+        boards=[{"code":code,"name":"测试%d"%i,"history_asof":"2026-11-20"}
+                for i,code in enumerate(code_list)]
+        calls=[]
+        def fetch(part):
+            calls.append(part)
+            if len(part)>5:
+                raise TimeoutError("url too long")
+            return [row for row in rows if row["f12"] in part]
+        def apply(board,quote,expected,history,close,refs):
+            board["history_asof"]=expected
+            board["close"]=quote["close"]
+            return True
+        with patch.object(batch,"_api_rows",side_effect=fetch), \
+             patch.object(batch,"apply_batch_close",side_effect=apply), \
+             patch.object(batch,"reference_days",return_value={5:"2026-11-17",20:"2026-10-27"}), \
+             patch.object(batch.time,"sleep",return_value=None):
+            result=batch.update(boards,expected_day=DAY,history_dir="/unused",
+                                close_dir="/unused",chunk_size=10)
+        self.assertEqual(result["recovered"],10)
+        self.assertEqual(result["attempted"],3)
+        self.assertEqual(result["missing_count"],0)
+        self.assertTrue(all(x["history_asof"]==DAY for x in boards))
+
+    def test_early_failed_batch_does_not_skip_other_bk_groups(self):
+        code_list=["BK%04d"%(1100+i) for i in range(10)]
+        boards=[{"code":code,"name":"测试%d"%i,"history_asof":"2026-11-20"}
+                for i,code in enumerate(code_list)]
+        def fetch(part):
+            if part[0]==code_list[0]:
+                raise TimeoutError("source timed out")
+            return [{**ROW,"f12":code,"f2":1000+i}
+                    for i,code in enumerate(code_list) if code in part]
+        def apply(board,quote,expected,history,close,refs):
+            board["history_asof"]=expected
+            return True
+        with patch.object(batch,"_api_rows",side_effect=fetch), \
+             patch.object(batch,"apply_batch_close",side_effect=apply), \
+             patch.object(batch,"reference_days",return_value={5:"2026-11-17",20:"2026-10-27"}), \
+             patch.object(batch.time,"sleep",return_value=None):
+            result=batch.update(boards,expected_day=DAY,history_dir="/unused",
+                                close_dir="/unused",chunk_size=5)
+        self.assertEqual(result["recovered"],5)
+        self.assertEqual(result["missing_count"],5)
+        self.assertEqual(result["attempted"],2)
+
     def test_one_daily_close_preserves_real_past_prices_and_old_snapshot(self):
         with tempfile.TemporaryDirectory() as root:
             hist=Path(root)/"history"
