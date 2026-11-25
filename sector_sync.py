@@ -563,7 +563,7 @@ def main():
         from tools.sector_batch_snapshot import update as update_batch_closes
         batch = update_batch_closes(
             boards, expected_day=expected, history_dir=HIST,
-            close_dir=OUT / 'close_history', chunk_size=60)
+            close_dir=OUT / 'close_history', chunk_size=3)
     except Exception as exc:
         batch['failed'] = [{'error':'官方批量收盘请求失败：'+type(exc).__name__+': '+str(exc)[:180]}]
         print('批量BK收盘数据失败：',str(exc)[:180],flush=True)

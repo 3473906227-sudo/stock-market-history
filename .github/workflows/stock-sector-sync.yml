@@ -18,6 +18,7 @@ on:
       # 仅这一个修复令牌文件触发一次性行情恢复；平常push、改代码不会触发行情。
       - tools/run_sector_repair_20261124.flag
       - tools/run_sector_batch_20261124_once.flag
+      - tools/run_sector_backfill_20261124_once.flag
   schedule:
     # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
     - cron: '5 9 * * 1-5'
@@ -101,6 +102,25 @@ jobs:
           git fetch origin main
           git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
           SECTOR_STATUS_FILE=/tmp/sector_remote_status.json python -m tools.sector_daily_gate
+      - name: Report incomplete data honestly when duplicate schedule is skipped
+        if: steps.daily_gate.outputs.run_needed == 'false' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+        run: |
+          python - <<'PY'
+          import json,sys
+          try:
+              s=json.load(open('/tmp/sector_remote_status.json',encoding='utf8'))
+              total=int(s.get('board_count') or 0)
+              fresh=int(s.get('quote_fresh_count') or 0)
+              complete=bool(s.get('ok')) and total>0 and fresh==total
+          except (OSError,ValueError,TypeError) as exc:
+              complete=False
+              total=0
+              fresh=0
+          print(f'已完成板块行情: {fresh}/{total}，没有重复调用官方API')
+          if not complete:
+              print('::error::上次采集仍缺行情，自动任务跳过以保护源端；不可报绿色成功')
+              sys.exit(2)
+          PY
       - uses: actions/setup-python@v5
         if: steps.daily_gate.outputs.run_needed == 'true'
         with:
