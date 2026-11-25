@@ -80,6 +80,20 @@ class PageAggregationTests(unittest.TestCase):
         data=json.loads((self.out/"quotes.json").read_text("utf8"))
         self.assertEqual(data["boards"][0]["history_asof"],"2026-11-20")
 
+    def test_failed_first_attempt_uses_independent_second_attempt_page(self):
+        self.seed_pages()
+        original=(self.pages/"page_1.json")
+        success=(self.pages/"page_1_attempt_2.json")
+        success.write_bytes(original.read_bytes())
+        original.unlink()
+        (self.pages/"page_1_attempt_1.json").write_text(
+            json.dumps({"page":1,"ok":False,"rows":[],"errors":["HTTP 502"]}),
+            encoding="utf8")
+        status=a.run(self.pages,target="2026-11-24")
+        self.assertTrue(status["ok"])
+        self.assertEqual(status["official_paged_new"],116)
+        self.assertEqual(status["quote_fresh_count"],117)
+
     def test_mismatched_f18_anchor_does_not_replace_116_old_prices(self):
         self.seed_pages(wrong_anchor=True)
         status=a.run(self.pages,target="2026-11-24")
