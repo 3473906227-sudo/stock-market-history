@@ -10,8 +10,8 @@ print("EXPECTED_BK",len(codes),flush=True)
 hosts=["https://push2.eastmoney.com/api/qt/clist/get",
        "https://push2delay.eastmoney.com/api/qt/clist/get"]
 hits=set()
-for fs in ("m:90+t:2+f:!50","m:90+t:3+f:!50"):
-  for pn in range(1,10):
+for fs in ("m:90+t:2+f:!50",):
+  for pn in (3,):
     params={"pn":str(pn),"pz":"100","po":"1","np":"1","ut":"bd1d9ddb04089700cf9c27f6f7426281",
     "fltt":"2","invt":"2","fid":"f12","fs":fs,
     "fields":"f12,f13,f14,f2,f3,f18,f124"}
