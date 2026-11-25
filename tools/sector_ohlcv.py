@@ -15,8 +15,9 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from tools import apply_sector_pages
+from tools.fetch_sector_page import HOSTS as SNAPSHOT_ENDPOINTS
 from tools.github_schedule_trigger import a_share_trading_status
-from tools.sector_batch_snapshot import _history_file, _save_close_prices
+from tools.sector_batch_snapshot import _adjacent_trade_day, _history_file, _save_close_prices, validate_row
 from tools.sector_daily_gate import CN, expected_close_day
 
 
@@ -26,6 +27,7 @@ FIELDS = ('date', 'open', 'high', 'low', 'close', 'volume')
 HOSTS = ('push2his.eastmoney.com', '33.push2his.eastmoney.com')
 ENDPOINTS = tuple(f'https://{host}/api/qt/stock/kline/get' for host in HOSTS)
 SOURCE = '东方财富官方BK不复权历史日K'
+SNAPSHOT_SOURCE = '东方财富官方BK盘后完整OHLCV'
 
 
 def trade_days(start, end):
@@ -224,22 +226,77 @@ def merge_board(board, local, valid, target, attempts, errors):
     return additions, sources
 
 
-def sync_close_history(board, additions):
-    directory = OUT / 'close_history'
-    path = _history_file(board, directory)
+def read_close_history(board):
+    path = _history_file(board, OUT / 'close_history')
     closes = {}
     if path.exists():
         with path.open(encoding='utf-8-sig', newline='') as handle:
             for row in csv.DictReader(handle):
-                value = Decimal(row['close'])
-                if value.is_finite() and value > 0:
-                    closes[row['date']] = float(value)
+                try:
+                    day = row['date']
+                    value = Decimal(row['close'])
+                    if date.fromisoformat(day).isoformat() == day and value.is_finite() and 0 < value < 1_000_000:
+                        closes[day] = float(value)
+                except (InvalidOperation, KeyError, TypeError, ValueError):
+                    continue
+    return closes
+
+
+def sync_close_history(board, additions):
+    closes = read_close_history(board)
     closes.update({day: float(values[3]) for day, values in additions.items()})
-    _save_close_prices(board, directory, closes)
+    _save_close_prices(board, OUT / 'close_history', closes)
 
 
 def quote_day(board):
     return board.get('quote_asof') or board.get('history_asof') or ''
+
+
+def read_final_pages(directory):
+    observations = {}
+    for path in sorted(directory.glob('page_*.json')):
+        page = apply_sector_pages.load_json(path)
+        if page.get('ok') and page.get('endpoint') in SNAPSHOT_ENDPOINTS:
+            for row in page.get('rows', []):
+                if isinstance(row, dict) and all(field in row for field in ('f17', 'f15', 'f16', 'f5')):
+                    observations.setdefault(row.get('f12'), []).append((page['endpoint'], row))
+    return observations
+
+
+def prior_quote_close(board, previous_day):
+    if quote_day(board) == previous_day and str(board.get('quote_basis') or '').startswith('official'):
+        return board.get('history_close') or board.get('last')
+    return read_close_history(board).get(previous_day)
+
+
+def snapshot_bar(board, row, target, prior_close):
+    quote = validate_row(row, {board['code']}, target)
+    if row['f14'] != board['name']:
+        raise ValueError('盘后行情板块名称不匹配')
+    previous = quote['previous_close']
+    if (not prior_close or previous is None
+            or not abs(float(prior_close) - previous) <= 0.011):
+        raise ValueError('盘后快照昨收未与仓库独立记录核对一致')
+    values = bar(target, *(str(row[key]) for key in ('f17', 'f15', 'f16', 'f2', 'f5')))
+    close = float(values[3])
+    if abs((close / previous - 1) * 100 - quote['pct']) > 0.02:
+        raise ValueError('盘后快照收盘价、昨收价与当日涨幅不一致')
+    return values
+
+
+def verified_snapshot(board, target, prior_close, candidates, errors):
+    observations = {}
+    for endpoint, row in candidates:
+        try:
+            values = snapshot_bar(board, row, target, prior_close)
+            observations[tuple(map(Decimal, values))] = values, endpoint
+        except (KeyError, OSError, OverflowError, TypeError, ValueError) as exc:
+            errors.append(str(exc))
+    if len(observations) > 1:
+        errors.append(f'{target} 官方不同盘后响应的OHLCV不一致')
+    if len(observations) == 1:
+        return next(iter(observations.values()))
+    return None
 
 
 def refresh_quote(board, local, valid, latest, endpoint, required):
@@ -247,7 +304,8 @@ def refresh_quote(board, local, valid, latest, endpoint, required):
     if not latest or latest < existing or latest < required[0]:
         return False
     sessions = list(trade_days(date.fromisoformat(latest) - timedelta(days=105), date.fromisoformat(latest)))
-    closes = {day: float(local[day][3]) for day in sessions if day in valid}
+    closes = read_close_history(board)
+    closes.update({day: float(local[day][3]) for day in sessions if day in valid})
     close = closes[latest]
     volume = float(local[latest][4])
 
@@ -275,11 +333,15 @@ def refresh_quote(board, local, valid, latest, endpoint, required):
     if latest > existing or close != board.get('last') or board.get('quote_basis') == 'official_bk_previous_close':
         # These snapshot fields cannot be recovered from historical OHLCV.
         board.update(dict.fromkeys(('turnover', 'turnover_rate', 'up', 'down', 'leader', 'leader_pct')))
+    snapshot = endpoint in SNAPSHOT_ENDPOINTS
+    source_time = board.get('source_time') if snapshot and existing == latest else None
     board.update(last=close, volume=volume, change_pct=rate(1), ret5=rate(5), ret20=rate(20),
                  history_asof=latest, history_close=close, quote_asof=latest,
-                 quote_basis='official_daily_close', quote_source=SOURCE,
-                 quote_source_url=endpoint if endpoint in ENDPOINTS else ENDPOINTS[0], quote_source_label=board['name'],
-                 source_time=None, trend=trend, ma20=round(ma20, 3) if ma20 else None,
+                 quote_basis='official_bk_eod_ohlcv' if snapshot else 'official_daily_close',
+                 quote_source=SNAPSHOT_SOURCE if snapshot else SOURCE,
+                 quote_source_url=endpoint if endpoint in ENDPOINTS + SNAPSHOT_ENDPOINTS else ENDPOINTS[0],
+                 quote_source_label=board['name'],
+                 source_time=source_time, trend=trend, ma20=round(ma20, 3) if ma20 else None,
                  ma60=round(ma60, 3) if ma60 else None,
                  volume_ratio=round(volume / volume_base, 3) if volume_base else None)
     return previous != board
@@ -301,18 +363,25 @@ def read_artifacts(directory, target):
 def publish(target, input_dir, *, page_dir=None, quotes_only=False):
     required = dates_for(target)
     data = apply_sector_pages.load_json(OUT / 'quotes.json')
-    boards_from(data)
+    boards = boards_from(data)
     status = apply_sector_pages.load_json(OUT / 'status.json')
     if target < max(status.get('expected_trading_day') or '', data.get('expected_trade_date') or ''):
         print('本次目标早于已发布批次，保留更新的批次。', flush=True)
         return
+    final_pages, prior_close, previous_day = {}, {}, None
     if page_dir is not None and any(page_dir.glob('*.json')):
+        if not quotes_only:
+            previous_day = _adjacent_trade_day(target, -1)
+            final_pages = read_final_pages(page_dir)
+            prior_close = {board['code']: prior_quote_close(board, previous_day)
+                           for board in boards if board['code'] in final_pages}
         status = apply_sector_pages.run(page_dir, target=target)
         data = apply_sector_pages.load_json(OUT / 'quotes.json')
     boards = boards_from(data)
     records = read_artifacts(input_dir, target)
     history_fresh, gaps, quote_missing, error_summary = [], [], [], {}
     added_count = 0
+    snapshot_count = 0
     new_quotes = False
     for board in boards:
         code = board['code']
@@ -322,6 +391,13 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
         record = records.get(code, {})
         errors = record.get('errors', []).copy()
         additions, sources = merge_board(board, local, valid, target, record.get('responses', []), errors)
+        if target not in valid and target not in additions and code in final_pages:
+            anchor = (additions.get(previous_day) or (local.get(previous_day) if previous_day in valid else None))
+            snapshot = verified_snapshot(board, target, anchor[3] if anchor else prior_close.get(code),
+                                         final_pages[code], errors)
+            if snapshot:
+                additions[target], sources[target] = snapshot
+                snapshot_count += 1
         if additions:
             local.update(additions)
             valid.update(additions)
@@ -330,6 +406,10 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
             added_count += len(additions)
         latest = max(valid, default='')
         missing = [day for day in required if day not in valid]
+        latest_endpoint = sources.get(latest) or board.get('history_ohlcv_source_url')
+        if latest and latest_endpoint:
+            board.update(history_ohlcv_source_url=latest_endpoint,
+                         history_ohlcv_source=(SNAPSHOT_SOURCE if latest_endpoint in SNAPSHOT_ENDPOINTS else SOURCE))
         board.update(history_ohlcv_asof=latest or None, history_ohlcv_expected_asof=target,
                      history_ohlcv_missing_dates=missing, ohlcv_complete_to_target=not missing)
         if target in valid:
@@ -339,7 +419,7 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
             if errors:
                 error_summary[code] = list(dict.fromkeys(errors))[:4]
         if not quotes_only and latest <= target:
-            new_quotes |= refresh_quote(board, local, valid, latest, sources.get(latest) or board.get('quote_source_url'), required)
+            new_quotes |= refresh_quote(board, local, valid, latest, latest_endpoint, required)
         if quote_day(board) < target:
             quote_missing.append(board['name'])
 
@@ -363,7 +443,8 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
                   ohlcv_complete=complete, history_fresh_count=len(history_fresh),
                   history_pending_count=total-len(history_fresh), history_gap_board_count=len(gaps),
                   history_required_from=required[0], history_fresh_boards=history_fresh, history_gaps=gaps,
-                  history_added_rows=added_count, history_source_errors=error_summary)
+                  history_added_rows=added_count, history_added_snapshot_rows=snapshot_count,
+                  history_source_errors=error_summary)
     apply_sector_pages.atomic_json(OUT / 'quotes.json', data)
     apply_sector_pages.atomic_json(OUT / 'status.json', status)
     print(reason, flush=True)

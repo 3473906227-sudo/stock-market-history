@@ -25,7 +25,7 @@ def fetch_page(page:int):
         "ut":"bd1d9ddb04089700cf9c27f6f7426281",
         "fltt":"2","invt":"2","fid":"f12",
         "fs":"m:90+t:2+f:!50",
-        "fields":"f12,f13,f14,f2,f3,f18,f124",
+        "fields":"f2,f3,f5,f6,f12,f13,f14,f15,f16,f17,f18,f124",
     }
     errors=[]
     for host in HOSTS:

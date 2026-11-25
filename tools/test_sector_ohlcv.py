@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 import tempfile
 import unittest
@@ -57,6 +58,22 @@ class SectorHistoryTests(unittest.TestCase):
         additions, _ = sync.merge_board(BOARD, self.local, set(self.local), TARGET, attempts, errors)
         self.assertEqual(additions, {})
         self.assertIn(TARGET, errors[0])
+
+    def test_closed_snapshot_must_have_real_fields_and_an_independent_previous_close(self):
+        final_time = int(datetime(2026, 11, 24, 15, 30, tzinfo=sync.CN).timestamp())
+        row = {'f12': BOARD['code'], 'f13': 90, 'f14': BOARD['name'], 'f124': final_time,
+               'f17': 102, 'f15': 111, 'f16': 99, 'f2': 103, 'f5': 150, 'f18': 100, 'f3': 3.0}
+        self.assertEqual(sync.snapshot_bar(BOARD, row, TARGET, 100), ('102', '111', '99', '103', '150'))
+        for invalid in [dict(row, f124=final_time - 3600), dict(row, f124=final_time + 86400),
+                        dict(row, f18=101), dict(row, f5='-'), dict(row, f3=2.0), dict(row, f14='其他行业')]:
+            with self.assertRaises(ValueError):
+                sync.snapshot_bar(BOARD, invalid, TARGET, 100)
+        with self.assertRaises(ValueError):
+            sync.snapshot_bar(BOARD, row, TARGET, None)
+        errors = []
+        observations = [(sync.SNAPSHOT_ENDPOINTS[0], row), (sync.SNAPSHOT_ENDPOINTS[1], dict(row, f5=151))]
+        self.assertIsNone(sync.verified_snapshot(BOARD, TARGET, 100, observations, errors))
+        self.assertIn('不一致', errors[0])
 
     def test_publish_partial_ohlcv_and_alert_even_when_quotes_are_complete(self):
         boards = [dict(BOARD)] + [dict(BOARD, code=f'BK{3000+i}', name=f'行业{i}') for i in range(99)]
