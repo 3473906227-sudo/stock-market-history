@@ -1,15 +1,15 @@
 {
-  "run_at": "2026-11-25 23:28:51",
-  "github_run_id": "45645404869",
+  "run_at": "2026-11-26 03:03:25",
+  "github_run_id": "45681130626",
   "expected_trading_day": "2026-11-25",
   "mode": "full",
   "ok": false,
-  "reason": "2026-11-25 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 17，新增完整日K 0 条",
+  "reason": "2026-11-25 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 3，新增完整日K 70 条",
   "board_count": 117,
   "quote_fresh_count": 117,
   "quote_stale_count": 0,
   "quote_missing_names": [],
-  "quotes_updated": false,
+  "quotes_updated": true,
   "ohlcv_complete": false,
   "history_fresh_count": 117,
   "history_pending_count": 0,
@@ -27,7 +27,7 @@
   ],
   "previous_day_f18_verified": false,
   "selected_group_count": 17,
-  "history_gap_board_count": 17,
+  "history_gap_board_count": 3,
   "history_required_from": "2026-11-18",
   "history_fresh_boards": [
     {
@@ -501,116 +501,8 @@
   ],
   "history_gaps": [
     {
-      "code": "BK1329",
-      "name": "集成电路制造",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1328",
-      "name": "集成电路封测",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1015",
-      "name": "能源金属",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1549",
-      "name": "旅游零售Ⅲ",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK0538",
-      "name": "化学制品",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1479",
-      "name": "航空运输",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
       "code": "BK1597",
       "name": "血液制品",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1263",
-      "name": "摩托车及其他",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK0727",
-      "name": "医疗服务",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1207",
-      "name": "计算机",
       "latest": "2026-11-25",
       "dates": [
         "2026-11-18",
@@ -633,42 +525,6 @@
       ]
     },
     {
-      "code": "BK1237",
-      "name": "自动化设备",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1553",
-      "name": "多业态零售",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1551",
-      "name": "百货",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
       "code": "BK1292",
       "name": "广告媒体",
       "latest": "2026-11-25",
@@ -679,100 +535,26 @@
         "2026-11-23",
         "2026-11-24"
       ]
-    },
-    {
-      "code": "BK1289",
-      "name": "大众出版",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
-      "code": "BK1222",
-      "name": "影视院线",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
     }
   ],
-  "history_added_rows": 0,
+  "history_added_rows": 70,
   "history_added_snapshot_rows": 0,
   "history_source_errors": {
-    "BK1329": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1328": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1015": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1549": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
     "BK0538": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1479": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
+      "2026-11-17 官方历史与已存完整日K不一致，保留原记录"
     ],
     "BK1597": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
     "BK1263": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK0727": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1207": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
+      "2026-11-17 官方历史与已存完整日K不一致，保留原记录"
     ],
     "BK1209": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
-    "BK1237": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1553": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1551": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
     "BK1292": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1289": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1222": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ]
