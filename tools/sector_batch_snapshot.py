@@ -160,47 +160,95 @@ def apply_batch_close(board, row, expected, history_dir, close_dir, refs):
     _save_close_prices(board,close_dir,prices)
     return True
 
-def update(boards, *, expected_day, history_dir, close_dir, chunk_size=60):
+def update(boards, *, expected_day, history_dir, close_dir, chunk_size=10):
+    """小批次递进采集，容忍单批请求失败；已有板块永远不重复抓取。
+
+    上游批量接口对60只BK一次请求可能返回502/握手超时。默认10只一批；
+    失败时仅拆成两个5只的子批次各请求一次，避免第1批失败就停止全部。
+    一个交易日只有一次自动任务，单任务内请求有明确上限。
+    """
     items={str(b.get("code") or ""):b for b in boards
            if re.fullmatch(r"BK\d{4,6}",str(b.get("code") or ""))}
-    pending={code:b for code,b in items.items() if str(b.get("history_asof") or "")<expected_day}
+    pending={code:b for code,b in items.items()
+             if str(b.get("history_asof") or "") < expected_day}
     if not pending:
-        return {"recovered":0,"attempted":0,"valid_rows":0,"failed":[]}
+        return {"recovered":0,"attempted":0,"valid_rows":0,"failed":[],
+                "requested":0,"not_fresh":[],"source_incomplete":False}
     refs=reference_days(expected_day)
     codes=sorted(pending)
-    seen=set()
     recovered=0
     valid=0
-    failed=[]
     attempts=0
-    chunk_size=max(1,min(int(chunk_size),60))
-    for start in range(0,len(codes),chunk_size):
-        part=codes[start:start+chunk_size]
+    checked=set()
+    errors=[]
+    failed_batches=0
+    stale_batches=0
+    chunk_size=max(1,min(int(chunk_size),20))
+    request_limit=max(12,min(45, (len(codes)+chunk_size-1)//chunk_size*3))
+    def consume(part):
+        nonlocal recovered,valid,attempts,failed_batches,stale_batches
+        if attempts>=request_limit:
+            return False
         attempts+=1
         try:
             rows=_api_rows(part)
         except Exception as exc:
-            failed.append({"batch":len(part),"error":type(exc).__name__+": "+str(exc)[:160]})
-            print("OFFICIAL_BATCH_UNAVAILABLE",len(part),type(exc).__name__,str(exc)[:130],flush=True)
-            # 当整个官方接口被限流时避免对其余批次连续撞限流。
-            if recovered==0 and attempts==1:
-                break
-            continue
+            failed_batches+=1
+            errors.append({"batch_size":len(part),"sample":part[:2],
+                           "reason":type(exc).__name__+": "+str(exc)[:150]})
+            print("OFFICIAL_BATCH_UNAVAILABLE",len(part),type(exc).__name__,
+                  str(exc)[:145],flush=True)
+            return False
+        if not rows:
+            failed_batches+=1
+            errors.append({"batch_size":len(part),"reason":"官方接口返回空报价"})
+            return False
+        fresh_in_batch=0
         for item in rows:
             try:
-                q=validate_row(item,set(part),expected_day)
-                code=q["code"]
-                if code in seen:continue
-                seen.add(code)
+                quote=validate_row(item,set(part),expected_day)
+                code=quote["code"]
+                if code in checked:
+                    continue
+                checked.add(code)
                 valid+=1
-                if apply_batch_close(pending[code],q,expected_day,history_dir,close_dir,refs):
+                fresh_in_batch+=1
+                if apply_batch_close(pending[code],quote,expected_day,history_dir,
+                                     close_dir,refs):
                     recovered+=1
-            except (ValueError,KeyError,TypeError) as exc:
-                failed.append({"code":str(item.get("f12")) if isinstance(item,dict) else "unknown",
-                               "error":str(exc)[:150]})
-        print("OFFICIAL_BATCH_RESULT",len(part),"valid",valid,"updated",recovered,
-              "day",expected_day,flush=True)
+            except (ValueError,KeyError,TypeError,OverflowError) as exc:
+                errors.append({"code":str(item.get("f12")) if isinstance(item,dict) else "unknown",
+                               "reason":str(exc)[:155]})
+        if fresh_in_batch==0:
+            stale_batches+=1
+        print("OFFICIAL_BATCH_RESULT","size",len(part),"fresh",fresh_in_batch,
+              "total_valid",valid,"updated",recovered,"expected",expected_day,flush=True)
+        return True
+
+    source_fail_streak=0
+    for start in range(0,len(codes),chunk_size):
+        if attempts>=request_limit or source_fail_streak>=5:
+            print("OFFICIAL_BATCH_CIRCUIT_BREAK",attempts,source_fail_streak,flush=True)
+            break
+        part=codes[start:start+chunk_size]
+        ok=consume(part)
+        if not ok and len(part)>=6 and attempts<request_limit:
+            # 只拆一次：上游单次URL较长可能导致502；不全量重试。
+            half=len(part)//2
+            left=consume(part[:half])
+            time.sleep(.8)
+            right=consume(part[half:]) if attempts<request_limit else False
+            ok=left or right
+        if ok:
+            source_fail_streak=0
+        else:
+            source_fail_streak+=1
         if start+chunk_size<len(codes):
-            time.sleep(1.6)
+            time.sleep(1.0)
+    missing=sorted(code for code in codes if code not in checked)
+    print("OFFICIAL_BATCH_COVERAGE",recovered,"/",len(codes),"requests",attempts,
+          "missing",len(missing),flush=True)
     return {"recovered":recovered,"attempted":attempts,"valid_rows":valid,
-            "failed":failed[:40],"requested":len(codes)}
+            "failed":errors[:60],"requested":len(codes),"not_fresh":missing[:80],
+            "missing_count":len(missing),"source_incomplete":bool(missing),
+            "failure_batches":failed_batches,"stale_batches":stale_batches}
