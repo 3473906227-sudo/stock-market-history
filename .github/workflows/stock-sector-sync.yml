@@ -19,6 +19,7 @@ on:
       - tools/run_sector_repair_20261124.flag
       - tools/run_sector_batch_20261124_once.flag
       - tools/run_sector_backfill_20261124_once.flag
+      - tools/run_sector_paged_20261124_once.flag
   schedule:
     # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
     - cron: '5 9 * * 1-5'
@@ -30,6 +31,9 @@ on:
       - tools/test_sector_sync_safety.py
       - tools/sector_batch_snapshot.py
       - tools/test_sector_batch_snapshot.py
+      - tools/fetch_sector_page.py
+      - tools/apply_sector_pages.py
+      - tools/test_apply_sector_pages.py
       - .github/workflows/stock-sector-sync.yml
       - tools/probe_sector_sources.py
       - tools/recover_sectors_20261120.py
@@ -48,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Python syntax before any market requests
-        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py tools/sector_batch_snapshot.py
+        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py tools/sector_batch_snapshot.py tools/fetch_sector_page.py tools/apply_sector_pages.py
       - name: Run offline rate-limit and freshness regression tests
         run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
       - name: Verify backup snapshot never fabricates dates or returns
@@ -71,6 +75,8 @@ jobs:
           PY
       - name: Verify official BK batch quotes and timestamp without network
         run: python -m unittest discover -s tools -p 'test_sector_batch_snapshot.py' -v
+      - name: Test five-page aggregation and true per-sector dates without network
+        run: python -m unittest discover -s tools -p 'test_apply_sector_pages.py' -v
       - name: Verify daily gate module starts from repository root
         env:
           SECTOR_STATUS_FILE: /tmp/sector_gate_smoke_test.json
@@ -81,20 +87,22 @@ jobs:
         if: github.event_name == 'pull_request'
         continue-on-error: true
         run: python tools/probe_sector_sources.py
-  sync:
+  daily-gate:
     needs: syntax-check
-    # push只允许一次性修复令牌，平常push不触发；schedule依旧每天一次。
     if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 3
+    outputs:
+      run_needed: ${{ steps.gate.outputs.run_needed }}
+      expected_trade_day: ${{ steps.gate.outputs.expected_trade_day }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check exchange trading day
+      - name: Check official A-share calendar
         id: calendar
         if: github.event_name == 'schedule'
         run: python tools/github_schedule_trigger.py --check-trading-day
-      - name: Check one update per trading day
-        id: daily_gate
+      - name: Check daily one-run gate
+        id: gate
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         env:
           SECTOR_FORCE_UPDATE: ${{ github.event_name == 'push' && 'true' || inputs.force || 'false' }}
@@ -102,8 +110,8 @@ jobs:
           git fetch origin main
           git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
           SECTOR_STATUS_FILE=/tmp/sector_remote_status.json python -m tools.sector_daily_gate
-      - name: Report incomplete data honestly when duplicate schedule is skipped
-        if: steps.daily_gate.outputs.run_needed == 'false' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+      - name: Do not mark incomplete skipped sync as green success
+        if: steps.gate.outputs.run_needed == 'false'
         run: |
           python - <<'PY'
           import json,sys
@@ -111,71 +119,93 @@ jobs:
               s=json.load(open('/tmp/sector_remote_status.json',encoding='utf8'))
               total=int(s.get('board_count') or 0)
               fresh=int(s.get('quote_fresh_count') or 0)
-              complete=bool(s.get('ok')) and total>0 and fresh==total
-          except (OSError,ValueError,TypeError) as exc:
-              complete=False
-              total=0
-              fresh=0
-          print(f'已完成板块行情: {fresh}/{total}，没有重复调用官方API')
-          if not complete:
-              print('::error::上次采集仍缺行情，自动任务跳过以保护源端；不可报绿色成功')
+              ok=bool(s.get('ok')) and total>=100 and fresh==total
+          except (OSError,ValueError,TypeError):
+              ok=False;total=0;fresh=0
+          print(f'行业板块完成数量: {fresh}/{total}（已跳过重复请求）')
+          if not ok:
+              print('::error::行业行情尚未齐全，不能将跳过任务误标为更新成功')
               sys.exit(2)
           PY
-      - uses: actions/setup-python@v5
-        if: steps.daily_gate.outputs.run_needed == 'true'
+
+  fetch-pages:
+    name: Official BK index page ${{ matrix.page }}
+    needs: daily-gate
+    if: needs.daily-gate.outputs.run_needed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        page: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch one verified industry page only
+        run: python tools/fetch_sector_page.py --page ${{ matrix.page }} --output-dir sector_pages
+      - name: Upload one-page verified source
+        uses: actions/upload-artifact@v4
         with:
-          python-version: '3.11'
-      - name: Install market-data libraries
-        if: steps.daily_gate.outputs.run_needed == 'true'
-        run: python -m pip install --upgrade 'akshare>=1.16' 'pandas>=2.0'
-      - name: Prune unrelated sector files (17 groups + tracked stocks only)
-        if: steps.daily_gate.outputs.run_needed == 'true'
-        run: python sector_sync.py --prune-only
-      - name: Download verified industry quotes / history / constituents
-        if: steps.daily_gate.outputs.run_needed == 'true'
-        env:
-          TRIGGER_CRON: ${{ github.event.schedule }}
-          MANUAL_QUOTES: ${{ inputs.quotes_only || 'false' }}
+          name: stock-sector-page-${{ matrix.page }}
+          path: sector_pages/page_${{ matrix.page }}.json
+          if-no-files-found: error
+          retention-days: 3
+
+  aggregate-and-publish:
+    needs: [daily-gate, fetch-pages]
+    if: always() && needs.daily-gate.outputs.run_needed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read five independent official BK pages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: stock-sector-page-*
+          path: sector_pages
+          merge-multiple: true
+      - name: Validate every BK index and update only fresh close data
         run: |
-          set -euo pipefail
-          if [ "$MANUAL_QUOTES" = "true" ]; then
-            python sector_sync.py --quotes-only
-          else
-            python sector_sync.py --workers 1 --max-boards 140 --max-members 0
-          fi
-      - name: Publish only verified industry files (parallel-safe)
-        if: steps.daily_gate.outputs.run_needed == 'true'
+          python -m tools.apply_sector_pages --page-dir sector_pages \
+            --expected-day '${{ needs.daily-gate.outputs.expected_trade_day }}'
+      - name: Publish verified sector data safely
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          staging="$(mktemp -d)"
-          test -s data/sectors/quotes.json || { echo '::error::缺少已验证的行业快照'; exit 1; }
-          cp -a data/sectors/. "$staging/"
+          stage="$(mktemp -d)"
+          test -s data/sectors/quotes.json
+          test -s data/sectors/status.json
+          cp -a data/sectors/. "$stage/"
           for attempt in 1 2 3 4; do
             git fetch origin main
             git reset --hard origin/main
             mkdir -p data/sectors
-            # 删除旧历史目录后重新放回白名单文件，确保无关板块在仓库真正删除。
-            rm -rf data/sectors/history
-            cp -a "$staging/." data/sectors/
+            cp -a "$stage/." data/sectors/
             git add -A data/sectors/
             if git diff --cached --quiet; then
-              echo '行业数据无变化，不提交。'
-              exit 0
+              echo "本次没有新的已核验行业收盘，未写入伪行情"
+              break
             fi
-            git commit -m 'data: refresh verified A-share industry boards'
+            git commit -m "data: publish individually verified industry closing index pages"
             if git push origin HEAD:main; then
-              echo '行业行情已同步到 main/data/sectors/'
-              exit 0
+              echo "已将可信行业行情同步回main"
+              break
             fi
-            echo "同步时发生并行写入冲突，重试 $attempt/4"
-            sleep "$((attempt * 3))"
+            if [ "$attempt" = 4 ]; then
+              echo "::error::GitHub数据发布失败";exit 1
+            fi
+            sleep "$((attempt * 2))"
           done
-          echo '::error::行业行情发布失败（已重试4次）'
-          exit 1
-      - name: Validate actual completed trading day coverage
-        if: steps.daily_gate.outputs.run_needed == 'true'
-        # 先安全发布已核验的数据、再判定整轮健康：部分补采可积累，但不能显示绿色成功。
-        run: python sector_sync.py --validate-status
+      - name: Validate actual per-industry trading day coverage
+        run: |
+          python - <<'PY'
+          import json,sys
+          s=json.load(open('data/sectors/status.json',encoding='utf8'))
+          fresh=s.get('quote_fresh_count',0);total=s.get('board_count',0)
+          print(f'最新交易日实测覆盖：{fresh}/{total}；历史OHLCV：{s.get("history_fresh_count",0)}/{total}')
+          if not s.get('ok') or fresh!=total:
+              print('::error::行业行情有未更新项，已安全发布已核验结果，不报绿色成功')
+              print('尚缺前20个：',s.get('quote_missing_names',[])[:20])
+              sys.exit(2)
+          PY
