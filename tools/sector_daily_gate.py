@@ -32,6 +32,12 @@ def quotes_complete(expected, status):
             and status.get('quote_fresh_count') == total)
 
 
+def needs_quote_pages(expected, status, *, quotes_only=False):
+    if not quotes_complete(expected, status):
+        return True
+    return not quotes_only and status.get('history_fresh_count') != status.get('board_count')
+
+
 def should_run(expected: str, old_status: dict, *, event: str, force=False, quotes_only=False):
     published = old_status.get('expected_trading_day') or ''
     if published > expected:
@@ -59,7 +65,7 @@ def main():
         forced = os.environ.get("SECTOR_FORCE_UPDATE","false").strip().lower() == "true"
         quotes_only = os.environ.get('SECTOR_QUOTES_ONLY', 'false') == 'true'
         run,reason = should_run(day,status,event=event,force=forced,quotes_only=quotes_only)
-        fetch_quotes = run and (forced or not quotes_complete(day, status))
+        fetch_quotes = run and (forced or needs_quote_pages(day, status, quotes_only=quotes_only))
     except (ValueError,TypeError) as exc:
         day = ""
         run,reason = False, "安全跳过：" + str(exc)

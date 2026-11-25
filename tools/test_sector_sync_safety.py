@@ -137,7 +137,7 @@ class SectorSafetyTests(unittest.TestCase):
                     datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
 
     def test_daily_gate_requires_complete_history_for_full_sync(self):
-        from tools.sector_daily_gate import should_run, expected_close_day, CN
+        from tools.sector_daily_gate import should_run, expected_close_day, needs_quote_pages, CN
         friday = datetime(2026, 11, 20, 17, 15, tzinfo=CN)
         weekend = datetime(2026, 11, 22, 9, 0, tzinfo=CN)
         self.assertEqual(expected_close_day(friday), '2026-11-20')
@@ -147,6 +147,9 @@ class SectorSafetyTests(unittest.TestCase):
         self.assertTrue(should_run('2026-11-20',old,event='schedule')[0])
         self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch')[0])
         self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch',quotes_only=True)[0])
+        self.assertTrue(needs_quote_pages('2026-11-20',old))
+        self.assertFalse(needs_quote_pages('2026-11-20',dict(old, history_fresh_count=117)))
+        self.assertTrue(needs_quote_pages('2026-11-23',dict(old, history_fresh_count=117)))
         current = dict(old, ohlcv_complete=True, history_fresh_count=117, history_gaps=[])
         self.assertFalse(should_run('2026-11-20',current,event='schedule',force=True)[0])
         self.assertTrue(should_run('2026-11-20',current,event='workflow_dispatch',force=True)[0])
