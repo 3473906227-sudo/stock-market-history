@@ -1,7 +1,7 @@
 {
   "ok": true,
   "source": "东方财富官方BK历史日K与逐板块已核验收盘报价",
-  "fetched_at": "2026-11-25 23:18:35",
+  "fetched_at": "2026-11-25 23:22:41",
   "session": "final_or_delayed",
   "expected_trade_date": "2026-11-25",
   "historical_recovery_only": false,
@@ -101,7 +101,7 @@
       "ret20": -12.567,
       "history_asof": "2026-11-25",
       "history_close": 4659.21,
-      "ma20": 5209.926,
+      "ma20": 5209.925,
       "ma60": 6054.653,
       "trend": "bearish",
       "volume_ratio": 0.744,
@@ -114,7 +114,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "黄金",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "贵金属",
@@ -145,7 +147,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "贵金属",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "小家电",
@@ -163,7 +167,7 @@
       "ret20": -2.336,
       "history_asof": "2026-11-25",
       "history_close": 2088.48,
-      "ma20": 2159.314,
+      "ma20": 2159.313,
       "ma60": 2150.266,
       "trend": "below_ma20",
       "volume_ratio": 0.864,
@@ -176,7 +180,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "小家电",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "白色家电",
@@ -190,30 +196,24 @@
       "down": 3,
       "leader": "长虹美菱",
       "leader_pct": 9.98,
-      "ret5": null,
+      "ret5": -4.495,
       "ret20": 2.902,
       "history_asof": "2026-11-25",
       "history_close": 3076.86,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 3073.694,
+      "ma60": 3143.238,
+      "trend": "above_ma20",
+      "volume_ratio": 0.76,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "白色家电",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -246,7 +246,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "空调",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "能源金属",
@@ -316,7 +318,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "铜",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "综合电商",
@@ -334,7 +338,7 @@
       "ret20": -10.486,
       "history_asof": "2026-11-25",
       "history_close": 823.92,
-      "ma20": 903.235,
+      "ma20": 903.234,
       "ma60": 950.626,
       "trend": "bearish",
       "volume_ratio": 0.855,
@@ -347,7 +351,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "综合电商",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "半导体",
@@ -378,7 +384,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "半导体",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "光学光电子",
@@ -409,7 +417,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "光学光电子",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "银行",
@@ -440,7 +450,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "银行",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "银行Ⅱ",
@@ -471,7 +483,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "银行Ⅱ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "氮肥",
@@ -502,7 +516,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "氮肥",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "化学原料",
@@ -592,7 +608,7 @@
       "ret20": -1.114,
       "history_asof": "2026-11-25",
       "history_close": 5510.06,
-      "ma20": 5646.942,
+      "ma20": 5646.943,
       "ma60": 5858.968,
       "trend": "bearish",
       "volume_ratio": 1.237,
@@ -605,7 +621,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "旅游零售Ⅱ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "农化制品",
@@ -624,7 +642,7 @@
       "history_asof": "2026-11-25",
       "history_close": 1291.35,
       "ma20": 1409.536,
-      "ma60": 1565.155,
+      "ma60": 1565.156,
       "trend": "bearish",
       "volume_ratio": 1.621,
       "quote_asof": "2026-11-25",
@@ -669,7 +687,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "煤化工",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "工业金属",
@@ -688,7 +708,7 @@
       "history_asof": "2026-11-25",
       "history_close": 2320.53,
       "ma20": 2645.799,
-      "ma60": 3001.993,
+      "ma60": 3001.992,
       "trend": "bearish",
       "volume_ratio": 0.93,
       "quote_asof": "2026-11-25",
@@ -700,7 +720,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "工业金属",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "航运港口",
@@ -718,8 +740,8 @@
       "ret20": -4.685,
       "history_asof": "2026-11-25",
       "history_close": 11297.46,
-      "ma20": 11755.611,
-      "ma60": 12179.446,
+      "ma20": 11755.61,
+      "ma60": 12179.447,
       "trend": "bearish",
       "volume_ratio": 1.052,
       "quote_asof": "2026-11-25",
@@ -731,7 +753,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "航运港口",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "航空机场",
@@ -745,30 +769,24 @@
       "down": 8,
       "leader": "春秋航空",
       "leader_pct": 1.18,
-      "ret5": null,
+      "ret5": -1.759,
       "ret20": 3.021,
       "history_asof": "2026-11-25",
       "history_close": 3923.79,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 3993.492,
+      "ma60": 3966.489,
+      "trend": "below_ma20",
+      "volume_ratio": 1.101,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "航空机场",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -840,7 +858,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "家用电器",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "电子",
@@ -871,7 +891,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电子",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "聚氨酯",
@@ -902,7 +924,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "聚氨酯",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "房屋建设Ⅲ",
@@ -933,7 +957,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "房屋建设Ⅲ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "航空运输",
@@ -1003,7 +1029,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "黑色家电",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "线下药店",
@@ -1034,7 +1062,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "线下药店",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "基础化工",
@@ -1065,7 +1095,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "基础化工",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "非银金融",
@@ -1096,7 +1128,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "非银金融",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "美容护理",
@@ -1114,7 +1148,7 @@
       "ret20": -12.295,
       "history_asof": "2026-11-25",
       "history_close": 737.55,
-      "ma20": 798.199,
+      "ma20": 798.198,
       "ma60": 850.478,
       "trend": "bearish",
       "volume_ratio": 1.089,
@@ -1127,7 +1161,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "美容护理",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "交通运输",
@@ -1158,7 +1194,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "交通运输",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "消费电子",
@@ -1189,7 +1227,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "消费电子",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "电动乘用车",
@@ -1220,7 +1260,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电动乘用车",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "食品及饲料添加剂",
@@ -1251,7 +1293,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "食品及饲料添加剂",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "输变电设备",
@@ -1282,7 +1326,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "输变电设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "铁路公路",
@@ -1296,30 +1342,24 @@
       "down": 25,
       "leader": "招商公路",
       "leader_pct": 2.08,
-      "ret5": null,
+      "ret5": -5.22,
       "ret20": -3.376,
       "history_asof": "2026-11-25",
       "history_close": 8182.23,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 8535.207,
+      "ma60": 8541.914,
+      "trend": "bearish",
+      "volume_ratio": 0.958,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "铁路公路",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -1339,7 +1379,7 @@
       "ret20": -16.081,
       "history_asof": "2026-11-25",
       "history_close": 26863.7,
-      "ma20": 30514.317,
+      "ma20": 30514.316,
       "ma60": 33425.616,
       "trend": "bearish",
       "volume_ratio": 0.851,
@@ -1352,7 +1392,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电网设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "铝",
@@ -1383,7 +1425,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "铝",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "铁路运输",
@@ -1401,7 +1445,7 @@
       "ret20": -6.828,
       "history_asof": "2026-11-25",
       "history_close": 1394.92,
-      "ma20": 1473.376,
+      "ma20": 1473.377,
       "ma60": 1486.933,
       "trend": "bearish",
       "volume_ratio": 0.904,
@@ -1414,7 +1458,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "铁路运输",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "电力",
@@ -1433,7 +1479,7 @@
       "history_asof": "2026-11-25",
       "history_close": 16188.92,
       "ma20": 17454.771,
-      "ma60": 18493.212,
+      "ma60": 18493.213,
       "trend": "bearish",
       "volume_ratio": 0.9,
       "quote_asof": "2026-11-25",
@@ -1445,7 +1491,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电力",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "血液制品",
@@ -1515,7 +1563,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "多元金融",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "物流",
@@ -1546,7 +1596,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "物流",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "摩托车及其他",
@@ -1599,30 +1651,24 @@
       "down": 89,
       "leader": "宝立食品",
       "leader_pct": 6.47,
-      "ret5": null,
+      "ret5": -4.251,
       "ret20": -5.304,
       "history_asof": "2026-11-25",
       "history_close": 23864.74,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 25394.02,
+      "ma60": 25853.693,
+      "trend": "bearish",
+      "volume_ratio": 1.021,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "食品饮料",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -1643,7 +1689,7 @@
       "history_asof": "2026-11-25",
       "history_close": 1821.5,
       "ma20": 1964.621,
-      "ma60": 2032.6,
+      "ma60": 2032.601,
       "trend": "bearish",
       "volume_ratio": 1.058,
       "quote_asof": "2026-11-25",
@@ -1655,7 +1701,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "工程机械",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "环保",
@@ -1686,7 +1734,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "环保",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "专业工程",
@@ -1717,7 +1767,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "专业工程",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "建筑材料",
@@ -1735,7 +1787,7 @@
       "ret20": -13.925,
       "history_asof": "2026-11-25",
       "history_close": 2922.4,
-      "ma20": 3273.292,
+      "ma20": 3273.293,
       "ma60": 3512.541,
       "trend": "bearish",
       "volume_ratio": 0.948,
@@ -1748,7 +1800,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "建筑材料",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "医疗器械",
@@ -1779,7 +1833,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "医疗器械",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "国防军工",
@@ -1810,7 +1866,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "国防军工",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "家居用品",
@@ -1824,30 +1882,24 @@
       "down": 59,
       "leader": "悍高集团",
       "leader_pct": 6.67,
-      "ret5": null,
+      "ret5": -8.325,
       "ret20": -13.459,
       "history_asof": "2026-11-25",
       "history_close": 38463.88,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 42557.702,
+      "ma60": 46154.298,
+      "trend": "bearish",
+      "volume_ratio": 0.965,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "家居用品",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -1867,7 +1919,7 @@
       "ret20": -15.169,
       "history_asof": "2026-11-25",
       "history_close": 1885.63,
-      "ma20": 2108.382,
+      "ma20": 2108.383,
       "ma60": 2322.83,
       "trend": "bearish",
       "volume_ratio": 1.196,
@@ -1880,7 +1932,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "造纸",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "IT服务Ⅲ",
@@ -1911,7 +1965,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "IT服务Ⅲ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "农产品加工",
@@ -1930,7 +1986,7 @@
       "history_asof": "2026-11-25",
       "history_close": 1983.53,
       "ma20": 2124.897,
-      "ma60": 2282.258,
+      "ma60": 2282.259,
       "trend": "bearish",
       "volume_ratio": 1.519,
       "quote_asof": "2026-11-25",
@@ -1942,7 +1998,9 @@
       "ohlcv_complete_to_target": true,
       "history_ohlcv_expected_asof": "2026-11-25",
       "history_ohlcv_missing_dates": [],
-      "quote_source_label": "农产品加工"
+      "quote_source_label": "农产品加工",
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "计算机设备",
@@ -1973,7 +2031,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "计算机设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "医药生物",
@@ -2004,7 +2064,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "医药生物",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "车身附件及饰件",
@@ -2035,7 +2097,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "车身附件及饰件",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "生物制品",
@@ -2053,7 +2117,7 @@
       "ret20": -13.707,
       "history_asof": "2026-11-25",
       "history_close": 821.83,
-      "ma20": 911.752,
+      "ma20": 911.751,
       "ma60": 972.006,
       "trend": "bearish",
       "volume_ratio": 1.112,
@@ -2066,7 +2130,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "生物制品",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "小金属",
@@ -2080,30 +2146,24 @@
       "down": 17,
       "leader": "华锡有色",
       "leader_pct": 6.21,
-      "ret5": null,
+      "ret5": -9.813,
       "ret20": -18.206,
       "history_asof": "2026-11-25",
       "history_close": 2571.0,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 3002.628,
+      "ma60": 3406.69,
+      "trend": "bearish",
+      "volume_ratio": 0.87,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "小金属",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -2162,8 +2222,8 @@
       "ret20": -8.449,
       "history_asof": "2026-11-25",
       "history_close": 993.33,
-      "ma20": 1063.497,
-      "ma60": 1092.869,
+      "ma20": 1063.496,
+      "ma60": 1092.87,
       "trend": "bearish",
       "volume_ratio": 1.644,
       "quote_asof": "2026-11-25",
@@ -2175,7 +2235,9 @@
       "ohlcv_complete_to_target": true,
       "history_ohlcv_asof": "2026-11-25",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "轻工制造",
@@ -2206,7 +2268,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "轻工制造",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "包装印刷",
@@ -2237,7 +2301,9 @@
       "ohlcv_complete_to_target": true,
       "history_ohlcv_expected_asof": "2026-11-25",
       "history_ohlcv_missing_dates": [],
-      "quote_source_label": "包装印刷"
+      "quote_source_label": "包装印刷",
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "饮料乳品",
@@ -2268,7 +2334,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "饮料乳品",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "计算机",
@@ -2338,7 +2406,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "厨卫电器",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "专用设备",
@@ -2369,7 +2439,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "专用设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "电池",
@@ -2400,7 +2472,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电池",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "石油石化",
@@ -2431,7 +2505,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "石油石化",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "化学制药",
@@ -2462,7 +2538,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "化学制药",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "生猪养殖",
@@ -2493,7 +2571,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "生猪养殖",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "逆变器",
@@ -2524,7 +2604,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "逆变器",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "建筑装饰",
@@ -2594,7 +2676,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "轨交设备Ⅲ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "养殖业",
@@ -2625,7 +2709,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "养殖业",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "风电设备",
@@ -2643,7 +2729,7 @@
       "ret20": -15.843,
       "history_asof": "2026-11-25",
       "history_close": 933.6,
-      "ma20": 1079.622,
+      "ma20": 1079.621,
       "ma60": 1180.002,
       "trend": "bearish",
       "volume_ratio": 1.02,
@@ -2656,7 +2742,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "风电设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "通信服务",
@@ -2687,7 +2775,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "通信服务",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "航海装备Ⅲ",
@@ -2744,7 +2834,7 @@
       "ret20": -20.63,
       "history_asof": "2026-11-25",
       "history_close": 15961.36,
-      "ma20": 17931.587,
+      "ma20": 17931.588,
       "ma60": 21332.909,
       "trend": "bearish",
       "volume_ratio": 0.921,
@@ -2757,7 +2847,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "通信设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "软件开发",
@@ -2788,7 +2880,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "软件开发",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "跨境电商",
@@ -2806,7 +2900,7 @@
       "ret20": -17.25,
       "history_asof": "2026-11-25",
       "history_close": 2057.17,
-      "ma20": 2357.459,
+      "ma20": 2357.458,
       "ma60": 2522.596,
       "trend": "bearish",
       "volume_ratio": 1.007,
@@ -2819,7 +2913,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "跨境电商",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "机械设备",
@@ -2837,7 +2933,7 @@
       "ret20": -17.715,
       "history_asof": "2026-11-25",
       "history_close": 3527.83,
-      "ma20": 3989.704,
+      "ma20": 3989.703,
       "ma60": 4351.869,
       "trend": "bearish",
       "volume_ratio": 0.992,
@@ -2850,7 +2946,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "机械设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "锂电池",
@@ -2881,7 +2979,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "锂电池",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "通用设备",
@@ -2899,7 +2999,7 @@
       "ret20": -18.447,
       "history_asof": "2026-11-25",
       "history_close": 37404.88,
-      "ma20": 42525.226,
+      "ma20": 42525.227,
       "ma60": 46564.788,
       "trend": "bearish",
       "volume_ratio": 1.017,
@@ -2912,7 +3012,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "通用设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "饲料",
@@ -2943,7 +3045,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "饲料",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "汽车",
@@ -2961,7 +3065,7 @@
       "ret20": -16.078,
       "history_asof": "2026-11-25",
       "history_close": 3128.51,
-      "ma20": 3487.899,
+      "ma20": 3487.9,
       "ma60": 3698.073,
       "trend": "bearish",
       "volume_ratio": 1.006,
@@ -2974,7 +3078,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "汽车",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "煤炭开采",
@@ -2992,7 +3098,7 @@
       "ret20": -9.935,
       "history_asof": "2026-11-25",
       "history_close": 1638.82,
-      "ma20": 1764.664,
+      "ma20": 1764.663,
       "ma60": 1891.15,
       "trend": "bearish",
       "volume_ratio": 1.025,
@@ -3005,7 +3111,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "煤炭开采",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "商贸零售",
@@ -3023,7 +3131,7 @@
       "ret20": -12.237,
       "history_asof": "2026-11-25",
       "history_close": 1867.13,
-      "ma20": 2052.96,
+      "ma20": 2052.961,
       "ma60": 2150.77,
       "trend": "bearish",
       "volume_ratio": 1.22,
@@ -3036,7 +3144,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "商贸零售",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "互联网电商",
@@ -3067,7 +3177,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "互联网电商",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "元件",
@@ -3085,23 +3197,20 @@
       "ret20": -19.753,
       "history_asof": "2026-11-25",
       "history_close": 40789.36,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 44802.697,
+      "ma60": 54552.677,
+      "trend": "bearish",
+      "volume_ratio": 1.004,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "元件",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -3134,7 +3243,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "汽车零部件",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "一般零售",
@@ -3165,7 +3276,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "一般零售",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "基础建设",
@@ -3196,7 +3309,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "基础建设",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "光伏设备",
@@ -3227,7 +3342,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "光伏设备",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "教育出版",
@@ -3245,7 +3362,7 @@
       "ret20": 2.264,
       "history_asof": "2026-11-25",
       "history_close": 2394.77,
-      "ma20": 2445.975,
+      "ma20": 2445.976,
       "ma60": 2315.93,
       "trend": "below_ma20",
       "volume_ratio": 1.046,
@@ -3258,7 +3375,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "教育出版",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "自动化设备",
@@ -3350,30 +3469,24 @@
       "down": 9,
       "leader": "中汽股份",
       "leader_pct": -0.55,
-      "ret5": null,
+      "ret5": -9.468,
       "ret20": -14.094,
       "history_asof": "2026-11-25",
       "history_close": 794.58,
-      "ma20": null,
-      "ma60": null,
-      "trend": null,
-      "volume_ratio": null,
+      "ma20": 882.897,
+      "ma60": 921.195,
+      "trend": "bearish",
+      "volume_ratio": 0.953,
       "quote_asof": "2026-11-25",
       "history_ohlcv_asof": "2026-11-25",
       "quote_basis": "official_bk_eod_ohlcv",
       "quote_source": "东方财富官方BK盘后完整OHLCV",
       "quote_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "source_time": "2026-11-25 15:39:57",
-      "ohlcv_complete_to_target": false,
+      "ohlcv_complete_to_target": true,
       "quote_source_label": "汽车服务",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ],
+      "history_ohlcv_missing_dates": [],
       "history_ohlcv_source_url": "https://push2.eastmoney.com/api/qt/clist/get",
       "history_ohlcv_source": "东方财富官方BK盘后完整OHLCV"
     },
@@ -3445,7 +3558,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "电商服务",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "广告媒体",
@@ -3515,7 +3630,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "游戏Ⅲ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "游戏Ⅱ",
@@ -3546,7 +3663,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "游戏Ⅱ",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "出版",
@@ -3577,7 +3696,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "出版",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "视频媒体",
@@ -3595,7 +3716,7 @@
       "ret20": 15.776,
       "history_asof": "2026-11-25",
       "history_close": 1383.56,
-      "ma20": 1457.914,
+      "ma20": 1457.915,
       "ma60": 1140.909,
       "trend": "below_ma20",
       "volume_ratio": 0.9,
@@ -3608,7 +3729,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "视频媒体",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "大众出版",
@@ -3678,7 +3801,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "传媒",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "广告营销",
@@ -3709,7 +3834,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "广告营销",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "营销代理",
@@ -3740,7 +3867,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "营销代理",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "稀土",
@@ -3758,7 +3887,7 @@
       "ret20": -15.49,
       "history_asof": "2026-11-25",
       "history_close": 6374.72,
-      "ma20": 7479.245,
+      "ma20": 7479.244,
       "ma60": 8334.212,
       "trend": "bearish",
       "volume_ratio": 0.736,
@@ -3771,7 +3900,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "稀土",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     },
     {
       "name": "影视院线",
@@ -3828,7 +3959,7 @@
       "ret20": -9.193,
       "history_asof": "2026-11-25",
       "history_close": 3631.79,
-      "ma20": 4131.828,
+      "ma20": 4131.829,
       "ma60": 3896.304,
       "trend": "below_ma20",
       "volume_ratio": 0.813,
@@ -3841,7 +3972,9 @@
       "ohlcv_complete_to_target": true,
       "quote_source_label": "影视动漫制作",
       "history_ohlcv_expected_asof": "2026-11-25",
-      "history_ohlcv_missing_dates": []
+      "history_ohlcv_missing_dates": [],
+      "history_ohlcv_source_url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "history_ohlcv_source": "东方财富官方BK不复权历史日K"
     }
   ],
   "quote_fresh_count": 117,
@@ -3855,6 +3988,6 @@
   ],
   "history_fresh_count": 117,
   "history_pending_count": 0,
-  "history_gap_board_count": 26,
+  "history_gap_board_count": 18,
   "ohlcv_complete": false
 }
