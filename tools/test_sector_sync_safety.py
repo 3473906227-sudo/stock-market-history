@@ -136,20 +136,22 @@ class SectorSafetyTests(unittest.TestCase):
                     datetime(2026,11,17,tzinfo=timezone(timedelta(hours=8))),
                     datetime(2026,11,22,tzinfo=timezone(timedelta(hours=8))))
 
-    def test_daily_gate_one_attempt_per_trade_day(self):
+    def test_daily_gate_requires_complete_history_for_full_sync(self):
         from tools.sector_daily_gate import should_run, expected_close_day, CN
         friday = datetime(2026, 11, 20, 17, 15, tzinfo=CN)
         weekend = datetime(2026, 11, 22, 9, 0, tzinfo=CN)
         self.assertEqual(expected_close_day(friday), '2026-11-20')
         self.assertEqual(expected_close_day(weekend), '2026-11-20')
-        old = {'expected_trading_day':'2026-11-20', 'mode':'full', 'ok':False}
-        self.assertFalse(should_run('2026-11-20',old,event='schedule')[0])
-        self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch')[0])
-        self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch',force=True)[0])
-        self.assertTrue(should_run('2026-11-20',old,event='push',force=True)[0])
-        self.assertFalse(should_run('2026-11-20',old,event='push')[0])
-        self.assertTrue(should_run('2026-11-23',old,event='schedule')[0])
-        self.assertFalse(should_run('2026-11-20',old,event='schedule',force=True)[0])
+        old = {'expected_trading_day':'2026-11-20', 'mode':'full', 'ok':True,
+               'board_count':117, 'quote_fresh_count':117, 'history_fresh_count':5, 'ohlcv_complete':False}
+        self.assertTrue(should_run('2026-11-20',old,event='schedule')[0])
+        self.assertTrue(should_run('2026-11-20',old,event='workflow_dispatch')[0])
+        self.assertFalse(should_run('2026-11-20',old,event='workflow_dispatch',quotes_only=True)[0])
+        current = dict(old, ohlcv_complete=True, history_fresh_count=117, history_gaps=[])
+        self.assertFalse(should_run('2026-11-20',current,event='schedule',force=True)[0])
+        self.assertTrue(should_run('2026-11-20',current,event='workflow_dispatch',force=True)[0])
+        self.assertTrue(should_run('2026-11-23',current,event='schedule')[0])
+        self.assertFalse(should_run('2026-11-19',current,event='workflow_dispatch',force=True)[0])
 
     def _fake_full(self, *, fresh):
         from collections import defaultdict

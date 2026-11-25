@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A股行业日线每日最多一次采集闸门：仅用仓库状态，不调用市场API。"""
+"""按收盘交易日及实际完成状态判断是否需要采集。"""
 from __future__ import annotations
 from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
@@ -26,15 +26,20 @@ def expected_close_day(now: datetime):
         day -= timedelta(days=1)
     raise ValueError("无法找到最近交易日")
 
-def should_run(expected: str, old_status: dict, *, event: str, force=False):
-    # force 仅对显式手动或一次性修复令牌push有效；schedule不允许绕过每日上限。
-    # push只由工作流白名单中的单次令牌文件触发，普通代码push不能调用此job。
-    if event in ("workflow_dispatch", "push") and force:
-        return True, "管理员手动或受控一次性修复"
-    if (old_status.get("expected_trading_day") == expected and
-            old_status.get("mode") in ("full", "quotes")):
-        return False, "该交易日已有采集记录（即使源端失败也不自动重试）"
-    return True, "该交易日尚无采集记录"
+def should_run(expected: str, old_status: dict, *, event: str, force=False, quotes_only=False):
+    published = old_status.get('expected_trading_day') or ''
+    if published > expected:
+        return False, '已有更晚的发布批次'
+    if event == 'workflow_dispatch' and force:
+        return True, '手动补采'
+    total = old_status.get('board_count') or 0
+    quote_ok = total >= 100 and old_status.get('quote_fresh_count') == total
+    history_ok = (old_status.get('ohlcv_complete') is True
+                  and old_status.get('history_fresh_count') == total
+                  and 'history_gaps' in old_status)
+    if published == expected and quote_ok and (history_ok or quotes_only):
+        return False, '该交易日所需数据已实际验收齐全'
+    return True, '该交易日所需数据尚未补齐'
 
 def main():
     try:
@@ -47,7 +52,8 @@ def main():
             status = {}
         event = os.environ.get("GITHUB_EVENT_NAME","")
         forced = os.environ.get("SECTOR_FORCE_UPDATE","false").strip().lower() == "true"
-        run,reason = should_run(day,status,event=event,force=forced)
+        quotes_only = os.environ.get('SECTOR_QUOTES_ONLY', 'false') == 'true'
+        run,reason = should_run(day,status,event=event,force=forced,quotes_only=quotes_only)
     except (ValueError,TypeError) as exc:
         day = ""
         run,reason = False, "安全跳过：" + str(exc)
@@ -58,7 +64,7 @@ def main():
             f.write("expected_trade_day=" + day + "\n")
     print(f"行业同步每日闸门：目标={day or '未知'}；"
           f"{'允许运行' if run else '不重复运行'}；{reason}",flush=True)
-    return 0
+    return 0 if day else 4
 
 if __name__ == "__main__":
     sys.exit(main())

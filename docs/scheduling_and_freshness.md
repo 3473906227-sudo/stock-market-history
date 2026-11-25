@@ -1,5 +1,13 @@
 # A股行情定时同步：防延迟配置
 
+## 行业收盘与完整日K
+
+`stock-sector-sync.yml` 在交易日北京时间 17:05 采集。日K分批读取东方财富官方 BK 不复权历史接口，用板块代码、名称、交易日、OHLCV 字段及已存日K交叉核验。例行采集会继续补抓 2026-11-18 起的历史缺档。官方分页报价可独立补收盘价。
+
+- 行情总览以每个板块的 `quote_asof` 为报价日期。历史图表从 `data/sectors/history/` 读取完整日K，最新日期以实际载入的有效 CSV 最后一条为准。`history_ohlcv_asof` 是发布时校验的日K日期，`history_ohlcv_missing_dates` 是待补交易日。`close_history/` 供收盘价计算使用。
+- 行情与图表分别展示报价日期、完整日K日期。从同一次 GitHub 提交读取 `quotes.json`、`status.json` 和图表 CSV，可避免混用缓存批次。强弱对比应使用行业与基准指数共有的交易日。
+- `status.json` 的 `history_fresh_boards` 列出有目标日完整日K的板块，`history_gaps` 同时列出近期各缺失交易日。工作流先发布可核验数据，再以实际覆盖率告警。有缺档时，可手动重跑完整同步。当日已齐全时会跳过重复采集。
+
 当前 GitHub Actions 已有错峰定时 + 补跑，仅属**尽力而为**，GitHub `schedule` 不能保证准时。推荐增加独立定时器，使用仓库自带 `tools/github_schedule_trigger.py` 通过 GitHub 官方 `workflow_dispatch` API 触发任务。
 
 ## 在 PythonAnywhere 设置（需要可用的 Scheduled Tasks 与 GitHub API 出站联网权限）

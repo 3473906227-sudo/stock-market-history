@@ -4,137 +4,107 @@ on:
   workflow_dispatch:
     inputs:
       quotes_only:
-        description: 'Only update current board quotes (true/false)'
+        description: 'Only update closing quote snapshots'
         type: boolean
-        required: false
         default: false
       force:
-        description: 'Force a manual repair even if today was already attempted'
+        description: 'Recheck an already complete trading day'
         type: boolean
-        required: false
         default: false
-  push:
-    paths:
-      # 仅这一个修复令牌文件触发一次性行情恢复；平常push、改代码不会触发行情。
-      - tools/run_sector_repair_20261124.flag
-      - tools/run_sector_batch_20261124_once.flag
-      - tools/run_sector_backfill_20261124_once.flag
-      - tools/run_sector_paged_20261124_once.flag
-      - tools/run_sector_paged_retry_20261124_once.flag
   schedule:
-    # UTC 09:05 = 北京时间17:05；仅收盘后每天一次，避免重复采集触发上游限流。
+    # 北京时间17:05。交易所休市日由前置检查过滤。
     - cron: '5 9 * * 1-5'
-  # 主分支代码push不触发行情采集；仅按交易日定时或显式手动请求执行。
   pull_request:
     paths:
       - sector_sync.py
-      - tools/sector_daily_gate.py
-      - tools/test_sector_sync_safety.py
-      - tools/sector_batch_snapshot.py
-      - tools/test_sector_batch_snapshot.py
-      - tools/fetch_sector_page.py
-      - tools/apply_sector_pages.py
-      - tools/test_apply_sector_pages.py
+      - tools/*sector*.py
+      - tools/github_schedule_trigger.py
       - .github/workflows/stock-sector-sync.yml
-      - tools/probe_sector_sources.py
-      - tools/recover_sectors_20261120.py
-      - tools/test_recovery_20261120.py
 
 permissions:
-  contents: write
+  contents: read
+
 concurrency:
   group: a-share-industry-boards-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  syntax-check:
+  tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Validate Python syntax before any market requests
-        run: python -m py_compile sector_sync.py tools/github_schedule_trigger.py tools/sector_daily_gate.py tools/sector_daily_backup.py tools/sector_batch_snapshot.py tools/fetch_sector_page.py tools/apply_sector_pages.py
-      - name: Run offline rate-limit and freshness regression tests
-        run: python -m unittest discover -s tools -p 'test_sector_sync_safety.py' -v
-      - name: Verify backup snapshot never fabricates dates or returns
-        run: python -m unittest discover -s tools -p 'test_sector_daily_backup.py' -v
-      - name: Probe whether backup site has latest closed BK index
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: |
-          python - <<'PY'
-          from datetime import datetime
-          from zoneinfo import ZoneInfo
-          from tools.sector_daily_backup import download,parse_snapshot
-          code='BK1329'
-          day=datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat()
-          try:
-              quote=parse_snapshot(download(code),code,day)
-              print('BACKUP_LIVE_VERIFIED',code,quote)
-          except Exception as e:
-              print('BACKUP_NOT_READY',code,day,type(e).__name__,str(e)[:200])
-          PY
-      - name: Verify official BK batch quotes and timestamp without network
-        run: python -m unittest discover -s tools -p 'test_sector_batch_snapshot.py' -v
-      - name: Test five-page aggregation and true per-sector dates without network
-        run: python -m unittest discover -s tools -p 'test_apply_sector_pages.py' -v
-      - name: Verify daily gate module starts from repository root
-        env:
-          SECTOR_STATUS_FILE: /tmp/sector_gate_smoke_test.json
-        run: python -m tools.sector_daily_gate
-      - name: Test November 20 validated recovery without network
-        run: python -m unittest discover -s tools -p 'test_recovery_20261120.py' -v
-      - name: Probe independent 2026-11-20 sector close source
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: python tools/probe_sector_sources.py
+        with:
+          sparse-checkout: tools
+      - name: Test industry source validation and publishing
+        run: python -m unittest discover -s tools -p 'test_*sector*.py' -v
+
   daily_gate:
-    needs: syntax-check
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+    needs: tests
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
       run_needed: ${{ steps.gate.outputs.run_needed }}
       expected_trade_day: ${{ steps.gate.outputs.expected_trade_day }}
+      shards: ${{ steps.gate.outputs.shards }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check official A-share calendar
+        with:
+          ref: main
+          sparse-checkout: |
+            tools
+            data/sectors
+      - name: Check A-share exchange calendar
         id: calendar
         if: github.event_name == 'schedule'
         run: python tools/github_schedule_trigger.py --check-trading-day
-      - name: Check daily one-run gate
+      - name: Check verified coverage for the latest closed session
         id: gate
         if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
         env:
-          SECTOR_FORCE_UPDATE: ${{ github.event_name == 'push' && 'true' || inputs.force || 'false' }}
+          SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
+          SECTOR_QUOTES_ONLY: ${{ inputs.quotes_only || 'false' }}
         run: |
-          git fetch origin main
-          git show origin/main:data/sectors/status.json > /tmp/sector_remote_status.json || true
-          SECTOR_STATUS_FILE=/tmp/sector_remote_status.json python -m tools.sector_daily_gate
-      - name: Do not mark incomplete skipped sync as green success
-        if: steps.gate.outputs.run_needed == 'false'
-        run: |
-          python - <<'PY'
-          import json,sys
-          try:
-              s=json.load(open('/tmp/sector_remote_status.json',encoding='utf8'))
-              total=int(s.get('board_count') or 0)
-              fresh=int(s.get('quote_fresh_count') or 0)
-              ok=bool(s.get('ok')) and total>=100 and fresh==total
-          except (OSError,ValueError,TypeError):
-              ok=False;total=0;fresh=0
-          print(f'行业板块完成数量: {fresh}/{total}（已跳过重复请求）')
-          if not ok:
-              print('::error::行业行情尚未齐全，不能将跳过任务误标为更新成功')
-              sys.exit(2)
-          PY
+          python -m tools.sector_daily_gate
+          echo "shards=$(python -c 'import json; print(json.dumps(list(range(30))))')" >> "$GITHUB_OUTPUT"
+
+  fetch_history:
+    needs: daily_gate
+    if: needs.daily_gate.outputs.run_needed == 'true' && !inputs.quotes_only
+    name: Industry daily bars shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: ${{ fromJSON(needs.daily_gate.outputs.shards || '[]') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            tools
+            data/sectors
+      - name: Fetch validated observations from Eastmoney
+        env:
+          TARGET: ${{ needs.daily_gate.outputs.expected_trade_day }}
+          SHARD: ${{ matrix.shard }}
+        run: python -m tools.sector_ohlcv fetch --target "$TARGET" --shard "$SHARD" --shards 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stock-sector-history-${{ matrix.shard }}
+          path: sector_history/history-${{ matrix.shard }}.json
+          if-no-files-found: error
+          retention-days: 3
 
   fetch_pages:
-    name: Official BK page ${{ matrix.page }} attempt ${{ matrix.attempt }}
+    name: Official BK quote page ${{ matrix.page }} attempt ${{ matrix.attempt }}
     needs: daily_gate
     if: needs.daily_gate.outputs.run_needed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -142,15 +112,16 @@ jobs:
         attempt: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools
       - name: Stagger requests across independent hosted runners
         env:
           PAGE: ${{ matrix.page }}
           ATTEMPT: ${{ matrix.attempt }}
         run: sleep "$(( (ATTEMPT - 1) * 12 + PAGE ))"
-      - name: Fetch one verified official page on this runner
+      - name: Fetch an official closing quote page
         run: python tools/fetch_sector_page.py --page ${{ matrix.page }} --attempt ${{ matrix.attempt }} --output-dir sector_pages
-      - name: Upload independent single-attempt source
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: stock-sector-page-${{ matrix.page }}-attempt-${{ matrix.attempt }}
           path: sector_pages/page_${{ matrix.page }}_attempt_${{ matrix.attempt }}.json
@@ -158,61 +129,57 @@ jobs:
           retention-days: 3
 
   aggregate-and-publish:
-    needs: [daily_gate, fetch_pages]
-    if: always() && needs.daily_gate.outputs.run_needed == 'true'
+    needs: [daily_gate, fetch_history, fetch_pages]
+    if: always() && !cancelled() && needs.daily_gate.outputs.run_needed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      TARGET: ${{ needs.daily_gate.outputs.expected_trade_day }}
+      QUOTES_ONLY: ${{ inputs.quotes_only || 'false' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Read five independent official BK pages
-        uses: actions/download-artifact@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            tools
+            data/sectors
+      - uses: actions/download-artifact@v4
+        if: ${{ !inputs.quotes_only }}
+        continue-on-error: true
+        with:
+          pattern: stock-sector-history-*
+          path: sector_history
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           pattern: stock-sector-page-*
           path: sector_pages
           merge-multiple: true
-      - name: Validate every BK index and update only fresh close data
-        run: |
-          python -m tools.apply_sector_pages --page-dir sector_pages \
-            --expected-day '${{ needs.daily_gate.outputs.expected_trade_day }}'
-      - name: Publish verified sector data safely
+      - name: Merge verified records into the current main and publish
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          stage="$(mktemp -d)"
-          test -s data/sectors/quotes.json
-          test -s data/sectors/status.json
-          cp -a data/sectors/. "$stage/"
+          mode=()
+          if [ "$QUOTES_ONLY" = true ]; then mode=(--quotes-only); fi
           for attempt in 1 2 3 4; do
             git fetch origin main
             git reset --hard origin/main
-            mkdir -p data/sectors
-            cp -a "$stage/." data/sectors/
-            git add -A data/sectors/
-            if git diff --cached --quiet; then
-              echo "本次没有新的已核验行业收盘，未写入伪行情"
-              break
-            fi
-            git commit -m "data: publish individually verified industry closing index pages"
-            if git push origin HEAD:main; then
-              echo "已将可信行业行情同步回main"
-              break
-            fi
-            if [ "$attempt" = 4 ]; then
-              echo "::error::GitHub数据发布失败";exit 1
-            fi
+            python -m tools.sector_ohlcv publish --target "$TARGET" --page-dir sector_pages "${mode[@]}"
+            git add -A data/sectors
+            if git diff --cached --quiet; then break; fi
+            git commit -m "data: publish verified industry daily bars and closing quotes"
+            if git push origin HEAD:main; then break; fi
+            if [ "$attempt" = 4 ]; then echo '::error::行业数据发布失败'; exit 1; fi
             sleep "$((attempt * 2))"
           done
-      - name: Validate actual per-industry trading day coverage
+      - name: Report and alert on missing industry trading days
+        shell: bash
         run: |
-          python - <<'PY'
-          import json,sys
-          s=json.load(open('data/sectors/status.json',encoding='utf8'))
-          fresh=s.get('quote_fresh_count',0);total=s.get('board_count',0)
-          print(f'最新交易日实测覆盖：{fresh}/{total}；历史OHLCV：{s.get("history_fresh_count",0)}/{total}')
-          if not s.get('ok') or fresh!=total:
-              print('::error::行业行情有未更新项，已安全发布已核验结果，不报绿色成功')
-              print('尚缺前20个：',s.get('quote_missing_names',[])[:20])
-              sys.exit(2)
-          PY
+          mode=()
+          if [ "$QUOTES_ONLY" = true ]; then mode=(--quotes-only); fi
+          python -m tools.sector_ohlcv check --target "$TARGET" "${mode[@]}" | tee -a "$GITHUB_STEP_SUMMARY"

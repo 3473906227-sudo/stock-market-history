@@ -567,7 +567,6 @@ def main():
     except Exception as exc:
         batch['failed'] = [{'error':'官方批量收盘请求失败：'+type(exc).__name__+': '+str(exc)[:180]}]
         print('批量BK收盘数据失败：',str(exc)[:180],flush=True)
-    batch_fresh = sum(str(b.get('history_asof') or '') >= expected for b in boards)
     if batch['recovered']:
         save_json(OUT / 'quotes.json', {
             'ok':True, 'source':'东方财富官方BK批量收盘报价（不包含完整OHLCV）',
@@ -575,28 +574,8 @@ def main():
             'expected_trade_date':expected, 'verified_batch_count':batch['recovered'],
             'boards':boards,
         })
-    if batch_fresh == len(names) and batch['recovered']:
-        full_history_fresh = sum(_history_asof(name) >= expected for name in names)
-        _write_status({
-            **base_status, 'ok':True, 'mode':'full',
-            'reason':(f'{batch_fresh}/{len(names)}个板块已由东方财富官方批量报价'
-                      f'核验到{expected}收盘；完整OHLCV已覆盖{full_history_fresh}个'),
-            'board_count':len(names), 'quote_fresh_count':batch_fresh,
-            'quote_stale_count':0, 'history_fresh_count':full_history_fresh,
-            'history_pending_count':len(names)-full_history_fresh,
-            'ohlcv_complete':full_history_fresh==len(names),
-            'official_batch_recovered':batch['recovered'],
-            'official_batch_requests':batch['attempted'], 'official_batch_failures':batch['failed'],
-            'quotes_updated':True, 'request_count':batch['attempted'],
-        })
-        print('行业行情一次批量同步完成，'+str(batch_fresh)+'个已核验到最新收盘日；'
-              '无需继续向上游逐板块请求',flush=True)
-        return 0
-
     old_dates = {name: _history_asof(name) for name in names}
-    board_by_name={b['name']:b for b in boards}
-    pending = [name for name in names if old_dates[name] < expected and
-               str(board_by_name[name].get('history_asof') or '') < expected]
+    pending = [name for name in names if old_dates[name] < expected]
     # 核心行业优先；未命中的板块按上一次尝试时间轮转，避免每轮只请求同一批失败对象。
     pending.sort(key=lambda name: (
         0 if name in target_sectors else 1,
