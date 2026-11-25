@@ -246,6 +246,85 @@ def apply_previous_close(board, quote, expected, history_dir, close_dir, refs):
     _save_close_prices(board,close_dir,prices)
     return True
 
+def _all_official_bk_list(codes, *, max_pages=9):
+    """按BK代码过滤东方财富官方分页行业/概念列表，避免单批包含不兼容代码触发502。"""
+    requested=set(codes)
+    found={}
+    page_requests=0
+    failures=[]
+    hosts=(
+        "https://push2.eastmoney.com/api/qt/clist/get",
+        "https://push2delay.eastmoney.com/api/qt/clist/get",
+    )
+    for market_filter in ("m:90+t:2+f:!50","m:90+t:3+f:!50"):
+        if len(found)>=len(requested):
+            break
+        errors_streak=0
+        for page in range(1,max_pages+1):
+            if len(found)>=len(requested) or errors_streak>=3:
+                break
+            params={
+                "pn":str(page),"pz":"100","po":"1","np":"1",
+                "ut":"bd1d9ddb04089700cf9c27f6f7426281",
+                "fltt":"2","invt":"2","fid":"f12","fs":market_filter,
+                "fields":FIELDS,
+            }
+            body=None
+            for host in hosts:
+                page_requests+=1
+                try:
+                    req=Request(host+"?"+urlencode(params),headers={
+                        "User-Agent":"Mozilla/5.0 (compatible; VerifiedBKList/1.0)",
+                        "Referer":"https://quote.eastmoney.com/",
+                        "Accept":"application/json",
+                    })
+                    with urlopen(req,timeout=10) as response:
+                        if response.status!=200:
+                            raise IOError("官方BK列表HTTP "+str(response.status))
+                        content=response.read(750001)
+                    if len(content)>750000 or not content:
+                        raise IOError("官方BK列表为空或响应过大")
+                    candidate=json.loads(content.decode("utf-8-sig"))
+                    if not isinstance(candidate,dict) or candidate.get("rc") not in (0,"0"):
+                        raise ValueError("官方BK列表返回错误状态")
+                    data=candidate.get("data")
+                    if not isinstance(data,dict):
+                        raise ValueError("官方BK列表缺少有效data")
+                    rows=data.get("diff") or []
+                    if isinstance(rows,dict):
+                        rows=list(rows.values())
+                    if not isinstance(rows,list):
+                        raise ValueError("官方BK列表缺少报价数组")
+                    body=(rows,data.get("total"))
+                    break
+                except (OSError,TimeoutError,ValueError,TypeError) as exc:
+                    failures.append({"market":market_filter,"page":page,
+                                     "error":type(exc).__name__+": "+str(exc)[:100]})
+            if body is None:
+                errors_streak+=1
+                print("OFFICIAL_LIST_PAGE_FAILED",market_filter,page,flush=True)
+                continue
+            errors_streak=0
+            rows,total=body
+            for row in rows:
+                if not isinstance(row,dict):
+                    continue
+                code=str(row.get("f12") or "")
+                if code in requested:
+                    found[code]=row
+            print("OFFICIAL_LIST_PAGE",market_filter,page,"rows",len(rows),
+                  "covered",len(found),"/",len(requested),flush=True)
+            if not rows or len(rows)<100:
+                break
+            try:
+                if total is not None and page*100>=int(total):
+                    break
+            except (ValueError,TypeError):
+                pass
+            time.sleep(.5)
+    return found,page_requests,failures[:40]
+
+
 def update(boards, *, expected_day, history_dir, close_dir, chunk_size=3):
     """小批次递进采集，容忍单批请求失败；已有板块永远不重复抓取。
 
