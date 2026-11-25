@@ -24,7 +24,7 @@ CN=ZoneInfo("Asia/Shanghai")
 ENDPOINT="https://push2.eastmoney.com/api/qt/ulist.np/get"
 DELAY_ENDPOINT="https://push2delay.eastmoney.com/api/qt/ulist.np/get"
 SOURCE="东方财富官方BK行业批量收盘报价"
-FIELDS="f2,f3,f12,f13,f14,f124"
+FIELDS="f2,f3,f18,f12,f13,f14,f124"
 
 def _api_rows(codes):
     if not (1 <= len(codes) <= 60) or not all(re.fullmatch(r"BK\d{4,6}", c) for c in codes):
@@ -160,7 +160,7 @@ def apply_batch_close(board, row, expected, history_dir, close_dir, refs):
     _save_close_prices(board,close_dir,prices)
     return True
 
-def update(boards, *, expected_day, history_dir, close_dir, chunk_size=10):
+def update(boards, *, expected_day, history_dir, close_dir, chunk_size=6):
     """小批次递进采集，容忍单批请求失败；已有板块永远不重复抓取。
 
     上游批量接口对60只BK一次请求可能返回502/握手超时。默认10只一批；
@@ -183,7 +183,7 @@ def update(boards, *, expected_day, history_dir, close_dir, chunk_size=10):
     errors=[]
     failed_batches=0
     stale_batches=0
-    chunk_size=max(1,min(int(chunk_size),20))
+    chunk_size=max(1,min(int(chunk_size),12))
     request_limit=max(12,min(45, (len(codes)+chunk_size-1)//chunk_size*3))
     def consume(part):
         nonlocal recovered,valid,attempts,failed_batches,stale_batches
