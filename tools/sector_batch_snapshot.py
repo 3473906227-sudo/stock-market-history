@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 import csv
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from pathlib import Path
 import hashlib
 import json
@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 from tools.sector_daily_backup import historical_prices, reference_days
+from tools.github_schedule_trigger import a_share_trading_status
 
 CN=ZoneInfo("Asia/Shanghai")
 ENDPOINT="https://push2.eastmoney.com/api/qt/ulist.np/get"
@@ -67,6 +68,13 @@ def _api_rows(codes):
                           type(exc).__name__+" "+str(exc)[:120])
     raise IOError("两条东方财富官方批量接口均不可用；"+ "; ".join(errors))
 
+def _verified_optional_yesterday(row):
+    try:
+        value=float(row.get("f18"))
+        return round(value,3) if math.isfinite(value) and 0<value<1000000 else None
+    except (TypeError,ValueError):
+        return None
+
 def validate_row(row, codes, expected):
     if not isinstance(row,dict):
         raise ValueError("行情项类型异常")
@@ -89,7 +97,44 @@ def validate_row(row, codes, expected):
     return {
         "code":code, "close":round(close,3), "pct":round(pct,3),
         "source_label":str(row.get("f14") or "")[:80],
+        "previous_close":_verified_optional_yesterday(row),
         "timestamp":trade_time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+def _adjacent_trade_day(value, direction):
+    day=date.fromisoformat(value)
+    for _ in range(25):
+        day+=timedelta(days=direction)
+        state,_=a_share_trading_status(day)
+        if state=="unknown":
+            raise ValueError("缺失交易日历，不可推算昨收日期")
+        if state=="open":
+            return day.isoformat()
+    raise ValueError("无法确认相邻交易日")
+
+def validate_previous_close(row, codes, expected):
+    """在次交易日读官方f18上一收盘，精确回补expected日close，不冒充当日涨幅。"""
+    if not isinstance(row,dict):
+        raise ValueError("昨日收盘数据不是对象")
+    code=str(row.get("f12") or "").strip()
+    if code not in codes or not re.fullmatch(r"BK\d{4,6}",code):
+        raise ValueError("昨日收盘的官方BK代码不匹配")
+    if str(row.get("f13"))!="90":
+        raise ValueError("非东方财富官方BK市场")
+    try:
+        value=float(row.get("f18"))
+        timestamp=int(row.get("f124"))
+    except (TypeError,ValueError,OverflowError):
+        raise ValueError("昨收指数或行情时间戳缺失") from None
+    observed=datetime.fromtimestamp(timestamp,CN)
+    if observed.date().isoformat()!=_adjacent_trade_day(expected,1):
+        raise ValueError("行情不是目标收盘后的紧邻下一交易日")
+    if not(math.isfinite(value) and 0<value<1000000):
+        raise ValueError("昨收指数价格异常")
+    return {
+        "code":code,"close":round(value,3),"day":expected,
+        "source_label":str(row.get("f14") or "")[:80],
+        "source_time":observed.strftime("%Y-%m-%d %H:%M:%S"),
     }
 
 def _history_file(board, directory):
@@ -145,6 +190,11 @@ def apply_batch_close(board, row, expected, history_dir, close_dir, refs):
     # 当前日旧官方日K若存在可校验一致性；不允许以相差显著的截面价格覆盖。
     if prior is not None and abs(prior-row["close"])/max(prior,1) > .002:
         raise ValueError("已存完整行情与批量收盘差异过大，保留原数据")
+    # 同一次官方批量报价的f18即前交易日真实收盘价，顺带填补漏采日。
+    if row.get("previous_close") and row.get("previous_close")>0:
+        prev_day=_adjacent_trade_day(expected,-1)
+        if prev_day not in prices:
+            prices[prev_day]=row["previous_close"]
     board.update({
         "last":row["close"], "change_pct":row["pct"],
         "history_asof":expected, "history_close":row["close"], "quote_asof":expected,
@@ -157,6 +207,38 @@ def apply_batch_close(board, row, expected, history_dir, close_dir, refs):
         "ma20":None, "ma60":None, "trend":None, "volume_ratio":None,
     })
     prices[expected]=row["close"]
+    _save_close_prices(board,close_dir,prices)
+    return True
+
+def apply_previous_close(board, quote, expected, history_dir, close_dir, refs):
+    """仅作为被验证的前一日收盘价；没有昨日前一日参考价时当日涨跌置空。"""
+    if str(board.get("history_asof") or "")>=expected:
+        return False
+    prices=_close_prices(board,history_dir,close_dir)
+    close=quote["close"]
+    if prices.get(expected) and abs(prices[expected]-close)/close>.002:
+        raise ValueError("已存官方昨收价与新请求不一致")
+    yesterday=_adjacent_trade_day(expected,-1)
+    prev=prices.get(yesterday,0)
+    def ret(days):
+        base=prices.get(refs.get(days,""),0)
+        return round((close/base-1)*100,3) if base>0 else None
+    # 记录原始昨天价格，正日行情不可伪造OHLCV或独立涨跌。
+    board.update({
+        "last":close,"history_asof":expected,"history_close":close,
+        "quote_asof":expected,
+        "change_pct":round((close/prev-1)*100,3) if prev>0 else None,
+        "ret5":ret(5),"ret20":ret(20),
+        "quote_basis":"official_bk_previous_close",
+        "quote_source":SOURCE + "f18昨收（次交易日核验）",
+        "quote_source_url":ENDPOINT,
+        "quote_source_label":quote["source_label"],
+        "source_time":quote["source_time"],
+        "ohlcv_complete_to_target":False,
+        "history_ohlcv_asof":max(historical_prices(board["name"],history_dir).keys(),default=""),
+        "ma20":None,"ma60":None,"trend":None,"volume_ratio":None,
+    })
+    prices[expected]=close
     _save_close_prices(board,close_dir,prices)
     return True
 
