@@ -190,11 +190,27 @@ def fetch_board(board, required):
     return {'responses': results, 'errors': errors, 'missing_dates': sorted(needed)}
 
 
+def sorted_boards():
+    data = apply_sector_pages.load_json(OUT / 'quotes.json')
+    return sorted(boards_from(data), key=lambda board: board['code'])
+
+
+def needed_shards(target, count):
+    required = set(dates_for(target))
+    pending = set()
+    for index, board in enumerate(sorted_boards()):
+        shard = index % count
+        if shard not in pending:
+            path = _history_file(board, OUT / 'history')
+            if not required.issubset(valid_history(read_history(path))):
+                pending.add(shard)
+    return sorted(pending)
+
+
 def fetch_shard(target, index, count, output):
     required = dates_for(target)
-    boards = sorted(boards_from(apply_sector_pages.load_json(OUT / 'quotes.json')), key=lambda b: b['code'])
     records = {}
-    for board in boards[index::count]:
+    for board in sorted_boards()[index::count]:
         result = fetch_board(board, required)
         records[board['code']] = result
         print(board['code'], board['name'], '缺失交易日', result['missing_dates'], result['errors'], flush=True)
@@ -377,6 +393,7 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
         print('本次目标早于已发布批次，保留更新的批次。', flush=True)
         return
     final_pages, prior_close, previous_day = {}, {}, None
+    paged_updated = False
     if page_dir is not None and any(page_dir.glob('*.json')):
         if not quotes_only:
             previous_day = _adjacent_trade_day(target, -1)
@@ -384,6 +401,7 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
             prior_close = {board['code']: prior_quote_close(board, previous_day)
                            for board in boards if board['code'] in final_pages}
         status = apply_sector_pages.run(page_dir, target=target)
+        paged_updated = status.get('quotes_updated', False)
         data = apply_sector_pages.load_json(OUT / 'quotes.json')
     boards = boards_from(data)
     records = read_artifacts(input_dir, target)
@@ -450,7 +468,7 @@ def publish(target, input_dir, *, page_dir=None, quotes_only=False):
                   expected_trading_day=target, mode='quotes' if quotes_only else 'full',
                   ok=quote_ok and (quotes_only or complete), reason=reason, board_count=total,
                   quote_fresh_count=fresh, quote_stale_count=len(quote_missing),
-                  quote_missing_names=quote_missing, quotes_updated=new_quotes or status.get('quotes_updated', False),
+                  quote_missing_names=quote_missing, quotes_updated=new_quotes or paged_updated,
                   ohlcv_complete=complete, history_fresh_count=len(history_fresh),
                   history_pending_count=total-len(history_fresh), history_gap_board_count=len(gaps),
                   history_required_from=required[0], history_fresh_boards=history_fresh, history_gaps=gaps,
@@ -479,7 +497,7 @@ def check(target, *, quotes_only=False):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('fetch', 'publish', 'check'))
+    parser.add_argument('command', choices=('plan', 'fetch', 'publish', 'check'))
     parser.add_argument('--target', required=True)
     parser.add_argument('--directory', type=Path, default=Path('sector_history'))
     parser.add_argument('--page-dir', type=Path)
@@ -487,7 +505,11 @@ def main():
     parser.add_argument('--shards', type=int, default=1)
     parser.add_argument('--quotes-only', action='store_true')
     args = parser.parse_args()
-    if args.command == 'fetch':
+    if args.command == 'plan':
+        if args.shards < 1:
+            parser.error('分片数量必须大于零')
+        print(json.dumps(needed_shards(args.target, args.shards)))
+    elif args.command == 'fetch':
         if not 0 <= args.shard < args.shards:
             parser.error('分片编号超出范围')
         fetch_shard(args.target, args.shard, args.shards, args.directory / f'history-{args.shard}.json')

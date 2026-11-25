@@ -88,6 +88,14 @@ class SectorHistoryTests(unittest.TestCase):
         self.assertIsNone(sync.verified_snapshot(BOARD, TARGET, 100, observations, errors))
         self.assertIn('不一致', errors[0])
 
+    def test_backfill_plan_skips_shards_with_no_missing_trading_days(self):
+        complete = dict(BOARD, code='BK0400', name='齐全板块')
+        required = sync.dates_for(TARGET)
+        path = sync._history_file(complete, self.out / 'history')
+        sync.write_history(path, dict.fromkeys(required, ANCHOR_VALUES))
+        with patch.object(sync, 'sorted_boards', return_value=[complete, BOARD]):
+            self.assertEqual(sync.needed_shards(TARGET, 2), [1])
+
     def test_publish_partial_ohlcv_and_alert_even_when_quotes_are_complete(self):
         boards = [dict(BOARD)] + [dict(BOARD, code=f'BK{3000+i}', name=f'行业{i}') for i in range(99)]
         sync.apply_sector_pages.atomic_json(self.out / 'quotes.json', {'boards': boards})

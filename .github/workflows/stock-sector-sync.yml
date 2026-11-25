@@ -47,7 +47,8 @@ jobs:
     outputs:
       run_needed: ${{ steps.gate.outputs.run_needed }}
       expected_trade_day: ${{ steps.gate.outputs.expected_trade_day }}
-      shards: ${{ steps.gate.outputs.shards }}
+      fetch_quotes: ${{ steps.gate.outputs.fetch_quotes }}
+      shards: ${{ steps.plan.outputs.shards }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,13 +66,19 @@ jobs:
         env:
           SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
           SECTOR_QUOTES_ONLY: ${{ inputs.quotes_only || 'false' }}
+        run: python -m tools.sector_daily_gate
+      - name: Plan only the shards with missing trading days
+        id: plan
+        if: steps.gate.outputs.run_needed == 'true' && !inputs.quotes_only
+        env:
+          TARGET: ${{ steps.gate.outputs.expected_trade_day }}
         run: |
-          python -m tools.sector_daily_gate
-          echo "shards=$(python -c 'import json; print(json.dumps(list(range(30))))')" >> "$GITHUB_OUTPUT"
+          shards=$(python -m tools.sector_ohlcv plan --target "$TARGET" --shards 30)
+          echo "shards=$shards" >> "$GITHUB_OUTPUT"
 
   fetch_history:
     needs: daily_gate
-    if: needs.daily_gate.outputs.run_needed == 'true' && !inputs.quotes_only
+    if: needs.daily_gate.outputs.run_needed == 'true' && needs.daily_gate.outputs.shards != '' && needs.daily_gate.outputs.shards != '[]'
     name: Industry daily bars shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -102,7 +109,7 @@ jobs:
   fetch_pages:
     name: Official BK quote page ${{ matrix.page }} attempt ${{ matrix.attempt }}
     needs: daily_gate
-    if: needs.daily_gate.outputs.run_needed == 'true'
+    if: needs.daily_gate.outputs.fetch_quotes == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
@@ -146,13 +153,14 @@ jobs:
             tools
             data/sectors
       - uses: actions/download-artifact@v4
-        if: ${{ !inputs.quotes_only }}
+        if: needs.daily_gate.outputs.shards != '' && needs.daily_gate.outputs.shards != '[]'
         continue-on-error: true
         with:
           pattern: stock-sector-history-*
           path: sector_history
           merge-multiple: true
       - uses: actions/download-artifact@v4
+        if: needs.daily_gate.outputs.fetch_quotes == 'true'
         continue-on-error: true
         with:
           pattern: stock-sector-page-*
