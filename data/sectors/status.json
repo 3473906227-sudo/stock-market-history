@@ -1,10 +1,10 @@
 {
-  "run_at": "2026-11-25 23:22:41",
-  "github_run_id": "45644078505",
+  "run_at": "2026-11-25 23:25:34",
+  "github_run_id": "45644631860",
   "expected_trading_day": "2026-11-25",
   "mode": "full",
   "ok": false,
-  "reason": "2026-11-25 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 18，新增完整日K 37 条",
+  "reason": "2026-11-25 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 17，新增完整日K 5 条",
   "board_count": 117,
   "quote_fresh_count": 117,
   "quote_stale_count": 0,
@@ -17,16 +17,17 @@
   "official_paged_valid_rows": 0,
   "official_paged_pages": [
     1,
-    2,
     3,
     4,
     5
   ],
   "official_paged_total": 496,
-  "official_paged_errors": [],
+  "official_paged_errors": [
+    "第2页三次独立请求全部失败：['HTTPError: HTTP Error 502: Bad Gateway', 'HTTPError: HTTP Error 502: Bad Gateway']; ['HTTPError: HTTP Error 502: Bad Gateway', 'HTTPError: HTTP Error 502: Bad Gateway']; ['HTTPError: HTTP Error 502: Bad Gateway', 'HTTP"
+  ],
   "previous_day_f18_verified": false,
   "selected_group_count": 17,
-  "history_gap_board_count": 18,
+  "history_gap_board_count": 17,
   "history_required_from": "2026-11-18",
   "history_fresh_boards": [
     {
@@ -632,18 +633,6 @@
       ]
     },
     {
-      "code": "BK1383",
-      "name": "航海装备Ⅲ",
-      "latest": "2026-11-25",
-      "dates": [
-        "2026-11-18",
-        "2026-11-19",
-        "2026-11-20",
-        "2026-11-23",
-        "2026-11-24"
-      ]
-    },
-    {
       "code": "BK1237",
       "name": "自动化设备",
       "latest": "2026-11-25",
@@ -716,7 +705,7 @@
       ]
     }
   ],
-  "history_added_rows": 37,
+  "history_added_rows": 5,
   "history_added_snapshot_rows": 0,
   "history_source_errors": {
     "BK1329": [
@@ -751,15 +740,6 @@
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
     ],
-    "BK0438": [
-      "2026-11-17 官方历史与已存完整日K不一致，保留原记录"
-    ],
-    "BK0440": [
-      "2026-11-17 官方历史与已存完整日K不一致，保留原记录"
-    ],
-    "BK1027": [
-      "2026-11-17 官方历史与已存完整日K不一致，保留原记录"
-    ],
     "BK0727": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
@@ -771,13 +751,6 @@
     "BK1209": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
       "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK1383": [
-      "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
-      "https://33.push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response"
-    ],
-    "BK0459": [
-      "2026-11-20 官方历史与已存完整日K不一致，保留原记录"
     ],
     "BK1237": [
       "https://push2his.eastmoney.com/api/qt/stock/kline/get: RemoteDisconnected: Remote end closed connection without response",
