@@ -12,7 +12,7 @@ for b in json.loads(Path("data/sectors/quotes.json").read_text(encoding="utf8"))
     if code.startswith("BK") and b.get("history_asof")<"2026-11-24": codes.append(code)
 print("CANDIDATES",len(codes), "time",datetime.now(ZoneInfo("Asia/Shanghai")).isoformat(),flush=True)
 urlhosts=("https://push2.eastmoney.com/api/qt/ulist.np/get","https://push2delay.eastmoney.com/api/qt/ulist.np/get")
-for n in (3,10,20,50):
+for n in (3,6,10,20,50):
     sample=codes[:n]
     params={"secids":",".join("90."+c for c in sample),"fields":"f2,f3,f12,f13,f14,f124",
       "fltt":"2","invt":"2","ut":"bd1d9ddb04089700cf9c27f6f7426281"}
@@ -23,7 +23,7 @@ for n in (3,10,20,50):
             with urlopen(req,timeout=7) as res:
                 payload=res.read(300001)
                 status=res.status
-            doc=json.loads(payload.decode("utf8-sig"))
+            doc=json.loads(payload.decode("utf-8-sig"))
             rows=(doc.get("data") or {}).get("diff") or []
             if isinstance(rows,dict): rows=list(rows.values())
             valid=[x for x in rows if isinstance(x,dict) and x.get("f12") in sample and x.get("f2") not in (None,"-") and x.get("f124")]
