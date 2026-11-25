@@ -30,6 +30,7 @@ on:
       - tools/test_sector_sync_safety.py
       - tools/sector_batch_snapshot.py
       - tools/test_sector_batch_snapshot.py
+      - tools/probe_clist_bk.py
       - .github/workflows/stock-sector-sync.yml
       - tools/probe_sector_sources.py
       - tools/recover_sectors_20261120.py
@@ -69,6 +70,10 @@ jobs:
           except Exception as e:
               print('BACKUP_NOT_READY',code,day,type(e).__name__,str(e)[:200])
           PY
+      - name: Probe full Eastmoney BK industry list as read-only fallback
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: python tools/probe_clist_bk.py
       - name: Verify official BK batch quotes and timestamp without network
         run: python -m unittest discover -s tools -p 'test_sector_batch_snapshot.py' -v
       - name: Verify daily gate module starts from repository root
