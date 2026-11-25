@@ -61,11 +61,21 @@ def read_pages(directory):
     received_pages=[]
     total_expected=None
     for page in range(1,6):
-        file=Path(directory)/f"page_{page}.json"
-        payload=load_json(file)
-        if not isinstance(payload,dict) or not payload.get("ok"):
-            errors.append(f"第{page}页未取到官方行情："+str(payload.get("errors",[]))[:140]
-                          if isinstance(payload,dict) else f"缺少第{page}页")
+        # 三台独立Runner分别尝试同一页；只采纳首个返回有效JSON的副本。
+        candidates=[Path(directory)/f"page_{page}_attempt_{attempt}.json"
+                    for attempt in (1,2,3)]
+        candidates.append(Path(directory)/f"page_{page}.json")
+        payload={}
+        diagnostics=[]
+        for file in candidates:
+            candidate=load_json(file)
+            if isinstance(candidate,dict) and candidate.get("ok") and candidate.get("rows"):
+                payload=candidate
+                break
+            if isinstance(candidate,dict) and candidate:
+                diagnostics.append(str(candidate.get("errors",[]))[:90])
+        if not payload:
+            errors.append(f"第{page}页三次独立请求全部失败："+("; ".join(diagnostics))[:220])
             continue
         rows=payload.get("rows")
         if not isinstance(rows,list) or not (1<=len(rows)<=100):
