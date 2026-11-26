@@ -1,0 +1,1 @@
+One-time sector market data repair on 2026-11-26 after A-share close: validate real 117 industry BK quotes and OHLCV via official endpoints; only this file triggers a push-run, daily schedule and index fallback remain active.
