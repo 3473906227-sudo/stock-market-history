@@ -1,6 +1,16 @@
 name: A-share industry boards sync
 
 on:
+  # 修复当天GitHub schedule漏触发的兜底：大盘任务成功后只检查行业缺数，未齐才补采。
+  # 一个交易日已完整更新时，闸门不再下载任何行情。
+  workflow_run:
+    workflows: ['Daily A-share market indices sync']
+    types: [completed]
+    branches: [main]
+  # 只由该一次性修复标记文件触发；平时提交代码不触发行情。
+  push:
+    paths:
+      - tools/run_sector_restore_20261126.flag
   workflow_dispatch:
     inputs:
       quotes_only:
@@ -41,7 +51,10 @@ jobs:
 
   daily_gate:
     needs: tests
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request' &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
@@ -58,11 +71,11 @@ jobs:
             data/sectors
       - name: Check A-share exchange calendar
         id: calendar
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_run'
         run: python tools/github_schedule_trigger.py --check-trading-day
       - name: Check verified coverage for the latest closed session
         id: gate
-        if: github.event_name != 'schedule' || steps.calendar.outputs.trading_day == 'true'
+        if: (github.event_name != 'schedule' && github.event_name != 'workflow_run') || steps.calendar.outputs.trading_day == 'true'
         env:
           SECTOR_FORCE_UPDATE: ${{ inputs.force || 'false' }}
           SECTOR_QUOTES_ONLY: ${{ inputs.quotes_only || 'false' }}
