@@ -1,10 +1,10 @@
 {
-  "run_at": "2026-11-26 23:00:48",
-  "github_run_id": "45844364675",
-  "expected_trading_day": "2026-11-26",
+  "run_at": "2026-11-27 20:27:47",
+  "github_run_id": "45998579027",
+  "expected_trading_day": "2026-11-27",
   "mode": "full",
   "ok": true,
-  "reason": "2026-11-26 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 0，新增完整日K 132 条",
+  "reason": "2026-11-27 报价 117/117，最新完整日K 117/117，仍缺交易日的板块 0，新增完整日K 117 条",
   "board_count": 117,
   "quote_fresh_count": 117,
   "quote_stale_count": 0,
@@ -499,7 +499,7 @@
     }
   ],
   "history_gaps": [],
-  "history_added_rows": 132,
-  "history_added_snapshot_rows": 47,
+  "history_added_rows": 117,
+  "history_added_snapshot_rows": 19,
   "history_source_errors": {}
 }
